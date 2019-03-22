@@ -10,9 +10,14 @@ import android.widget.Toast;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveFunctionListener;
 import com.bokecc.livemodule.live.function.lottery.LotteryHandler;
+import com.bokecc.livemodule.live.function.practice.PracticeHandler;
+import com.bokecc.livemodule.live.function.prize.PrizeHandler;
 import com.bokecc.livemodule.live.function.questionnaire.QuestionnaireHandler;
 import com.bokecc.livemodule.live.function.rollcall.RollCallHandler;
 import com.bokecc.livemodule.live.function.vote.VoteHandler;
+import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
 
@@ -30,6 +35,8 @@ public class FunctionHandler implements DWLiveFunctionListener {
     private VoteHandler voteHandler; // '投票' 功能处理机制
     private LotteryHandler lotteryHandler; // '抽奖' 功能处理机制
     private QuestionnaireHandler questionnaireHandler; // '问卷' 功能处理机制
+    private PracticeHandler practiceHandler;  // '随堂测' 功能处理机制
+    private PrizeHandler prizeHandler;  // '奖品' 功能处理机制
 
     public void initFunctionHandler(Context context) {
         this.context = context.getApplicationContext();
@@ -50,6 +57,12 @@ public class FunctionHandler implements DWLiveFunctionListener {
 
         questionnaireHandler = new QuestionnaireHandler();
         questionnaireHandler.initQuestionnaire(this.context);
+
+        practiceHandler = new PracticeHandler();
+        practiceHandler.initPractice(this.context);
+
+        prizeHandler = new PrizeHandler();
+        prizeHandler.initPrize(this.context);
     }
 
     /**
@@ -133,6 +146,32 @@ public class FunctionHandler implements DWLiveFunctionListener {
             @Override
             public void run() {
                 voteHandler.showVoteResult(rootView, jsonObject);
+            }
+        });
+    }
+
+    /**
+     * 收到奖品发送事件
+     *
+     * @param type       奖品类型: 1 奖杯 2 其他(后续扩展使用)
+     * @param viewerId   观看者的id
+     * @param viewerName 观看者的昵称
+     */
+    @Override
+    public void onPrizeSend(final int type, final String viewerId, final String viewerName) {
+        if (rootView == null) {
+            return;
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (type) {
+                    case 1: // 奖杯
+                        prizeHandler.showPrize(rootView, viewerName, viewerId);
+                        break;
+                    default:
+                        break;
+                }
             }
         });
     }
@@ -263,6 +302,100 @@ public class FunctionHandler implements DWLiveFunctionListener {
             @Override
             public void run() {
                 questionnaireHandler.showExeternalQuestionnaire(rootView, title, externalUrl);
+            }
+        });
+    }
+
+    /**
+     * 发布随堂测
+     *
+     * @param info 随堂测内容
+     */
+    @Override
+    public void onPracticePublish(final PracticeInfo info) {
+        if (rootView == null || info == null) {
+            return;
+        }
+
+        // 如果此随堂测已经回答过了，就不展示随堂测做题的界面
+        if (info.isAnswered()) {
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                practiceHandler.startPractice(rootView, info);
+            }
+        });
+    }
+
+    /**
+     * 收到随堂测提交结果
+     *
+     * @param info 随堂测结果
+     */
+    @Override
+    public void onPracticeSubmitResult(final PracticeSubmitResultInfo info) {
+        if (rootView == null) {
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toastOnUiThread("展示随堂测提交结果");
+                practiceHandler.showPracticeSubmitResult(rootView, info);
+            }
+        });
+    }
+
+    /**
+     * 收到随堂测统计信息
+     *
+     * @param info 随堂测排名信息
+     */
+    @Override
+    public void onPracticStatis(final PracticeStatisInfo info) {
+        if (rootView == null) {
+            return;
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                practiceHandler.showPracticeStatis(rootView, info);
+            }
+        });
+    }
+
+    /**
+     * 收到停止随堂测
+     *
+     * @param practiceId 随堂测ID
+     */
+    @Override
+    public void onPracticeStop(final String practiceId) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toastOnUiThread("随堂测停止");
+                practiceHandler.onPracticeStop(practiceId);
+            }
+        });
+    }
+
+    /**
+     * 收到关闭随堂测
+     *
+     * @param practiceId 随堂测ID
+     */
+    @Override
+    public void onPracticeClose(final String practiceId) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toastOnUiThread("随堂测关闭");
+                practiceHandler.onPracticeClose(practiceId);
             }
         });
     }

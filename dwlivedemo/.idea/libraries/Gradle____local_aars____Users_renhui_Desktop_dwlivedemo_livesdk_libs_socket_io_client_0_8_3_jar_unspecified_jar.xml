@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: __local_aars__:/Users/renhui/Desktop/dwlivedemo/livesdk/libs/socket.io-client-0.8.3.jar:unspecified@jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/livesdk/libs/socket.io-client-0.8.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

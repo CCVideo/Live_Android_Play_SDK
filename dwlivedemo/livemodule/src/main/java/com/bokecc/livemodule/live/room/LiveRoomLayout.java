@@ -426,6 +426,11 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         });
     }
 
+    // 隐藏视频文档切换功能
+    public void hideSwitchVideoDoc() {
+        mLiveVideoDocSwitch.setVisibility(GONE);
+    }
+
     public void clearChatInput() {
         mInput.setText("");
         hideKeyboard();

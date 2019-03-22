@@ -3,17 +3,20 @@ package com.bokecc.livemodule.live;
 import android.view.Surface;
 
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
-import com.bokecc.livemodule.login.LoginStatusListener;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.DWLiveListener;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
+import com.bokecc.sdk.mobile.live.logging.LogHelper;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.PrivateChatInfo;
 import com.bokecc.sdk.mobile.live.pojo.QualityInfo;
 import com.bokecc.sdk.mobile.live.pojo.Question;
@@ -27,6 +30,7 @@ import org.webrtc.EglBase;
 import org.webrtc.SurfaceViewRenderer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,24 +58,6 @@ public class DWLiveCoreHandler {
     }
 
     /******************************* 各类功能模块监听相关 ***************************************/
-
-    private LoginStatusListener loginStatusListener;
-
-    /**
-     * 设置登录状态监听
-     *
-     * @param listener 登录状态监听
-     */
-    public void setLoginStatusListener(LoginStatusListener listener) {
-        loginStatusListener = listener;
-    }
-
-    /**
-     * 获取登录状态监听
-     */
-    public LoginStatusListener getLoginStatusListener() {
-        return loginStatusListener;
-    }
 
     private DWLiveQAListener dwLiveQAListener;
 
@@ -264,6 +250,7 @@ public class DWLiveCoreHandler {
      * 开始播放
      */
     public void start(Surface surface) {
+        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Start");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             dwLive.start(surface);
@@ -274,6 +261,7 @@ public class DWLiveCoreHandler {
      * 停止播放
      */
     public void stop() {
+        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Stop");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             if (dwLivePlayer != null && dwLivePlayer.isPlaying()) {
@@ -287,6 +275,7 @@ public class DWLiveCoreHandler {
      * 释放资源
      */
     public void destroy() {
+        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Destroy");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             dwLive.onDestroy();
@@ -317,6 +306,41 @@ public class DWLiveCoreHandler {
         if (dwLive != null) {
             dwLive.sendRollCall();
         }
+    }
+
+    private Map<String, ArrayList<Integer>> practiceResultIndexs;  // 随堂测答题结果列表
+
+    /**
+     * 发送随堂测答题结果
+     *
+     * @param practiceId  随堂测ID
+     * @param answerOptions  随堂测回答的结果信息
+     */
+    public void sendPracticeAnswer(String practiceId, ArrayList<String> answerOptions) {
+        DWLive dwLive = DWLive.getInstance();
+        if (dwLive != null) {
+            dwLive.sendPracticeAnswer(practiceId, answerOptions);
+        }
+    }
+
+    // 缓存随堂测答题记录
+    public void cachePracticeResult(String practiceId, ArrayList<Integer> resultIndexs) {
+        if (practiceResultIndexs == null) {
+            practiceResultIndexs = new HashMap<>();
+        }
+        practiceResultIndexs.put(practiceId, resultIndexs);
+    }
+
+    /**
+     * 获取随堂测答题记录（根据随堂测ID）
+     *
+     * @param practiceId 随堂测ID
+     */
+    public ArrayList<Integer> getPracticeResult(String practiceId) {
+        if (practiceResultIndexs == null) {
+            return null;
+        }
+        return practiceResultIndexs.get(practiceId);
     }
 
     //--------------------------------- 模块间UI事件处理方法(中转事件) -----------------------------------/
@@ -626,6 +650,14 @@ public class DWLiveCoreHandler {
             if (dwLiveRoomListener != null && DWLive.getInstance().getRoomInfo() != null) {
                 dwLiveRoomListener.showRoomTitle(DWLive.getInstance().getRoomInfo().getName());
             }
+
+            /**
+             * TODO 可以尝试获取一下当前正在进行的随堂测，需要考虑用户重新登录及Home桌面的问题
+             * TODO（根据实际需求场景，自行实现）
+             */
+           // if(DWLive.getInstance() != null) {
+           //    DWLive.getInstance().getRealTimePractice();
+           // }
         }
 
         /**
@@ -815,6 +847,20 @@ public class DWLiveCoreHandler {
         }
 
         /**
+         * 收到奖品发送事件
+         *
+         * @param type       奖品类型: 1 奖杯 2 其他(后续扩展使用)
+         * @param viewerId   观看者的id
+         * @param viewerName 观看者的昵称
+         */
+        @Override
+        public void onPrizeSend(int type, String viewerId, String viewerName) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPrizeSend(type, viewerId, viewerName);
+            }
+        }
+
+        /**
          * 发布问卷
          *
          * @param info 问卷内容
@@ -860,6 +906,66 @@ public class DWLiveCoreHandler {
         public void onExeternalQuestionnairePublish(String title, String externalUrl) {
             if (dwLiveFunctionListener != null) {
                 dwLiveFunctionListener.onExeternalQuestionnairePublish(title, externalUrl);
+            }
+        }
+
+        /**
+         * 发布随堂测
+         *
+         * @param info 随堂测内容
+         */
+        @Override
+        public void onPracticePublish(PracticeInfo info) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticePublish(info);
+            }
+        }
+
+        /**
+         * 收到随堂测提交结果
+         *
+         * @param info 随堂测结果
+         */
+        @Override
+        public void onPracticeSubmitResult(PracticeSubmitResultInfo info) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticeSubmitResult(info);
+            }
+        }
+
+        /**
+         * 收到随堂测统计信息
+         *
+         * @param info 随堂测排名信息
+         */
+        @Override
+        public void onPracticStatis(PracticeStatisInfo info) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticStatis(info);
+            }
+        }
+
+        /**
+         * 收到停止随堂测
+         *
+         * @param practiceId 随堂测ID
+         */
+        @Override
+        public void onPracticeStop(String practiceId) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticeStop(practiceId);
+            }
+        }
+
+        /**
+         * 收到关闭随堂测
+         *
+         * @param practiceId 随堂测ID
+         */
+        @Override
+        public void onPracticeClose(String practiceId) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticeClose(practiceId);
             }
         }
     };

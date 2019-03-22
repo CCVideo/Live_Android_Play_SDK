@@ -322,6 +322,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
     TimerTask timerTask;
 
+    // 开始时间任务
     private void startTimerTask() {
         stopTimerTask();
         timerTask = new TimerTask() {
@@ -351,9 +352,11 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         timer.schedule(timerTask, 0, 1000);
     }
 
-    private void stopTimerTask() {
+    // 停止计时器（进度条、播放时间）
+    public void stopTimerTask() {
         if (timerTask != null) {
             timerTask.cancel();
+            timerTask = null;
         }
     }
 

@@ -108,11 +108,12 @@ public class MixedTextView extends LinearLayout {
         final String uriStr = uri.replaceAll(" ", "");
 
         LinearLayout imageLayout = new LinearLayout(mContext);
-        LinearLayout.LayoutParams param = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams param = new LayoutParams(LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         imageLayout.setLayoutParams(param);
 
         final ImageView image = new ImageView(mContext);
         image.setLayoutParams(param);
+        image.setScaleType(ImageView.ScaleType.FIT_XY);
         Glide.with(mContext).load(uriStr).crossFade().into(image);
         imageLayout.addView(image);
         this.addView(imageLayout);

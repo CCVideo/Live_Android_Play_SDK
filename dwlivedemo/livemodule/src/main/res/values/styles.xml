@@ -192,6 +192,34 @@
         <item name="android:button">@drawable/questionnaire_checkbox</item>
     </style>
 
+    <!-- 随堂测选项按钮 -->
+    <style name="practice_single_select_theme">
+        <item name="android:background">@drawable/practice_single_selete_bg</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">#FF643d</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="practice_single_select_layout_theme">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+    </style>
+
+    <style name="practiceButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">260dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/practice_button_bg</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
 
 </resources>
 

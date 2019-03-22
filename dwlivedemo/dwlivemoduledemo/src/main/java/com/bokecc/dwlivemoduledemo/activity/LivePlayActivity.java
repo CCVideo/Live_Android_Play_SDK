@@ -37,6 +37,7 @@ import com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout;
 import com.bokecc.livemodule.live.qa.LiveQAComponent;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.live.video.LiveVideoView;
+import com.bokecc.sdk.mobile.live.logging.LogHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +83,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
     @Override
     protected void onResume() {
+        LogHelper.getInstance().writeLog("LivePlayActivity onResume");
         super.onResume();
         mFunctionHandler.setRootView(mRoot);
         // 判断是否开启了弹幕
@@ -100,6 +102,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
     @Override
     protected void onPause() {
+        LogHelper.getInstance().writeLog("LivePlayActivity onPause");
         super.onPause();
         mFunctionHandler.removeRootView();
         mLiveVideoView.stop();
@@ -108,6 +111,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
     @Override
     protected void onDestroy() {
+        LogHelper.getInstance().writeLog("LivePlayActivity onDestroy");
         super.onDestroy();
         mLiveFloatingView.dismiss();
         mLiveVideoView.destroy();

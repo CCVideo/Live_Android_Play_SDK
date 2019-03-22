@@ -1,5 +1,8 @@
 package com.bokecc.livemodule.live;
 
+import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
 
@@ -41,6 +44,17 @@ public interface DWLiveFunctionListener {
      * @param jsonObject 投票结果数据
      */
     void onVoteResult(JSONObject jsonObject);
+
+    //**************************** 奖品 ************************************
+
+    /**
+     * 收到奖品发送事件
+     *
+     * @param type       奖品类型: 1 奖杯 2 其他(后续扩展使用)
+     * @param viewerId   观看者的id
+     * @param viewerName 观看者的昵称
+     */
+    void onPrizeSend(int type, String viewerId, String viewerName);
 
     //**************************** 抽奖 ************************************
 
@@ -96,6 +110,42 @@ public interface DWLiveFunctionListener {
      * @param externalUrl 第三方问卷链接
      */
     void onExeternalQuestionnairePublish(String title, String externalUrl);
+
+
+    /**
+     * 发布随堂测
+     *
+     * @param info 随堂测内容
+     */
+    void onPracticePublish(PracticeInfo info);
+
+    /**
+     * 收到随堂测提交结果
+     *
+     * @param info 随堂测结果
+     */
+    void onPracticeSubmitResult(PracticeSubmitResultInfo info);
+
+    /**
+     * 收到随堂测统计信息
+     *
+     * @param info 随堂测排名信息
+     */
+    void onPracticStatis(PracticeStatisInfo info);
+
+    /**
+     * 收到停止随堂测
+     *
+     * @param practiceId 随堂测ID
+     */
+    void onPracticeStop(String practiceId);
+
+    /**
+     * 收到关闭随堂测
+     *
+     * @param practiceId 随堂测ID
+     */
+    void onPracticeClose(String practiceId);
 
     //**************************** SDK 功能异常 ************************************
 

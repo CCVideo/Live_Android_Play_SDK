@@ -41,5 +41,12 @@ public class LiveDocComponent extends LinearLayout {
             liveCoreHandler.setDocView(mDocView);
         }
     }
+
+    // 设置文档区域是否可滑动
+    public void setDocScrollable(boolean scrollable) {
+        if (mDocView != null) {
+            mDocView.setScrollable(scrollable);
+        }
+    }
 }
 

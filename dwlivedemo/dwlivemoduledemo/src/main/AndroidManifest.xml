@@ -39,10 +39,13 @@
             android:name=".activity.PilotActivity"
             android:screenOrientation="portrait" />
 
-        <!-- 登录页 -->
-        <activity
-            android:name=".activity.LoginActivity"
+        <!-- 直播登录页 -->
+        <activity android:name=".activity.LiveLoginActivity"
             android:screenOrientation="portrait" />
+
+        <!-- 回放登录页 -->
+        <activity android:name=".activity.ReplayLoginActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 扫码页面 -->
         <activity android:name=".scan.qr_codescan.MipcaActivityCapture" />
@@ -55,6 +58,11 @@
 
         <!-- 直播观看播放页（默认文档为大屏，仅适配模版有'文档'的直播间） -->
         <activity android:name=".activity.extra.LivePlayDocActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:screenOrientation="portrait" />
+
+        <!-- 直播观看经典播放页（默认文档在下，视频在上） -->
+        <activity android:name=".activity.extra.LivePlayClassicActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait" />
 

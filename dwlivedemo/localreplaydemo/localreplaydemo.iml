@@ -117,7 +117,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.android.support:cardview-v7:28.0.0-rc01@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:swiperefreshlayout:28.0.0-rc01@aar" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:/Users/renhui/Desktop/dwlivedemo/localreplaydemo/libs/org.apache.http.legacy.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-v4:28.0.0-rc01@aar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:viewmodel:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:versionedparcelable:28.0.0-rc01@aar" level="project" />
@@ -165,7 +164,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:collections:28.0.0-rc01@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.tencent.bugly:crashreport:2.6.6.1@aar" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:/Users/renhui/Desktop/dwlivedemo/localreplaydemo/libs/dwlivesdk.jar:unspecified@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:loader:28.0.0-rc01@aar" level="project" />

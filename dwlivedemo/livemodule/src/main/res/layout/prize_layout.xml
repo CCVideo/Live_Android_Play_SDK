@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/id_popup_window_outside_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="#4c000000"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:id="@+id/cup_img"
+                    android:layout_width="250dp"
+                    android:layout_height="126dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/prize_cup" />
+
+                <TextView
+                    android:id="@+id/self_prize"
+                    android:layout_width="179dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/prize_cup_desc_bg"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@id/cup_img"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:text="太棒了，恭喜你获得奖杯"/>
+
+                <LinearLayout
+                    android:id="@+id/other_prize"
+                    android:layout_width="179dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/prize_cup_desc_bg"
+                    android:gravity="center"
+                    android:layout_below="@id/cup_img"
+                    android:layout_centerInParent="true"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:text="恭喜"/>
+
+                    <TextView
+                        android:id="@+id/prize_viewer_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="14sp"
+                        android:textColor="#F58833"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:text="获得奖杯"/>
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

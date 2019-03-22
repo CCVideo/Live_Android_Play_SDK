@@ -19,6 +19,7 @@ import com.bokecc.livemodule.live.DWLiveVideoListener;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+import com.bokecc.sdk.mobile.live.logging.LogHelper;
 
 import java.io.IOException;
 
@@ -130,10 +131,14 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         if (hasCallStartPlay) {
             return;
         }
+        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler start");
         hasCallStartPlay = true;
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.start(surface);
+            if (mVideoProgressBar != null) {
+                mVideoProgressBar.setVisibility(VISIBLE);
+            }
         }
     }
 
@@ -141,6 +146,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      * 停止播放
      */
     public void stop() {
+        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler Stop");
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.stop();
@@ -148,6 +154,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     }
 
     public void destroy() {
+        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler destroy");
         if (player != null) {
             player.pause();
             player.stop();
@@ -206,6 +213,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     hasCallStartPlay = false;  // 准备正常播放了，将字段回归为false;
                     player.start();
                     mVideoNoplayTip.setVisibility(GONE);
+                    mVideoProgressBar.setVisibility(GONE);
                 }
             });
         }

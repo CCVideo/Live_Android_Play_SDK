@@ -46,11 +46,36 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
     }
 
     /**
+     * 清空聊天数据
+     */
+    public void clearChatData() {
+        this.mChatEntities = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    /**
      * 添加数据，用于回放的添加
      */
     public void add(ArrayList<ChatEntity> mChatEntities) {
         this.mChatEntities = mChatEntities;
         notifyDataSetChanged();
+    }
+
+    /**
+     * 添加数据，用于回放的添加
+     */
+    public void append(ArrayList<ChatEntity> mChatEntities) {
+        this.mChatEntities.addAll(mChatEntities);
+        // 当消息达到300条的时候，移除最早的消息
+        while (this.mChatEntities.size() > 300) {
+            this.mChatEntities.remove(0);
+        }
+        notifyDataSetChanged();
+    }
+
+    // 获取当前的聊天数量
+    public int getChatListSize() {
+        return mChatEntities == null ? 0 : mChatEntities.size();
     }
 
     /**

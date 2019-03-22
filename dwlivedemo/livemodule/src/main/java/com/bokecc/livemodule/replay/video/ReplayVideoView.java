@@ -1,6 +1,10 @@
 package com.bokecc.livemodule.replay.video;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -28,7 +32,7 @@ public class ReplayVideoView extends RelativeLayout {
 
     View mRootView;
 
-    TextureView mViewContainer;
+    TextureView mTextureView;
 
     TextView mVideoNoplayTip;
 
@@ -61,7 +65,7 @@ public class ReplayVideoView extends RelativeLayout {
 
     private void inflateViews() {
         mRootView = LayoutInflater.from(mContext).inflate(R.layout.live_video_view, this);
-        mViewContainer = mRootView.findViewById(R.id.live_video_container);
+        mTextureView = mRootView.findViewById(R.id.live_video_container);
         mVideoNoplayTip = mRootView.findViewById(R.id.tv_video_no_play_tip);
         mVideoProgressBar = mRootView.findViewById(R.id.video_progressBar);
     }
@@ -70,7 +74,7 @@ public class ReplayVideoView extends RelativeLayout {
      * 初始化播放器
      */
     private void initPlayer() {
-        mViewContainer.setSurfaceTextureListener(surfaceTextureListener);
+        mTextureView.setSurfaceTextureListener(surfaceTextureListener);
         player = new DWReplayPlayer(mContext);
         player.setOnPreparedListener(preparedListener);
         player.setOnInfoListener(infoListener);
@@ -131,6 +135,13 @@ public class ReplayVideoView extends RelativeLayout {
         }
     }
 
+    Bitmap tempBitmap;
+
+    // 缓存视频的切换前的画面
+    public void cacheScreenBitmap() {
+        tempBitmap =  mTextureView.getBitmap();
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -145,6 +156,19 @@ public class ReplayVideoView extends RelativeLayout {
             // 正在播放中或者暂停中，只需要将新的surface给player即可
             if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
                 player.setSurface(surface);
+                // 尝试绘制之前的画面
+                try {
+                    if (tempBitmap != null && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
+                        RectF rectF = new RectF(0, 0, mTextureView.getWidth(), mTextureView.getHeight());
+                        Canvas canvas = surface.lockCanvas(new Rect(0, 0, mTextureView.getWidth(), mTextureView.getHeight()));
+                        if (canvas != null) {
+                            canvas.drawBitmap(tempBitmap, null, rectF, null);
+                            surface.unlockCanvasAndPost(canvas);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 // 如果不是播放中或者暂停中，就触发开始播放的操作（此操作是从头开始播放）
                 if (hasCallStartPlay) {

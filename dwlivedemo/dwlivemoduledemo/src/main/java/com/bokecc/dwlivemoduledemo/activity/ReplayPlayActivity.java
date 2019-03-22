@@ -1,6 +1,7 @@
 package com.bokecc.dwlivemoduledemo.activity;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -280,6 +281,8 @@ public class ReplayPlayActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if (isVideoMain) {
+                        // 缓存视频的切换前的画面
+                        mReplayVideoView.cacheScreenBitmap();
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         mReplayFloatingView.addView(mReplayVideoView);
@@ -287,6 +290,8 @@ public class ReplayPlayActivity extends BaseActivity {
                         isVideoMain = false;
                         mReplayRoomLayout.setVideoDocSwitchText("切换视频");
                     } else {
+                        // 缓存视频的切换前的画面
+                        mReplayVideoView.cacheScreenBitmap();
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         mReplayFloatingView.addView(mDocLayout);
@@ -347,6 +352,8 @@ public class ReplayPlayActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    mChatLayout.stopTimerTask();
+                    mReplayRoomLayout.stopTimerTask();
                     mExitPopupWindow.dismiss();
                     finish();
                 }

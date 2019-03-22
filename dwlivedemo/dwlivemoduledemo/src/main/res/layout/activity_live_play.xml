@@ -11,15 +11,21 @@
         android:layout_weight="1">
 
         <RelativeLayout
-            android:id="@+id/rl_video_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- 视频组件 -->
-            <com.bokecc.livemodule.live.video.LiveVideoView
-                android:id="@+id/live_video_view"
+            <RelativeLayout
+                android:id="@+id/rl_video_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+
+                <!-- 视频组件 -->
+                <com.bokecc.livemodule.live.video.LiveVideoView
+                    android:id="@+id/live_video_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
 
             <!--- 连麦视频组件 -->
             <com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout

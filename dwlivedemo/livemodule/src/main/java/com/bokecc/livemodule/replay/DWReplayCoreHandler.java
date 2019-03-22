@@ -2,7 +2,6 @@ package com.bokecc.livemodule.replay;
 
 import android.view.Surface;
 
-import com.bokecc.livemodule.login.LoginStatusListener;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
@@ -16,8 +15,6 @@ import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
-
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * 回放相关逻辑核心处理机制
@@ -41,24 +38,6 @@ public class DWReplayCoreHandler {
     }
 
     /******************************* 各类监听相关 ***************************************/
-
-    private LoginStatusListener loginStatusListener;
-
-    /**
-     * 设置登录状态监听
-     *
-     * @param listener 登录状态监听
-     */
-    public void setLoginStatusListener(LoginStatusListener listener) {
-        loginStatusListener = listener;
-    }
-
-    /**
-     * 获取登录状态监听
-     */
-    public LoginStatusListener getLoginStatusListener() {
-        return loginStatusListener;
-    }
 
     /**
      * 回放聊天监听
@@ -148,7 +127,7 @@ public class DWReplayCoreHandler {
      */
     public boolean hasPdfView() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
-        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
+        if (dwLiveReplay != null &&  dwLiveReplay.getTemplateInfo() != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
             return ViEW_VISIBLE_TAG.equals(dwLiveReplay.getTemplateInfo().getPdfView());
         }
         return false;
@@ -159,7 +138,7 @@ public class DWReplayCoreHandler {
      */
     public boolean hasChatView() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
-        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
+        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo() != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
             return ViEW_VISIBLE_TAG.equals(dwLiveReplay.getTemplateInfo().getChatView());
         }
         return false;
@@ -170,7 +149,7 @@ public class DWReplayCoreHandler {
      */
     public boolean hasQaView() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
-        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
+        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo() != null &&dwLiveReplay.getTemplateInfo().getPdfView() != null) {
             return ViEW_VISIBLE_TAG.equals(dwLiveReplay.getTemplateInfo().getQaView());
         }
         return false;

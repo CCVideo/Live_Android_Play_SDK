@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/qs_summary_order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="12dp"
+        android:text="A："
+        android:textColor="#333333"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <ProgressBar
+        android:id="@+id/wrong_summary_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="136dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="12dp"
+        android:minHeight="14dp"
+        android:progress="30"
+        android:progressDrawable="@drawable/practice_wrong_progress_bg" />
+
+    <ProgressBar
+        android:id="@+id/right_summary_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="136dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="12dp"
+        android:minHeight="14dp"
+        android:progress="30"
+        android:progressDrawable="@drawable/practice_right_progress_bg" />
+
+    <TextView
+        android:id="@+id/qs_summary_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="40人"
+        android:textSize="13sp" />
+
+</LinearLayout>
