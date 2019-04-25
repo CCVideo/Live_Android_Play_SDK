@@ -11,6 +11,7 @@ import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayPageInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.TreeSet;
  * 回放相关逻辑核心处理机制
  */
 public class DWReplayCoreHandler {
+
+    private static final String TAG = "DWReplayCoreHandler";
 
     private static DWReplayCoreHandler dwReplayCoreHandler = new DWReplayCoreHandler();
 
@@ -89,7 +92,10 @@ public class DWReplayCoreHandler {
      */
     public void setPlayer(DWReplayPlayer player) {
         this.player = player;
-        setDWLivePlayParams();
+        DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        if (dwLiveReplay != null) {
+            dwLiveReplay.setReplayPlayer(this.player);
+        }
     }
 
     /***
@@ -98,6 +104,7 @@ public class DWReplayCoreHandler {
     public DWReplayPlayer getPlayer() {
         return this.player;
     }
+
     /**
      * 设置文档展示控件
      *
@@ -105,16 +112,9 @@ public class DWReplayCoreHandler {
      */
     public void setDocView(DocView docView) {
         this.docView = docView;
-        setDWLivePlayParams();
-    }
-
-    /**
-     * 设置播放的参数
-     */
-    private void setDWLivePlayParams() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext(), player, docView);
+            dwLiveReplay.setReplayDocView(this.docView);
         }
     }
 
@@ -166,6 +166,8 @@ public class DWReplayCoreHandler {
         this.surface = surface;
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
+            LogUtil.d(TAG,"DWReplayCoreHandler start() surface != null-->:"+(surface != null));
+            dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
             dwLiveReplay.start(surface);
         }
     }
@@ -183,7 +185,7 @@ public class DWReplayCoreHandler {
     /**
      * 释放资源
      */
-    public void destory() {
+    public void destroy() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
             dwLiveReplay.onDestroy();

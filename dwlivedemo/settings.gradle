@@ -1,1 +1,1 @@
-include ':localreplaydemo', ':livemodule', ':dwlivemoduledemo'
+include ':livemodule', ':dwlivemoduledemo'

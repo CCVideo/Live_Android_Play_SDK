@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
 import com.bokecc.dwlivemoduledemo.R;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 /**
  * 退出确认弹出框
@@ -96,6 +97,7 @@ public class ExitPopupWindow {
      * 显示弹出框
      */
     public void show(View view) {
+        LogUtil.d("ExitPop show() : isShowing():"+isShowing());
         if (isShowing()) {
             return;
         }

@@ -25,6 +25,7 @@ import com.bokecc.livemodule.replay.intro.ReplayIntroComponent;
 import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
  * 回放播放页（默认文档大屏，视频小屏，可手动切换）
  */
 public class ReplayPlayActivity extends BaseActivity {
-
+    private static final String TAG = "ReplayPlayActivity";
     View mRoot;
 
     LinearLayout mReplayMsgLayout;
@@ -62,9 +63,11 @@ public class ReplayPlayActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        LogUtil.d(TAG,"ReplayPlayActivity onResume()");
         mRoot.postDelayed(new Runnable() {
             @Override
             public void run() {
+                LogUtil.d(TAG,"ReplayPlayActivity#onResume()#run():mReplayVideoView start()");
                 mReplayVideoView.start();
                 showFloatingDocLayout();
             }
@@ -86,6 +89,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        LogUtil.d(TAG,"onBackPressed()");
         if (!isPortrait()) {
             quitFullScreen();
             return;
@@ -128,20 +132,23 @@ public class ReplayPlayActivity extends BaseActivity {
         // 判断当前直播间模版是否有"文档"功能
         if (dwReplayCoreHandler.hasPdfView()) {
             initDocLayout();
+            LogUtil.d(TAG, "initDocLayout");
         }
         // 判断当前直播间模版是否有"聊天"功能
         if (dwReplayCoreHandler.hasChatView()) {
             initChatLayout();
+            LogUtil.d(TAG, "initChatLayout");
         }
         // 判断当前直播间模版是否有"问答"功能
         if (dwReplayCoreHandler.hasQaView()) {
             initQaLayout();
+            LogUtil.d(TAG, "initQaLayout");
         }
         // 直播间简介
         initIntroLayout();
     }
 
-    /********************************* 直播重要组件相关 ***************************************/
+    /********************************* 重要组件相关 ***************************************/
 
     // 简介组件
     ReplayIntroComponent mIntroComponent;
@@ -175,6 +182,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     // 初始化简介布局区域
     private void initIntroLayout() {
+        LogUtil.d(TAG, "initIntroLayout");
         mIdList.add(R.id.live_portrait_info_intro);
         mTagList.add(mIntroTag);
         mIntroTag.setVisibility(View.VISIBLE);
@@ -194,6 +202,7 @@ public class ReplayPlayActivity extends BaseActivity {
         if (dwReplayCoreHandler == null) {
             return;
         }
+        LogUtil.d(TAG,"showFloatingDocLayout() hasPdfView:"+dwReplayCoreHandler.hasPdfView());
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwReplayCoreHandler.hasPdfView()) {
             if (!mReplayFloatingView.isShowing()) {

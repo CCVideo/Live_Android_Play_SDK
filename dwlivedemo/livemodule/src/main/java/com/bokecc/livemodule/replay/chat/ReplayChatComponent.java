@@ -101,7 +101,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
         mChatList.smoothScrollToPosition(mChatAdapter.getChatListSize());
     }
 
-    private ArrayList<ChatEntity> mChatEntities;
+    private ArrayList<ChatEntity> mChatEntities = new ArrayList<>();
 
     private ChatEntity getReplayChatEntity(ReplayChatMsg msg) {
         ChatEntity chatEntity = new ChatEntity();
@@ -176,6 +176,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
                                     clearChatEntities();
                                 }
                             });
+
                             for (ChatEntity entity : mChatEntities) {
                                 if (!TextUtils.isEmpty(entity.getTime()) && time >= Integer.valueOf(entity.getTime())) {
                                     temp_chatEntities.add(entity);

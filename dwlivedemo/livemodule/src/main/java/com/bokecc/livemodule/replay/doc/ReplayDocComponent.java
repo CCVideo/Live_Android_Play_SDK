@@ -32,7 +32,8 @@ public class ReplayDocComponent extends LinearLayout {
 
     private void initViews() {
         mDocView = new DocView(mContext);
-        mDocView.setScrollable(false); // 为了保证悬浮窗能正常处理触摸事件，必须将文档WebView响应滑动禁用调，且小窗模式建议使用文档的适应窗口模式
+        // 设置true：响应文档内容上下滑动，不支持悬浮窗拖动  设置false：支持悬浮窗拖动，不响应文档内容上下滑动
+        mDocView.setScrollable(false);
         mDocView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         addView(mDocView);
 

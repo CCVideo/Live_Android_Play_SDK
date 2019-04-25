@@ -18,6 +18,7 @@
         android:textSize="15sp" />
 
     <ProgressBar
+        android:visibility="gone"
         android:id="@+id/video_progressBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="50dp"

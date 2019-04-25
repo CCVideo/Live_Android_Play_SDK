@@ -10,7 +10,7 @@ import com.bokecc.livemodule.LiveSDKHelper;
  */
 public class DWApplication extends Application {
 
-    private Context context;
+    private static Context context;
 
     @Override
     public void onCreate() {
@@ -22,7 +22,7 @@ public class DWApplication extends Application {
         LiveSDKHelper.initSDK(getContext());
     }
 
-    public Context getContext() {
+    public static Context getContext() {
         return context;
     }
 }

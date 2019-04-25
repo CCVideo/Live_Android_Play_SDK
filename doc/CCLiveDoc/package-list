@@ -10,5 +10,4 @@ com.bokecc.sdk.mobile.live.replay.drm.exception
 com.bokecc.sdk.mobile.live.replay.drm.util
 com.bokecc.sdk.mobile.live.replay.flexible
 com.bokecc.sdk.mobile.live.replay.pojo
-com.bokecc.sdk.mobile.live.rtc
 com.bokecc.sdk.mobile.live.widget

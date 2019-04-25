@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -19,14 +20,16 @@ import android.widget.TextView;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * CC 回放视频展示控件
  */
 public class ReplayVideoView extends RelativeLayout {
+
+    private static final String TAG = ReplayVideoView.class.getSimpleName();
 
     Context mContext;
 
@@ -95,7 +98,9 @@ public class ReplayVideoView extends RelativeLayout {
      * 开始播放
      */
     public void start() {
+        LogUtil.d(TAG,"ReplayVideoView start() hasCallStartPlay:"+hasCallStartPlay);
         if (hasCallStartPlay) {
+            LogUtil.d(TAG,"ReplayVideoView start return");
             return;
         }
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
@@ -111,11 +116,14 @@ public class ReplayVideoView extends RelativeLayout {
      * 停止播放
      */
     public void stop() {
+        hasCallStartPlay = false;
+        LogUtil.d(TAG, "player != null--->"+(player != null));
         if (player != null) {
             player.pause();
             if (player.getCurrentPosition() != 0) {
                 currentPosition = player.getCurrentPosition();
             }
+            LogUtil.d(TAG, "player pause currentPosition:"+currentPosition);
         }
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
@@ -131,7 +139,7 @@ public class ReplayVideoView extends RelativeLayout {
 
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
-            dwReplayCoreHandler.destory();
+            dwReplayCoreHandler.destroy();
         }
     }
 
@@ -151,11 +159,12 @@ public class ReplayVideoView extends RelativeLayout {
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            LogUtil.d(TAG,"onSurfaceTextureAvailable");
             // 使用新的surfaceTexture生成surface
             surface = new Surface(surfaceTexture);
             // 正在播放中或者暂停中，只需要将新的surface给player即可
             if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
-                player.setSurface(surface);
+                LogUtil.d(TAG,"draw cache image tempBitmap != null-->:"+(tempBitmap != null));
                 // 尝试绘制之前的画面
                 try {
                     if (tempBitmap != null && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
@@ -166,10 +175,13 @@ public class ReplayVideoView extends RelativeLayout {
                             surface.unlockCanvasAndPost(canvas);
                         }
                     }
+                    LogUtil.d(TAG,"set new Surface");
+                    player.setSurface(surface);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
+                LogUtil.d(TAG,"start new play ");
                 // 如果不是播放中或者暂停中，就触发开始播放的操作（此操作是从头开始播放）
                 if (hasCallStartPlay) {
                     return;
@@ -218,16 +230,20 @@ public class ReplayVideoView extends RelativeLayout {
     IMediaPlayer.OnInfoListener infoListener = new IMediaPlayer.OnInfoListener() {
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+            LogUtil.v(TAG, "IMediaPlayer: OnInfoListener: what:"+what +" extra:"+extra);
             switch (what) {
                 // 缓冲开始
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
+                    LogUtil.d(TAG, "IMediaPlayer: OnInfoListener: MEDIA_INFO_BUFFERING_START");
                     mVideoProgressBar.setVisibility(VISIBLE);
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
+                    LogUtil.d(TAG, "IMediaPlayer: OnInfoListener: MEDIA_INFO_BUFFERING_END");
                     mVideoProgressBar.setVisibility(GONE);
                     break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+                    LogUtil.d(TAG, "IMediaPlayer: OnInfoListener: MEDIA_INFO_VIDEO_RENDERING_START");
                     mVideoProgressBar.setVisibility(GONE);
                     break;
                 default:
@@ -240,6 +256,7 @@ public class ReplayVideoView extends RelativeLayout {
     IMediaPlayer.OnBufferingUpdateListener bufferingUpdateListener = new IMediaPlayer.OnBufferingUpdateListener() {
         @Override
         public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+            LogUtil.v(TAG, "IMediaPlayer: OnBufferingUpdateListener: p:"+percent);
             DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
             if (dwReplayCoreHandler != null) {
                 dwReplayCoreHandler.updateBufferPercent(percent);

@@ -8,26 +8,7 @@
     tools:context="com.bokecc.dwlivemoduledemo.activity.PilotActivity">
 
     <TextView
-        android:id="@+id/tv_center_in_parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
-
-    <Button
-        android:id="@+id/btn_start_live"
-        style="@style/pilotButtonTheme"
-        android:layout_below="@+id/tv_center_in_parent"
-        android:layout_marginTop="66dp"
-        android:text="@string/pilot_live" />
-
-    <Button
-        android:id="@+id/btn_start_replay"
-        style="@style/pilotButtonTheme"
-        android:layout_below="@id/btn_start_live"
-        android:layout_marginTop="30dp"
-        android:text="@string/pilot_replay" />
-
-    <TextView
+        android:id="@+id/about_version_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -37,4 +18,26 @@
         android:text="@string/pilot_version"
         android:textColor="#AAAAAA"
         android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btn_start_local_replay"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@id/about_version_code"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_local_replay" />
+
+    <Button
+        android:id="@+id/btn_start_replay"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@id/btn_start_local_replay"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_replay" />
+
+    <Button
+        android:id="@+id/btn_start_live"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@+id/btn_start_replay"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_live" />
+
 </RelativeLayout>

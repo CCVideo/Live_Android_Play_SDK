@@ -152,8 +152,11 @@ public class DWLiveCoreHandler {
      * @param player 播放器
      */
     public void setPlayer(DWLivePlayer player) {
-        dwLivePlayer = player;
-        setDWLivePlayParams();
+        this.dwLivePlayer = player;
+        DWLive dwLive = DWLive.getInstance();
+        if (dwLive != null) {
+            dwLive.setDWLivePlayer(dwLivePlayer);
+        }
     }
 
     /**
@@ -163,16 +166,9 @@ public class DWLiveCoreHandler {
      */
     public void setDocView(DocView docView) {
         this.docView = docView;
-        setDWLivePlayParams();
-    }
-
-    /**
-     * 设置播放的参数
-     */
-    private void setDWLivePlayParams() {
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
-            dwLive.setDWLivePlayParams(dwLiveListener, DWLiveEngine.getInstance().getContext(), docView, dwLivePlayer);
+            dwLive.setDWLivePlayDocView(this.docView);
         }
     }
 
@@ -250,9 +246,11 @@ public class DWLiveCoreHandler {
      * 开始播放
      */
     public void start(Surface surface) {
-        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Start");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
+            // 设置播放参数 （回调 及 上下文）
+            dwLive.setDWLivePlayParams(dwLiveListener, DWLiveEngine.getInstance().getContext());
+            // 调用开始播放逻辑
             dwLive.start(surface);
         }
     }

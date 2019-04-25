@@ -20,6 +20,7 @@ import com.bokecc.livemodule.replay.DWReplayRoomListener;
 import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,8 @@ import java.util.TimerTask;
  * 回放直播间信息组件
  */
 public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomListener {
+
+    private static final String TAG = "ReplayRoomLayout";
 
     Context mContext;
 
@@ -176,9 +179,11 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         // 修改播放状态
         if (mPlayIcon.isSelected()) {
             mPlayIcon.setSelected(false);
+            LogUtil.d(TAG,"changePlayerStatus# player.pause()");
             player.pause();
         } else {
             mPlayIcon.setSelected(true);
+            LogUtil.d(TAG,"changePlayerStatus# player.start()");
             player.start();
         }
     }
@@ -321,7 +326,6 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     Timer timer = new Timer();
 
     TimerTask timerTask;
-
     // 开始时间任务
     private void startTimerTask() {
         stopTimerTask();

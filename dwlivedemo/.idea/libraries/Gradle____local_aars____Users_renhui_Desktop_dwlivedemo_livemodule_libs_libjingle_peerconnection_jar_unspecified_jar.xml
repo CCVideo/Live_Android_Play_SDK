@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: __local_aars__:/Users/renhui/Desktop/dwlivedemo/livemodule/libs/libjingle_peerconnection.jar:unspecified@jar">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/livemodule/libs/libjingle_peerconnection.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

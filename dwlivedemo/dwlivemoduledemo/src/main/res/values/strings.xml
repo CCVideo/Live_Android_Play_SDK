@@ -2,9 +2,11 @@
     <string name="app_name">观看端</string>
 
     <!-- 导航页 -->
-    <string name="pilot_version">v3.2</string>
+    <string name="pilot_version">v3.3</string>
     <string name="pilot_live">观看直播</string>
     <string name="pilot_replay">观看回放</string>
+    <string name="pilot_local_replay">离线回放</string>
 
     <string name="scan_text">将二维码置于框内, 即可自动扫描</string>
+    <string name="action_settings">设置</string>
 </resources>

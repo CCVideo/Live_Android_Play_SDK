@@ -34,7 +34,7 @@ import java.util.Map;
 
 public class LiveQaAdapter extends RecyclerView.Adapter<LiveQaAdapter.ChatViewHolder> {
 
-    private final static String TAG = "ReplayQaAdapter";
+    private final static String TAG = LiveQaAdapter.class.getSimpleName();
 
     private Context mContext;
 

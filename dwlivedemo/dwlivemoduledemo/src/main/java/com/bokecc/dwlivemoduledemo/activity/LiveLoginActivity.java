@@ -5,17 +5,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.bokecc.dwlivemoduledemo.R;
-import com.bokecc.dwlivemoduledemo.activity.extra.LivePlayClassicActivity;
-import com.bokecc.dwlivemoduledemo.activity.extra.LivePlayDocActivity;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.dwlivemoduledemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivemoduledemo.scan.qr_codescan.MipcaActivityCapture;
@@ -28,6 +29,7 @@ import com.bokecc.sdk.mobile.live.pojo.PublishInfo;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.pojo.Viewer;
+import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +38,8 @@ import java.util.Map;
  * 直播观看登录页面
  */
 public class LiveLoginActivity extends BaseActivity implements View.OnClickListener {
+
+    private static final String TAG = "LiveLoginActivity";
 
     static final int MAX_NAME = 20;  // 用户昵称最多20字符
 
@@ -50,6 +54,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
     Button btnLoginLive; // 登录按钮
 
+    private String mGroupId = ""; //聊天分组使用（选填）
+    private boolean needAutoLogin = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         hideActionBar();
@@ -58,9 +65,49 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         initViews();
 
         preferences = getSharedPreferences("live_login_info", Activity.MODE_PRIVATE);
-        getSharePrefernce();
+        getSharePreference();
         if (map != null) {
             initEditTextInfo();
+        }
+
+        //解析网页端URL跳转直播
+        parseUriIntent();
+
+    }
+
+
+    private void parseUriIntent() {
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+        if (uri != null) {
+            String userId = uri.getQueryParameter("userid");
+            String roomId = uri.getQueryParameter("roomid");
+            String autoLogin = uri.getQueryParameter("autoLogin");
+            String viewerName = uri.getQueryParameter("viewername");
+            String viewerToken = uri.getQueryParameter("viewertoken");
+            String groupId = uri.getQueryParameter("groupid");
+            String qurey = uri.getQuery();
+
+            LogUtil.d(TAG, "userId =" + userId + " roomId =" + roomId + " autoLogin =" + autoLogin
+                    + " viewerName =" + viewerName + " viewerToken =" + viewerToken + " groupId =" + groupId
+                    +" qurey:"+qurey
+            );
+
+            userId = userId == null ? "" : userId;
+            roomId = roomId == null ? "" : roomId;
+            viewerName = viewerName == null ? "" : viewerName;
+            viewerToken = viewerToken == null ? "" : viewerToken;
+            mGroupId = mGroupId == null ? "" : mGroupId;
+
+            lllLoginLiveUid.setText(userId);
+            lllLoginLiveRoomid.setText(roomId);
+            lllLoginLiveName.setText(viewerName);
+            lllLoginLivePassword.setText(viewerToken);
+
+            if ("true".equals(autoLogin)) {
+                needAutoLogin = true;
+            }
+
         }
     }
 
@@ -90,7 +137,19 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         });
 
         loginPopupWindow = new LoginPopupWindow(this);
+
+        mRoot.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+            @Override
+            public void onWindowFocusChanged(boolean hasFocus) {
+                if (needAutoLogin) {
+                    needAutoLogin = false;
+                    doLiveLogin();
+                }
+                mRoot.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
+            }
+        });
     }
+
 
     /**
      * 隐藏弹窗
@@ -113,6 +172,10 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
      */
     private void doLiveLogin() {
 
+        if (!loginCheck()) {
+            return;
+        }
+
         loginPopupWindow.show(mRoot);
 
         // 创建登录信息
@@ -121,7 +184,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         loginInfo.setUserId(lllLoginLiveUid.getText());
         loginInfo.setViewerName(lllLoginLiveName.getText());
         loginInfo.setViewerToken(lllLoginLivePassword.getText());
-
+        if (!"".equals(mGroupId.trim())) {
+            loginInfo.setGroupId(mGroupId);
+        }
         // 设置登录参数
         DWLive.getInstance().setDWLiveLoginParams(new DWLiveLoginListener() {
             @Override
@@ -146,6 +211,23 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         DWLive.getInstance().startLogin();
     }
 
+    private boolean loginCheck() {
+        if (lllLoginLiveUid.getText().toString().trim().equals("")) {
+            toastOnUiThread("CC账号ID=null");
+            return false;
+        }
+        if (lllLoginLiveRoomid.getText().toString().trim().equals("")) {
+            toastOnUiThread("直播间ID=null");
+            return false;
+        }
+        if (lllLoginLiveName.getText().toString().trim().equals("")) {
+            toastOnUiThread("用户名=null");
+            return false;
+        }
+
+        return true;
+    }
+
     //------------------------------- 缓存数据相关方法-----------------------------------------
 
     SharedPreferences preferences;
@@ -159,7 +241,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         editor.commit();
     }
 
-    private void getSharePrefernce() {
+    private void getSharePreference() {
         lllLoginLiveUid.setText(preferences.getString("liveuid", ""));
         lllLoginLiveRoomid.setText(preferences.getString("liveroomid", ""));
         lllLoginLiveName.setText(preferences.getString("liveusername", ""));
