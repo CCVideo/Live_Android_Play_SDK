@@ -47,14 +47,16 @@ public class TasksManagerDBController {
         return list;
     }
 
-    public TasksManagerModel addTask(String name, final String url, final String path) {
+    public TasksManagerModel addTask(String name, final String url, final String path,TasksManager.Status status) {
         if (TextUtils.isEmpty(url) || TextUtils.isEmpty(path)) {
+            status.setVal(TasksManager.CODE_URL_ERROR);
             return null;
         }
         // 必须用FileDownloadUtils.generateId去关联TasksManagerModel和FileDownloader
         final int id = FileDownloadUtils.generateId(url, path + "/" + name);
         TasksManagerModel model = TasksManager.getImpl().getById(id);
         if (model != null) { //任务已存在
+            status.setVal(TasksManager.CODE_TASK_ALREADY_EXIST);
             return null;
         }
         model = new TasksManagerModel();
@@ -64,6 +66,9 @@ public class TasksManagerDBController {
         model.setPath(path + "/" + name);
         model.setTaskStatus(TasksManagerModel.INIT_STATUS);
         final boolean succeed = db.insert(TABLE_NAME, null, model.toContentValues()) != -1;
+        if(!succeed){
+            status.setVal(TasksManager.INSERT_DATA_BASE_ERROR);
+        }
         return succeed ? model : null;
     }
 

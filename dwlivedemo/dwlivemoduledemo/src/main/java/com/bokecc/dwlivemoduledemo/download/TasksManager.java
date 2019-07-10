@@ -1,5 +1,7 @@
 package com.bokecc.dwlivemoduledemo.download;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -16,7 +18,22 @@ import java.util.List;
  * Description:
  */
 public class TasksManager {
-
+    public static final int CODE_OK = 0;
+    public static final int CODE_TASK_ALREADY_EXIST = 1;
+    public static final int CODE_URL_ERROR = 2;
+    public static final int INSERT_DATA_BASE_ERROR = 3;
+    public class Status {
+        int val;
+        Status(int val) {
+            this.val = val;
+        }
+        int getVal() {
+            return val;
+        }
+        void setVal(int val) {
+            this.val = val;
+        }
+    }
 
     private final static class HolderClass {
         private final static TasksManager INSTANCE = new TasksManager();
@@ -210,16 +227,19 @@ public class TasksManager {
      * @param name 文件名
      * @param url  文件下载url
      * @param path 文件存放路径
+     * @return 0 :任务添加成功，非0任务已存在
      */
-    public void addTask(String name, final String url, final String path) {
-        TasksManagerModel tasksManagerModel = dbController.addTask(name, url, path);
+    public int addTask(String name, final String url, final String path) {
+        Status status = new Status(CODE_OK);
+        TasksManagerModel tasksManagerModel = dbController.addTask(name, url, path, status);
         if (tasksManagerModel != null) {
             modelList.add(tasksManagerModel);
         }
+        return status.getVal();
     }
 
     public void updateTaskModelStatus(int taskId, int status) {
-         dbController.updateTaskModelStatus(taskId, status);
+        dbController.updateTaskModelStatus(taskId, status);
     }
 
     public void updateTaskModelTotal(int id, long total) {

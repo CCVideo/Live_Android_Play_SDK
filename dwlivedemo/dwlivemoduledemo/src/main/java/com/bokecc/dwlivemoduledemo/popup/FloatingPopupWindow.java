@@ -14,7 +14,6 @@ import com.bokecc.dwlivemoduledemo.R;
  * 悬浮弹出框（支持拖动）
  */
 public class FloatingPopupWindow {
-
     // 弹窗宽度
     private static final int POPUP_WINDOW_WIDTH = 300;
 

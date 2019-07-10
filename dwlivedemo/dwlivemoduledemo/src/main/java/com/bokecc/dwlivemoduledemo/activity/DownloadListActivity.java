@@ -38,7 +38,7 @@ import java.lang.ref.WeakReference;
  */
 public class DownloadListActivity extends BaseActivity implements View.OnClickListener, DownloadView {
 
-    public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload";
+    public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload/";
 
     /**
      * activity里最底层的父布局容器，用于弹出PopupWindow使用
@@ -146,7 +146,7 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
 
             @Override
             public void onItemLongClick(final int taskId) {
-                mDeletePopup.setListener(new DownloadInfoDeletePopup.ConfirmListener(){
+                mDeletePopup.setListener(new DownloadInfoDeletePopup.ConfirmListener() {
                     @Override
                     public void onConfirmClick() {
                         TasksManager.getImpl().removeTask(taskId);
@@ -161,8 +161,8 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void onUrlAdd(String url) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
-                postNotifyDataChanged();
+                int ret = TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
+                handleAddTaskRet(ret);
             }
         });
     }
@@ -222,8 +222,9 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
                     String url = result.trim();
                     if (url.startsWith("http") && url.endsWith("ccr")) {
                         String fileName = url.substring(url.lastIndexOf("/") + 1);
-                        TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
-                        postNotifyDataChanged();
+                        int ret = TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
+                        handleAddTaskRet(ret);
+
                     } else {
                         Toast.makeText(getApplicationContext(), "扫描失败，请扫描正确的播放二维码", Toast.LENGTH_SHORT).show();
                     }
@@ -231,6 +232,25 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
                 break;
         }
     }
+
+
+    public void handleAddTaskRet(int ret) {
+        switch (ret) {
+            case TasksManager.CODE_OK:
+                postNotifyDataChanged();
+                break;
+            case TasksManager.CODE_TASK_ALREADY_EXIST:
+                toastOnUiThread("任务已存在");
+                break;
+            case TasksManager.CODE_URL_ERROR:
+                toastOnUiThread("任务Url错误");
+                break;
+            case TasksManager.INSERT_DATA_BASE_ERROR:
+                toastOnUiThread("数据库发生错误");
+                break;
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

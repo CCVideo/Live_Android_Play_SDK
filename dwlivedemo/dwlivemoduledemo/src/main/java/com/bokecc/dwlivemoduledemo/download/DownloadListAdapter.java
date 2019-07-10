@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bokecc.dwlivemoduledemo.R;
-import com.bokecc.sdk.mobile.live.util.LogUtil;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadSampleListener;
@@ -77,6 +77,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                         startDownloadTask(holder, tasksModel);
                         break;
                     case FileDownloadStatus.pending:
+                    case FileDownloadStatus.retry:
                     case FileDownloadStatus.connected:
                     case FileDownloadStatus.started:
                     case FileDownloadStatus.progress:
@@ -96,7 +97,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
     private void startDownloadTask(DownloadViewHolder holder, TasksManagerModel tasksModel) {
         final BaseDownloadTask downloadTask = FileDownloader.getImpl().create(tasksModel.getUrl())
                 .setPath(tasksModel.getPath())
-                .setAutoRetryTimes(3)
+                .setAutoRetryTimes(10)
                 .setCallbackProgressTimes(100)
                 .setListener(taskDownloadListener);
         TasksManager.getImpl()
@@ -305,9 +306,16 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         }
 
         @Override
+        protected void retry(BaseDownloadTask task, Throwable ex, int retryingTimes, int soFarBytes) {
+            super.retry(task, ex, retryingTimes, soFarBytes);
+            ex.printStackTrace();
+            ELog.e(TAG,"downLoad retry="+retryingTimes);
+        }
+
+        @Override
         protected void error(BaseDownloadTask task, Throwable e) {
             super.error(task, e);
-            LogUtil.e(TAG,e.getMessage());
+            ELog.e(TAG,e.getMessage());
             final DownloadViewHolder holder = checkCurrentHolder(task);
             if (holder == null) {
                 return;

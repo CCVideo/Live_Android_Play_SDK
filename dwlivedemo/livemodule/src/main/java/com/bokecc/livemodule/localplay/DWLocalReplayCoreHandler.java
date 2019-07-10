@@ -7,6 +7,7 @@ import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplayListener;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayPageInfo;
@@ -125,7 +126,7 @@ public class DWLocalReplayCoreHandler {
 
     /******************************* 设置"播放"组件/控件相关 ***************************************/
 
-    private IjkMediaPlayer player;
+    private DWReplayPlayer player;
     //播放内容地址
     private String playPath;
     //显示文档的控件
@@ -139,7 +140,7 @@ public class DWLocalReplayCoreHandler {
      *
      * @param player 播放器
      */
-    public void setPlayer(IjkMediaPlayer player) {
+    public void setPlayer(DWReplayPlayer player) {
         this.player = player;
         setDWLocalReplayPlayParams();
     }
@@ -157,7 +158,7 @@ public class DWLocalReplayCoreHandler {
     /***
      * 获取当前的播放器
      */
-    public IjkMediaPlayer getPlayer() {
+    public DWReplayPlayer getPlayer() {
         return this.player;
     }
 

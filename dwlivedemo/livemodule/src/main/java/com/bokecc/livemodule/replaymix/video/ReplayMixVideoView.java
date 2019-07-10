@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -21,8 +20,8 @@ import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.livemodule.replaymix.DWReplayMixVideoListener;
 
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * CC 回放视频展示控件
@@ -39,7 +38,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
 
     ProgressBar mVideoProgressBar;
 
-    IjkMediaPlayer player;
+    DWReplayPlayer player;
 
     Surface surface;
     private float currentSpeed = 1.0f;
@@ -77,7 +76,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
      */
     private void initPlayer() {
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
-        player = new IjkMediaPlayer();
+        player = new DWReplayPlayer(getContext());
         player.setOnPreparedListener(preparedListener);
         player.setOnInfoListener(infoListener);
         player.setOnBufferingUpdateListener(bufferingUpdateListener);
@@ -106,9 +105,6 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
         DWReplayMixCoreHandler dwReplayMixCoreHandler = DWReplayMixCoreHandler.getInstance();
         if (dwReplayMixCoreHandler != null) {
             dwReplayMixCoreHandler.onSurfaceAvailable(surface, true);
-            if (mVideoProgressBar != null) {
-                mVideoProgressBar.setVisibility(VISIBLE);
-            }
         }
     }
 
@@ -127,7 +123,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
     /**
      * 停止播放
      */
-    public void stop() {
+    public void pause() {
         hasCallStartPlay = false;  // 准备正常播放了，将字段回归为false
         if (player != null) {
             player.pause();
@@ -138,15 +134,11 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
         }
         DWReplayMixCoreHandler mixCoreHandler = DWReplayMixCoreHandler.getInstance();
         if (mixCoreHandler != null) {
-            mixCoreHandler.stop();
+            mixCoreHandler.pause();
         }
     }
 
     public void destroy() {
-        if (player != null) {
-            player.pause();
-            player.stop();
-        }
         DWReplayMixCoreHandler mixCoreHandler = DWReplayMixCoreHandler.getInstance();
         if (mixCoreHandler != null) {
             mixCoreHandler.destroy();
@@ -185,7 +177,6 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                             surface.unlockCanvasAndPost(canvas);
                         }
                     }
-                    player.setSurface(surface);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -196,6 +187,9 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                 }
                 onSurfaceAvailable(true);
                 hasCallStartPlay = true;
+            }
+            if(player != null){
+                player.updateSurface(surface);
             }
         }
 

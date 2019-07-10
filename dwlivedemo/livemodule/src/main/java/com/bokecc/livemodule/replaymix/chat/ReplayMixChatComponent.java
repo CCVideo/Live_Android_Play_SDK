@@ -15,6 +15,7 @@ import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.replaymix.DWReplayMixChatListener;
 import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.livemodule.replaymix.chat.adapter.ReplayMixChatAdapter;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class ReplayMixChatComponent extends RelativeLayout implements DWReplayMi
     public void appendChatEntities(ArrayList<ChatEntity> chatEntities) {
         mChatAdapter.append(chatEntities);
         // 如果只是需要追加数据，而不滑动，可以注释掉下面的调用
-        mChatList.smoothScrollToPosition(mChatAdapter.getChatListSize());
+        mChatList.smoothScrollToPosition(mChatAdapter.getChatListSize()-1);
     }
 
     private ArrayList<ChatEntity> mChatEntities;
@@ -166,7 +167,7 @@ public class ReplayMixChatComponent extends RelativeLayout implements DWReplayMi
                         return;
                     }
                     // 获取当前的player
-                    final IjkMediaPlayer player = replayCoreHandler.getPlayer();
+                    final DWReplayPlayer player = replayCoreHandler.getPlayer();
                     if (player != null && player.isPlaying()) {
                         final ArrayList<ChatEntity> temp_chatEntities = new ArrayList<>();
                         int time = Math.round(player.getCurrentPosition() / 1000);

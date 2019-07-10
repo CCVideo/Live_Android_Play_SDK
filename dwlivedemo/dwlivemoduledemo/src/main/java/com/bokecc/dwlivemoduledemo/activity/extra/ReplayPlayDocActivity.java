@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * 回放播放页 （默认文档大屏，视频小屏，可手动切换）
- *
+ * <p>
  * 注意：此播放页只适配直播间模版中有'文档'区域的
  */
 public class ReplayPlayDocActivity extends BaseActivity {
@@ -85,14 +85,14 @@ public class ReplayPlayDocActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mReplayVideoView.stop();
+        mReplayVideoView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mReplayFloatingView.dismiss();
-        mReplayVideoView.destory();
+        mReplayVideoView.destroy();
     }
 
     @Override
@@ -332,6 +332,11 @@ public class ReplayPlayDocActivity extends BaseActivity {
                     mReplayMsgLayout.setVisibility(View.GONE);
                 }
             });
+        }
+
+        @Override
+        public void onClickDocScaleType(int type) {
+
         }
     };
 

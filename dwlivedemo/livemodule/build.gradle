@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -15,15 +15,16 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion = '28.0.3'
 
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //    implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -32,12 +33,12 @@ dependencies {
     // Glide
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     // CC SDK
-    //    api project(':livesdk')
     api files('libs/dwlivesdk.jar')
-    implementation files('libs/libjingle_peerconnection.jar')
     implementation files('libs/tbs_sdk_thirdapp_v4.3.0.1020.jar')
+    implementation files('libs/libjingle_peerconnection.jar')
     api 'com.squareup.okhttp3:okhttp:3.10.0'
     api('io.socket:socket.io-client:0.8.3') {
         exclude group: 'org.json', module: 'json'
     }
+
 }

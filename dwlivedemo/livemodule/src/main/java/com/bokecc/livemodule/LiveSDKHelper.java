@@ -1,10 +1,10 @@
 package com.bokecc.livemodule;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
-import com.bokecc.sdk.mobile.live.logging.LogHelper;
 import com.bokecc.sdk.mobile.live.util.HttpUtil;
 
 /**
@@ -16,16 +16,13 @@ public class LiveSDKHelper {
 
     /**
      * 初始化SDK
-     * @param context 应用上下文
+     * @param app 应用上下文
      */
-    public static void initSDK(Context context) {
+    public static void initSDK(Application app) {
         // 判断是否初始化了SDK，如果没有就进行初始化
         if (DWLiveEngine.getInstance() == null) {
-            context = context.getApplicationContext();
             // 拉流 SDK 初始化
-            DWLiveEngine.init(context);
-            // 初始化日志记录模块
-            LogHelper.getInstance().init(context, true, null);
+            DWLiveEngine.init(app,true);
             // 设置Http请求日志输出LEVEL为详细（其他设置字段请参考CCLiveDoc的API文档查看）
             HttpUtil.LOG_LEVEL = HttpUtil.HttpLogLevel.GENERAL;
         } else {

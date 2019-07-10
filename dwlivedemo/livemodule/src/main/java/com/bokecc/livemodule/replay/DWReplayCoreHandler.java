@@ -1,7 +1,9 @@
 package com.bokecc.livemodule.replay;
 
+import android.util.Log;
 import android.view.Surface;
 
+import com.bokecc.livemodule.replay.doc.ReplayDocSizeChangeListener;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
@@ -9,9 +11,10 @@ import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
+import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLiveInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayPageInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
-import com.bokecc.sdk.mobile.live.util.LogUtil;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
@@ -49,11 +52,19 @@ public class DWReplayCoreHandler {
 
     /**
      * 设置回放聊天监听
+     *
      * @param replayChatListener 回放聊天监听
      */
     public void setReplayChatListener(DWReplayChatListener replayChatListener) {
         this.replayChatListener = replayChatListener;
     }
+
+    private ReplayDocSizeChangeListener mDocSizeListener;
+
+    public void setDocSizeChangeListener(ReplayDocSizeChangeListener listener) {
+        mDocSizeListener = listener;
+    }
+
 
     /**
      * 回放问答监听
@@ -62,6 +73,7 @@ public class DWReplayCoreHandler {
 
     /**
      * 设置回放问答监听
+     *
      * @param replayQAListener 回放问答监听
      */
     public void setReplayQAListener(DWReplayQAListener replayQAListener) {
@@ -73,6 +85,7 @@ public class DWReplayCoreHandler {
 
     /**
      * 设置直播间信息监听
+     *
      * @param listener 直播间信息监听
      */
     public void setReplayRoomListener(DWReplayRoomListener listener) {
@@ -111,9 +124,11 @@ public class DWReplayCoreHandler {
      * @param docView 文档展示控件
      */
     public void setDocView(DocView docView) {
+        ELog.i(this,"setDocView");
         this.docView = docView;
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
+            dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
             dwLiveReplay.setReplayDocView(this.docView);
         }
     }
@@ -127,7 +142,7 @@ public class DWReplayCoreHandler {
      */
     public boolean hasPdfView() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
-        if (dwLiveReplay != null &&  dwLiveReplay.getTemplateInfo() != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
+        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo() != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
             return ViEW_VISIBLE_TAG.equals(dwLiveReplay.getTemplateInfo().getPdfView());
         }
         return false;
@@ -149,36 +164,40 @@ public class DWReplayCoreHandler {
      */
     public boolean hasQaView() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
-        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo() != null &&dwLiveReplay.getTemplateInfo().getPdfView() != null) {
+        if (dwLiveReplay != null && dwLiveReplay.getTemplateInfo() != null && dwLiveReplay.getTemplateInfo().getPdfView() != null) {
             return ViEW_VISIBLE_TAG.equals(dwLiveReplay.getTemplateInfo().getQaView());
         }
         return false;
     }
 
+
+    public ReplayLiveInfo getReplayLiveInfo() {
+        DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        if (dwLiveReplay != null) {
+            return dwLiveReplay.getReplayLiveInfo();
+        }
+        return null;
+    }
+
+
     /******************************* 视频播放相关 ***************************************/
 
-    private Surface surface;
 
     /**
      * 开始播放
      */
     public void start(Surface surface) {
-        this.surface = surface;
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            LogUtil.d(TAG,"DWReplayCoreHandler start() surface != null-->:"+(surface != null));
-            dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
-            dwLiveReplay.start(surface);
+            dwLiveReplay.start(null);
         }
     }
 
-    /**
-     * 停止播放
-     */
-    public void stop() {
+
+    public void pause() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            dwLiveReplay.stop();
+            dwLiveReplay.pause();
         }
     }
 
@@ -190,6 +209,9 @@ public class DWReplayCoreHandler {
         if (dwLiveReplay != null) {
             dwLiveReplay.onDestroy();
         }
+        if (docView != null) {
+            docView = null;
+        }
     }
 
     /**
@@ -200,6 +222,32 @@ public class DWReplayCoreHandler {
             replayRoomListener.updateBufferPercent(percent);
         }
     }
+
+    public void playError(int code){
+        if (replayRoomListener != null) {
+            replayRoomListener.onPlayError(code);
+        }
+    }
+
+    public void bufferStart(){
+        if(replayRoomListener != null){
+            replayRoomListener.bufferStart();
+        }
+    }
+
+    public void bufferEnd(){
+        if(replayRoomListener != null){
+            replayRoomListener.bufferEnd();
+        }
+    }
+
+    public void onPlayComplete(){
+        if(replayRoomListener != null){
+            replayRoomListener.onPlayComplete();
+        }
+    }
+
+
 
     /**
      * 回放视频准备好了
@@ -248,8 +296,10 @@ public class DWReplayCoreHandler {
         }
 
         @Override
-        public void onPageChange(String docId, String docName, int pageNum, int docTotalPage) {
-
+        public void onPageChange(String docId, String docName, int width, int height, int pageNum, int docTotalPage) {
+            Log.d(TAG, "onPageChange: pageNum:" + pageNum + " docTotalPage:" + docTotalPage + " docId=" + docId);
+            Log.d(TAG, "onPageChange: pageNum:" + "w:" + width + "height:" + height);
+            mDocSizeListener.updateSize(width,height);
         }
 
         @Override
@@ -262,4 +312,6 @@ public class DWReplayCoreHandler {
 
         }
     };
+
+
 }

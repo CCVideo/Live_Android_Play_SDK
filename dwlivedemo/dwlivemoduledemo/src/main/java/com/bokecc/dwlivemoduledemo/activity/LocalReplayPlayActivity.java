@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -28,7 +27,6 @@ import com.bokecc.livemodule.localplay.intro.LocalReplayIntroComponent;
 import com.bokecc.livemodule.localplay.qa.LocalReplayQAComponent;
 import com.bokecc.livemodule.localplay.room.LocalReplayRoomLayout;
 import com.bokecc.livemodule.localplay.video.LocalReplayVideoView;
-import com.bokecc.sdk.mobile.live.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;

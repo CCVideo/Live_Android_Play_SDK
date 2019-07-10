@@ -2,7 +2,7 @@
     <string name="app_name">观看端</string>
 
     <!-- 导航页 -->
-    <string name="pilot_version">v3.3</string>
+    <string name="pilot_version">获得场景视频\u3000v3.3</string>
     <string name="pilot_live">观看直播</string>
     <string name="pilot_replay">观看回放</string>
     <string name="pilot_local_replay">离线回放</string>

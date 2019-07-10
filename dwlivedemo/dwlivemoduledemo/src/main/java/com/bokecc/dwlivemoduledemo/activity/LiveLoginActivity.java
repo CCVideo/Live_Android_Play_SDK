@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -29,7 +28,7 @@ import com.bokecc.sdk.mobile.live.pojo.PublishInfo;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.pojo.Viewer;
-import com.bokecc.sdk.mobile.live.util.LogUtil;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,13 +62,11 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_login);
         initViews();
-
         preferences = getSharedPreferences("live_login_info", Activity.MODE_PRIVATE);
         getSharePreference();
         if (map != null) {
             initEditTextInfo();
         }
-
         //解析网页端URL跳转直播
         parseUriIntent();
 
@@ -88,9 +85,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             String groupId = uri.getQueryParameter("groupid");
             String qurey = uri.getQuery();
 
-            LogUtil.d(TAG, "userId =" + userId + " roomId =" + roomId + " autoLogin =" + autoLogin
+            ELog.d(TAG, "userId =" + userId + " roomId =" + roomId + " autoLogin =" + autoLogin
                     + " viewerName =" + viewerName + " viewerToken =" + viewerToken + " groupId =" + groupId
-                    +" qurey:"+qurey
+                    + " qurey:" + qurey
             );
 
             userId = userId == null ? "" : userId;
@@ -107,7 +104,6 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             if ("true".equals(autoLogin)) {
                 needAutoLogin = true;
             }
-
         }
     }
 

@@ -7,6 +7,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,16 +26,18 @@ import com.bokecc.sdk.mobile.live.replay.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.ChatViewHolder> {
 
     private Context mContext;
-    private ArrayList<ChatEntity> mChatEntities;
+    private List<ChatEntity> mChatEntities;
     private LayoutInflater mInflater;
     private String selfId;
 
     public ReplayChatAdapter(Context context) {
-        mChatEntities = new ArrayList<>();
+        mChatEntities = new LinkedList<>();
         mContext = context;
         mInflater = LayoutInflater.from(context);
         Viewer viewer = DWLiveReplay.getInstance().getViewer();
@@ -49,15 +52,15 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
      * 清空聊天数据
      */
     public void clearChatData() {
-        this.mChatEntities = new ArrayList<>();
+        mChatEntities.clear();
         notifyDataSetChanged();
     }
 
     /**
      * 添加数据，用于回放的添加
      */
-    public void add(ArrayList<ChatEntity> mChatEntities) {
-        this.mChatEntities = mChatEntities;
+    public void add(ArrayList<ChatEntity> chatEntities) {
+        this.mChatEntities.addAll(chatEntities);
         notifyDataSetChanged();
     }
 

@@ -1,14 +1,9 @@
 package com.bokecc.livemodule.localplay.video;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
+import android.graphics.*;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -16,13 +11,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
-import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
-
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * CC 回放视频展示控件
@@ -39,7 +31,7 @@ public class LocalReplayVideoView extends RelativeLayout {
 
     ProgressBar mVideoProgressBar;
 
-    IjkMediaPlayer player;
+    DWReplayPlayer player;
 
     Surface surface;
 
@@ -78,7 +70,7 @@ public class LocalReplayVideoView extends RelativeLayout {
      */
     private void initPlayer() {
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
-        player = new IjkMediaPlayer();
+        player = new DWReplayPlayer(getContext());
         player.setOnPreparedListener(preparedListener);
         player.setOnInfoListener(infoListener);
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();

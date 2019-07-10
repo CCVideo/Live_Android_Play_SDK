@@ -6,6 +6,7 @@ import android.os.Handler;
 import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.activity.PilotActivity;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
+import com.bokecc.dwlivemoduledemo.utils.SPUtil;
 
 /**
  * 引导页
@@ -28,6 +29,5 @@ public class SplashActivity extends BaseActivity {
             }
         }, 3 * 1000L);
     }
-
 
 }

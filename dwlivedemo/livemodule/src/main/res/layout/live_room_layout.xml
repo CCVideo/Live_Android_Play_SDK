@@ -45,6 +45,14 @@
                     android:text="0"
                     android:visibility="gone" />
 
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/id_scale_type"
+                    style="@style/phoneLiveLandscapeTitleViewTheme"
+                    android:paddingRight="5dp"
+                    android:text="模式" />
+
                 <TextView
                     android:id="@+id/video_doc_switch"
                     style="@style/phoneLiveLandscapeTitleViewTheme"

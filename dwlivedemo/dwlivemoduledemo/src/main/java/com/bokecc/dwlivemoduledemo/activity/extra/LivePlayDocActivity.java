@@ -233,6 +233,11 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
                 }
             });
         }
+
+        @Override
+        public void onClickDocScaleType(int scaleType) {
+
+        }
     };
 
     // 初始化房间状态监听

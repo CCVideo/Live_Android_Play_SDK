@@ -90,7 +90,7 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
     @Override
     protected void onPause() {
         super.onPause();
-        mReplayVideoView.stop();
+        mReplayVideoView.pause();
     }
 
     @Override

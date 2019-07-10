@@ -22,6 +22,7 @@ import com.bokecc.livemodule.utils.TimeUtil;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 
@@ -147,7 +148,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                     return;
                 }
                 // 获取当前的player，执行seek操作
-                IjkMediaPlayer player = localReplayCoreHandler.getPlayer();
+                DWReplayPlayer player = localReplayCoreHandler.getPlayer();
                 player.seekTo(progress);
                 player.start();
             }
@@ -165,7 +166,8 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
         }
 
         // 获取当前的player
-        IjkMediaPlayer player = localReplayCoreHandler.getPlayer();
+        DWReplayPlayer player = localReplayCoreHandler.getPlayer();
+
 
         // 修改播放状态
         if (mPlayIcon.isSelected()) {
@@ -344,7 +346,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                     return;
                 }
                 // 获取当前的player
-                final IjkMediaPlayer player = localReplayCoreHandler.getPlayer();
+                final DWReplayPlayer player = localReplayCoreHandler.getPlayer();
                 if (!player.isPlaying() && (player.getDuration() - player.getCurrentPosition() < 500)) {
                     setCurrentTime(player.getDuration());
                 } else {

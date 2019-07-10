@@ -10,6 +10,17 @@ public interface DWReplayRoomListener {
      */
     void videoPrepared();
 
+
+    /**
+     * 开始缓冲
+     */
+    void bufferStart();
+
+
+
+    void bufferEnd();
+
+
     /**
      * 更新缓冲进度
      * @param percent 缓冲百分比
@@ -21,4 +32,15 @@ public interface DWReplayRoomListener {
      * @param playerDuration 播放时长
      */
     void showVideoDuration(long playerDuration);
+
+    /**
+     * 播放完成
+     */
+    void onPlayComplete();
+    /**
+     * 播放错误
+     * @param code code
+     */
+    void onPlayError(int code);
+
 }

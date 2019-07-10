@@ -34,7 +34,6 @@ import com.bokecc.livemodule.live.morefunction.MoreFunctionLayout;
 import com.bokecc.livemodule.live.qa.LiveQAComponent;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.live.video.LiveVideoView;
-import com.bokecc.sdk.mobile.live.logging.LogHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +76,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
     @Override
     protected void onResume() {
-        LogHelper.getInstance().writeLog("LivePlayActivity onResume");
+//        LogHelper.getInstance().writeLog("LivePlayActivity onResume");
         super.onResume();
         mFunctionHandler.setRootView(mRoot);
         // 判断是否开启了弹幕
@@ -95,7 +94,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
     @Override
     protected void onPause() {
-        LogHelper.getInstance().writeLog("LivePlayActivity onPause");
+//        LogHelper.getInstance().writeLog("LivePlayActivity onPause");
         super.onPause();
         mFunctionHandler.removeRootView();
         mLiveVideoView.stop();
@@ -104,7 +103,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
     @Override
     protected void onDestroy() {
-        LogHelper.getInstance().writeLog("LivePlayActivity onDestroy");
+//        LogHelper.getInstance().writeLog("LivePlayActivity onDestroy");
         super.onDestroy();
         mLiveVideoView.destroy();
     }
@@ -235,6 +234,11 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
                     finish();
                 }
             });
+        }
+
+        @Override
+        public void onClickDocScaleType(int scaleType) {
+            
         }
     };
 

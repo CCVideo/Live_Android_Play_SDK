@@ -1,7 +1,6 @@
 package com.bokecc.dwlivemoduledemo.activity;
 
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,7 +16,6 @@ import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.dwlivemoduledemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivemoduledemo.popup.FloatingPopupWindow;
-import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -25,7 +23,7 @@ import com.bokecc.livemodule.replay.intro.ReplayIntroComponent;
 import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
-import com.bokecc.sdk.mobile.live.util.LogUtil;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +61,11 @@ public class ReplayPlayActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        LogUtil.d(TAG,"ReplayPlayActivity onResume()");
         mRoot.postDelayed(new Runnable() {
             @Override
             public void run() {
-                LogUtil.d(TAG,"ReplayPlayActivity#onResume()#run():mReplayVideoView start()");
-                mReplayVideoView.start();
                 showFloatingDocLayout();
+                mReplayVideoView.start();
             }
         }, 200);
     }
@@ -77,19 +73,19 @@ public class ReplayPlayActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mReplayVideoView.stop();
+        mReplayVideoView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mReplayFloatingView.dismiss();
-        mReplayVideoView.destory();
+        mReplayVideoView.destroy();
     }
 
     @Override
     public void onBackPressed() {
-        LogUtil.d(TAG,"onBackPressed()");
+        ELog.d(TAG,"onBackPressed()");
         if (!isPortrait()) {
             quitFullScreen();
             return;
@@ -105,6 +101,8 @@ public class ReplayPlayActivity extends BaseActivity {
         mReplayVideoContainer = findViewById(R.id.rl_video_container);
         mReplayVideoView = findViewById(R.id.replay_video_view);
         mReplayRoomLayout = findViewById(R.id.replay_room_layout);
+        mReplayRoomLayout.setVideoView(mReplayVideoView);
+
 
         mReplayMsgLayout = findViewById(R.id.ll_pc_replay_msg_layout);
         mViewPager = findViewById(R.id.live_portrait_container_viewpager);
@@ -132,17 +130,17 @@ public class ReplayPlayActivity extends BaseActivity {
         // 判断当前直播间模版是否有"文档"功能
         if (dwReplayCoreHandler.hasPdfView()) {
             initDocLayout();
-            LogUtil.d(TAG, "initDocLayout");
+            ELog.d(TAG, "initDocLayout");
         }
         // 判断当前直播间模版是否有"聊天"功能
         if (dwReplayCoreHandler.hasChatView()) {
             initChatLayout();
-            LogUtil.d(TAG, "initChatLayout");
+            ELog.d(TAG, "initChatLayout");
         }
         // 判断当前直播间模版是否有"问答"功能
         if (dwReplayCoreHandler.hasQaView()) {
             initQaLayout();
-            LogUtil.d(TAG, "initQaLayout");
+            ELog.d(TAG, "initQaLayout");
         }
         // 直播间简介
         initIntroLayout();
@@ -169,6 +167,9 @@ public class ReplayPlayActivity extends BaseActivity {
         mChatTag.setVisibility(View.VISIBLE);
         mChatLayout = new ReplayChatComponent(this);
         mLiveInfoList.add(mChatLayout);
+        if(mChatLayout != null){
+            mReplayRoomLayout.setSeekListener(mChatLayout);
+        }
     }
 
     // 初始化问答布局区域
@@ -182,7 +183,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     // 初始化简介布局区域
     private void initIntroLayout() {
-        LogUtil.d(TAG, "initIntroLayout");
+        ELog.d(TAG, "initIntroLayout");
         mIdList.add(R.id.live_portrait_info_intro);
         mTagList.add(mIntroTag);
         mIntroTag.setVisibility(View.VISIBLE);
@@ -193,6 +194,7 @@ public class ReplayPlayActivity extends BaseActivity {
     // 初始化文档布局区域
     private void initDocLayout() {
         mDocLayout = new ReplayDocComponent(this);
+        mDocLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mReplayFloatingView.addView(mDocLayout);
     }
 
@@ -202,7 +204,7 @@ public class ReplayPlayActivity extends BaseActivity {
         if (dwReplayCoreHandler == null) {
             return;
         }
-        LogUtil.d(TAG,"showFloatingDocLayout() hasPdfView:"+dwReplayCoreHandler.hasPdfView());
+        ELog.d(TAG,"showFloatingDocLayout() hasPdfView:"+dwReplayCoreHandler.hasPdfView());
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwReplayCoreHandler.hasPdfView()) {
             if (!mReplayFloatingView.isShowing()) {
@@ -303,6 +305,10 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayVideoView.cacheScreenBitmap();
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
+                        ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
+                        lp.width =  ViewGroup.LayoutParams.MATCH_PARENT;
+                        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                        mDocLayout.setLayoutParams(lp);
                         mReplayFloatingView.addView(mDocLayout);
                         mReplayVideoContainer.addView(mReplayVideoView);
                         isVideoMain = true;
@@ -340,6 +346,12 @@ public class ReplayPlayActivity extends BaseActivity {
                 }
             });
         }
+
+
+        @Override
+        public void onClickDocScaleType(int type) {
+            mDocLayout.setScaleType(type);
+        }
     };
 
     //---------------------------------- 全屏相关逻辑 --------------------------------------------/
@@ -361,8 +373,8 @@ public class ReplayPlayActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mChatLayout.stopTimerTask();
-                    mReplayRoomLayout.stopTimerTask();
+                    mChatLayout.release();
+                    mReplayRoomLayout.release();
                     mExitPopupWindow.dismiss();
                     finish();
                 }

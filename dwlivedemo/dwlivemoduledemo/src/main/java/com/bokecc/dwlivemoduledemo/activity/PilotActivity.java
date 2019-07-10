@@ -1,5 +1,6 @@
 package com.bokecc.dwlivemoduledemo.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,11 +8,23 @@ import android.view.View;
 import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.activity.extra.ReplayMixPlayActivity;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
+import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
 
 /**
  * 观看直播 & 观看回放 & 离线回放 入口选择页
  */
 public class PilotActivity extends BaseActivity {
+
+    private RxPermissions rxPermissions;
+    private int grantNum = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +34,7 @@ public class PilotActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_pilot);
-
+        rxPermissions = new RxPermissions(this);
 
         /**************************************************************************
          *
@@ -43,7 +56,7 @@ public class PilotActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PilotActivity.this, LiveLoginActivity.class);
-                startActivity(intent);
+                checkoutPermission(intent);
             }
         });
 
@@ -52,7 +65,7 @@ public class PilotActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PilotActivity.this, ReplayLoginActivity.class);
-                startActivity(intent);
+                checkoutPermission(intent);
             }
         });
 
@@ -60,13 +73,40 @@ public class PilotActivity extends BaseActivity {
         findViewById(R.id.btn_start_local_replay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
-                startActivity(intent);
+                // Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
+                // startActivity(intent);
 
                 // TODO Demo模版：跳转到在线和离线混合（支持列表切换）播放页 (ReplayMixPlayActivity)
-                // Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
-                // startActivity(intent);
+                Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
+                checkoutPermission(intent);
             }
         });
     }
+
+
+
+
+    private void checkoutPermission(final Intent intent){
+        grantNum = 0;
+
+        Observable<Permission> permissionObservable = rxPermissions.requestEach(Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        );
+
+        Disposable subscribe = permissionObservable.subscribe(new Consumer<Permission>() {
+            @Override
+            public void accept(Permission permission) {
+                if (permission.granted) {
+                    ELog.i(this, "permission granted:" + permission.name);
+                    grantNum++;
+                    if (grantNum == 3) {
+                        ELog.i(this, "all permission is granted:");
+                        startActivity(intent);
+                    }
+                }
+            }
+        });
+    }
+
 }

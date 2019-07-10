@@ -1,15 +1,16 @@
 package com.bokecc.livemodule.live;
 
+import android.util.Log;
 import android.view.Surface;
 
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
+import com.bokecc.livemodule.live.doc.LiveDocSizeChangeListener;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.DWLiveListener;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
-import com.bokecc.sdk.mobile.live.logging.LogHelper;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
@@ -142,6 +143,11 @@ public class DWLiveCoreHandler {
 
     /******************************* 设置"播放"组件/控件相关 ***************************************/
 
+    private LiveDocSizeChangeListener mDocSizeListener;
+    public void setDocSizeChangeListener(LiveDocSizeChangeListener listener) {
+        mDocSizeListener = listener;
+    }
+
     private DWLivePlayer dwLivePlayer;
 
     private DocView docView;
@@ -259,7 +265,7 @@ public class DWLiveCoreHandler {
      * 停止播放
      */
     public void stop() {
-        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Stop");
+//        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Stop");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             if (dwLivePlayer != null && dwLivePlayer.isPlaying()) {
@@ -273,7 +279,7 @@ public class DWLiveCoreHandler {
      * 释放资源
      */
     public void destroy() {
-        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Destroy");
+//        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Destroy");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             dwLive.onDestroy();
@@ -539,8 +545,9 @@ public class DWLiveCoreHandler {
          * @param docTotalPage 当前文档总共的页数
          */
         @Override
-        public void onPageChange(String docId, String docName, int pageNum, int docTotalPage) {
-
+        public void onPageChange(String docId, String docName, int width ,int height, int pageNum, int docTotalPage) {
+            Log.d("SocketRoomHandler", "onPageChange: width:"+width +"  height:"+height);
+            mDocSizeListener.updateSize(width,height);
         }
 
         /**

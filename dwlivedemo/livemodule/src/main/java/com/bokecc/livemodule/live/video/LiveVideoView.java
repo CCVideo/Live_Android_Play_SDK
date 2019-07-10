@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -19,7 +20,6 @@ import com.bokecc.livemodule.live.DWLiveVideoListener;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
-import com.bokecc.sdk.mobile.live.logging.LogHelper;
 
 import java.io.IOException;
 
@@ -131,10 +131,11 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         if (hasCallStartPlay) {
             return;
         }
-        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler start");
+//        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler start");
         hasCallStartPlay = true;
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
+            Log.e("test","video to start surface=:"+surface);
             dwLiveCoreHandler.start(surface);
             if (mVideoProgressBar != null) {
                 mVideoProgressBar.setVisibility(VISIBLE);
@@ -146,7 +147,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      * 停止播放
      */
     public void stop() {
-        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler Stop");
+//        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler Stop");
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.stop();
@@ -154,7 +155,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     }
 
     public void destroy() {
-        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler destroy");
+//        LogHelper.getInstance().writeLog("LiveVideoView Call DwLiveCoreHandler destroy");
         if (player != null) {
             player.pause();
             player.stop();

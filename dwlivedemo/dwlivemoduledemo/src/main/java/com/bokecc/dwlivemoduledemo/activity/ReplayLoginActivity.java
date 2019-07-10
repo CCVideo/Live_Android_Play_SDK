@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,7 +17,6 @@ import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.dwlivemoduledemo.scan.qr_codescan.MipcaActivityCapture;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
-import com.bokecc.sdk.mobile.live.logging.LogHelper;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
@@ -55,6 +53,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         if (map != null) {
             initEditTextInfo();
         }
+
     }
 
     private void initViews() {
@@ -79,8 +78,6 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
                 .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         preferences = getSharedPreferences("live_login_info", Activity.MODE_PRIVATE);
 
-
-
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,13 +86,14 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         });
     }
 
+
+
     //———————————————————————————————————— 登录相关方法（核心方法）  —————————————————————————————————————————
 
     /**
      * 执行回放登录操作
      */
     private void doLiveLogin() {
-
 
         // 创建登录信息
         ReplayLoginInfo replayLoginInfo = new ReplayLoginInfo();
@@ -111,7 +109,6 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onException(final DWLiveException exception) {
-                Log.d("sivin", "onException: code: "+exception.getErrorCode()+" msg:"+exception.getMessage());
                 toastOnUiThread("登录失败");
             }
 

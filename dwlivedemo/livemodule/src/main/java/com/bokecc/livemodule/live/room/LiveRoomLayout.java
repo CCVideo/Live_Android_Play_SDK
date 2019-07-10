@@ -31,11 +31,17 @@ import com.bokecc.livemodule.live.chat.adapter.EmojiAdapter;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.util.SoftKeyBoardState;
 import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.widget.DocView;
 
 /**
  * 直播间信息组件
  */
 public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener {
+
+    private final int SCALE_CENTER_INSIDE = 0;
+    private final int SCALE_FIT_XY = 1;
+    private final int SCALE_CROP_CENTER = 2;
+    private int mCurrentScaleType = SCALE_CENTER_INSIDE;
 
     Context mContext;
     RelativeLayout mTopLayout;
@@ -65,9 +71,13 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     boolean isSoftInput = false;
     SoftKeyBoardState mSoftKeyBoardState;
     InputMethodManager mImm;
+    private TextView mDocScaleType;
 
     // 是否视频为主 （用于文档和视频区域展示切换）
     boolean isVideoMain = true;
+
+    //当前文档的类型
+    int currentType = 0;
 
     public LiveRoomLayout(Context context) {
         super(context);
@@ -101,6 +111,8 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         mEmojiGrid = findViewById(R.id.id_push_emoji_grid);
         mChatSend = findViewById(R.id.id_push_chat_send);
         mInput = findViewById(R.id.id_push_chat_input);
+
+        mDocScaleType = findViewById(R.id.id_scale_type);
 
         initEmojiAndChat();
 
@@ -149,6 +161,28 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
                 }
             }
         });
+
+
+        mDocScaleType.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (liveRoomStatusListener != null) {
+                    if (currentType == 0) {
+                        currentType = 1;
+                        mDocScaleType.setText("FitXY");
+                    } else if (currentType == 1) {
+                        currentType = 2;
+                        mDocScaleType.setText("CropCenter");
+                    } else if (currentType == 2) {
+                        currentType = 0;
+                        mDocScaleType.setText("centerInside");
+                    }
+
+                    liveRoomStatusListener.onClickDocScaleType(currentType);
+                }
+            }
+        });
+
     }
 
     /**
@@ -288,6 +322,11 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
          * 用户踢出 事件回调 #Called From DWLiveCoreHandler
          */
         void kickOut();
+
+        /**
+         * 点击文档类型
+         */
+        void onClickDocScaleType(int scaleType);
     }
 
     // 直播间状态监听
@@ -472,7 +511,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
             hideKeyboard();
             if (mTopLayout.isShown()) {
                 ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", mBottomLayout.getHeight());
-                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", - 1 * mTopLayout.getHeight());
+                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", -1 * mTopLayout.getHeight());
                 AnimatorSet animatorSet = new AnimatorSet();
                 animatorSet.play(top_y).with(bottom_y);
 
@@ -529,7 +568,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
             }
         }
     };
-
 
 
     //***************************************** 工具方法 *****************************************

@@ -13,6 +13,7 @@ import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLoginInfo;
@@ -22,8 +23,6 @@ import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
-
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * "在线&离线混合回放" 核心处理机制（用于支持在线回放&离线回放同页面播放）
@@ -119,7 +118,7 @@ public class DWReplayMixCoreHandler {
     /******************************* 设置"播放"组件/控件相关 ***************************************/
 
     //播放器
-    private IjkMediaPlayer ijkMediaPlayer;
+    private DWReplayPlayer ijkMediaPlayer;
 
     //显示文档控件
     private DocView docView;
@@ -128,14 +127,14 @@ public class DWReplayMixCoreHandler {
     /**
      * 设置播放器
      */
-    public void setPlayer(IjkMediaPlayer player) {
+    public void setPlayer(DWReplayPlayer player) {
         this.ijkMediaPlayer = player;
     }
 
     /**
      * 获取播放器
      */
-    public IjkMediaPlayer getPlayer() {
+    public DWReplayPlayer getPlayer() {
         return this.ijkMediaPlayer;
     }
 
@@ -173,10 +172,10 @@ public class DWReplayMixCoreHandler {
         }
     }
 
-    public void stop() {
+    public void pause() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            dwLiveReplay.stop();
+            dwLiveReplay.pause();
         }
         DWLiveLocalReplay dwLiveLocalReplay = DWLiveLocalReplay.getInstance();
         if (dwLiveLocalReplay != null) {
@@ -208,16 +207,12 @@ public class DWReplayMixCoreHandler {
         if (replayMixChatListener != null) {
             replayMixChatListener.onChatMessage(new TreeSet<ReplayChatMsg>());
         }
-
         // 设置登录参数
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
-
             // 登录失败
             @Override
             public void onException(final DWLiveException exception) {
-
             }
-
             // 登录成功
             @Override
             public void onLogin(TemplateInfo templateInfo) {
@@ -233,9 +228,10 @@ public class DWReplayMixCoreHandler {
                 startPlayReplay();
             }
         }, info);
-
         // 执行登录操作
+        DWLiveReplay.getInstance().stop();
         DWLiveReplay.getInstance().startLogin();
+
     }
 
     /**
@@ -257,7 +253,8 @@ public class DWReplayMixCoreHandler {
         if (mCurrentPlayType == PlayType.LIVE) {
             DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
             if (dwLiveReplay != null && surface != null) {
-                dwLiveReplay.start(surface);
+                dwLiveReplay.start(null);
+                ijkMediaPlayer.updateSurface(surface);
             }
         } else if (mCurrentPlayType == PlayType.LOCAL) {
             final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
@@ -341,7 +338,7 @@ public class DWReplayMixCoreHandler {
         }
 
         @Override
-        public void onPageChange(String docId, String docName, int pageNum, int docTotalPage) {
+        public void onPageChange(String docId, String docName, int width ,int height,int pageNum, int docTotalPage) {
 
         }
 

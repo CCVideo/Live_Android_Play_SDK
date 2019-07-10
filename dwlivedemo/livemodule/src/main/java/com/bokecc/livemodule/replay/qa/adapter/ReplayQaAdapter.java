@@ -17,12 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.qa.module.QaInfo;
+import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
-import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
 import com.bokecc.sdk.mobile.live.pojo.Question;
+import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLiveInfo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +50,7 @@ public class ReplayQaAdapter extends RecyclerView.Adapter<ReplayQaAdapter.ChatVi
     private LayoutInflater mInflater;
 
     // 获取到直播间信息
-    private LiveInfo liveInfo;
+    private ReplayLiveInfo liveInfo;
 
     public ReplayQaAdapter(Context context) {
         mQaInfoMapAll = new LinkedHashMap<>();
@@ -62,9 +62,9 @@ public class ReplayQaAdapter extends RecyclerView.Adapter<ReplayQaAdapter.ChatVi
         mInflater = LayoutInflater.from(context);
 
         // 获取直播间信息，用于计算问答时间
-        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
-        if (dwLiveCoreHandler != null) {
-            liveInfo = DWLiveCoreHandler.getInstance().getLiveInfo();
+        DWReplayCoreHandler dwReLiveCoreHandler = DWReplayCoreHandler.getInstance();
+        if (dwReLiveCoreHandler != null) {
+            liveInfo = dwReLiveCoreHandler.getReplayLiveInfo();
         }
     }
 
@@ -226,7 +226,7 @@ public class ReplayQaAdapter extends RecyclerView.Adapter<ReplayQaAdapter.ChatVi
             if (sendTime > 0) {
                 if (liveInfo != null) {
                     SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = simpleDateFormat.parse(liveInfo.getLiveStartTime());
+                    Date date = simpleDateFormat.parse(liveInfo.getStartTime());
                     Date dateForShow = new Date(date.getTime() + sendTime * 1000);
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
                     holder.questionTime.setText(sdf.format(dateForShow));

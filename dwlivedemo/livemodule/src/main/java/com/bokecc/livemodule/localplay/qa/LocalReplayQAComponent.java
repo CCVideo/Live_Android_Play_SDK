@@ -118,7 +118,6 @@ public class LocalReplayQAComponent extends RelativeLayout implements DWLocalDWR
                     continue;
                 }
             }
-
             // 回答过
             QaInfo qaInfo = new QaInfo(question);
             for (ReplayAnswerMsg answerMsg:answerMsgs) {
@@ -131,12 +130,10 @@ public class LocalReplayQAComponent extends RelativeLayout implements DWLocalDWR
                         .setUserRole(answerMsg.getUserRole());
                 qaInfo.addAnswer(answer);
             }
-
             qaInfoMap.put(question.getId(), qaInfo);
         }
 
         mQaInfoMap = qaInfoMap;
-
         mQaList.post(new Runnable() {
             @Override
             public void run() {
