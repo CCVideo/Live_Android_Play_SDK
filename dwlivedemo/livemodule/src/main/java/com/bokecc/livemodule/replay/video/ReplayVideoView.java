@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -27,6 +28,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
  * CC 回放视频展示控件
  */
 public class ReplayVideoView extends RelativeLayout {
+    private static final String TAG = "ReplayVideoView";
 
     private Context mContext;
 
@@ -39,6 +41,8 @@ public class ReplayVideoView extends RelativeLayout {
     private DWReplayPlayer player;
 
     private Bitmap tempBitmap;
+
+    private long allTime = 0;
 
     public ReplayVideoView(Context context) {
         super(context);
@@ -128,7 +132,7 @@ public class ReplayVideoView extends RelativeLayout {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             // 使用新的surfaceTexture生成surface
-            ELog.i(this, "onSurfaceTextureAvailable");
+            ELog.i(TAG, "onSurfaceTextureAvailable");
             Surface surface = new Surface(surfaceTexture);
             // 正在播放中或者暂停中，只需要将新的surface给player即可
             if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
@@ -151,12 +155,12 @@ public class ReplayVideoView extends RelativeLayout {
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            ELog.i(this, "onSurfaceTextureSizeChanged");
+            ELog.i(TAG, "onSurfaceTextureSizeChanged");
         }
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            ELog.i(this, "onSurfaceTextureDestroyed");
+            ELog.i(TAG, "onSurfaceTextureDestroyed");
             return false;
         }
 
@@ -173,6 +177,12 @@ public class ReplayVideoView extends RelativeLayout {
     }
 
 
+    public void dismissProgress() {
+        if (mVideoProgressBar != null) {
+            mVideoProgressBar.setVisibility(GONE);
+        }
+    }
+
     /******************************************* 播放器相关监听 ***********************************/
 
     IMediaPlayer.OnPreparedListener preparedListener = new IMediaPlayer.OnPreparedListener() {
@@ -181,6 +191,8 @@ public class ReplayVideoView extends RelativeLayout {
             mVideoNoPlayTip.post(new Runnable() {
                 @Override
                 public void run() {
+                    long duration = player.getDuration();
+                    allTime = Math.round((double) duration / 1000) * 1000;
                     mVideoNoPlayTip.setVisibility(GONE);
                     DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
                     if (dwReplayCoreHandler != null) {
@@ -199,23 +211,23 @@ public class ReplayVideoView extends RelativeLayout {
             switch (what) {
                 // 缓冲开始
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
-                    mVideoProgressBar.setVisibility(VISIBLE);
+                    showProgress();
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.bufferStart();
                     }
-                    ELog.e(this, "buffer start");
+                    ELog.e(TAG, "buffer start");
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
-                    mVideoProgressBar.setVisibility(GONE);
-                    ELog.e(this, "buffer end");
+                    dismissProgress();
+                    ELog.e(TAG, "buffer end");
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.bufferEnd();
                     }
                     break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-                    mVideoProgressBar.setVisibility(GONE);
-                    ELog.e(this, "render start");
+                    dismissProgress();
+                    ELog.e(TAG, "render start");
                     break;
                 default:
                     break;
@@ -242,7 +254,7 @@ public class ReplayVideoView extends RelativeLayout {
             mVideoProgressBar.post(new Runnable() {
                 @Override
                 public void run() {
-                    mVideoProgressBar.setVisibility(GONE);
+                    dismissProgress();
                 }
             });
             if (dwReplayCoreHandler != null) {
@@ -255,10 +267,14 @@ public class ReplayVideoView extends RelativeLayout {
     IMediaPlayer.OnCompletionListener completionListener = new IMediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(IMediaPlayer mp) {
-            DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
-            mVideoProgressBar.setVisibility(GONE);
-            if (dwReplayCoreHandler != null) {
-                dwReplayCoreHandler.onPlayComplete();
+            dismissProgress();
+            long progress = player.getCurrentPosition();
+            long progressTime = Math.round((double) progress / 1000) * 1000;
+            if (allTime - progressTime < 3000) {
+                DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
+                if (dwReplayCoreHandler != null) {
+                    dwReplayCoreHandler.onPlayComplete();
+                }
             }
         }
     };

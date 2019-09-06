@@ -27,6 +27,8 @@ import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import tv.danmaku.ijk.media.player.IjkTimedText;
+
 /**
  * 回放直播间信息组件
  */
@@ -61,8 +63,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
     private SeekListener mChatListener;
 
-
     private LinearLayout mTipsLayout;
+
     private TextView mTipsView;
 
 
@@ -83,7 +85,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     TimerTask timerTask;
 
     private ReplayVideoView mVideoView;
-    public void setVideoView(ReplayVideoView videoView){
+
+    public void setVideoView(ReplayVideoView videoView) {
         mVideoView = videoView;
     }
 
@@ -203,7 +206,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                mCurrentTime.setText(TimeUtil.getFormatTime(seekBar.getProgress()));
             }
 
             @Override
@@ -219,7 +222,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                     return;
                 }
 
-                if(mVideoView != null){
+                if (mVideoView != null) {
                     mVideoView.showProgress();
                 }
                 // 获取当前的player，执行seek操作
@@ -237,7 +240,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             public void onClick(View v) {
                 controllerShouldResponseFinger = true;
                 mTipsLayout.setVisibility(GONE);
-                if(mVideoView != null){
+                if (mVideoView != null) {
                     mVideoView.showProgress();
                 }
                 DWReplayCoreHandler instance = DWReplayCoreHandler.getInstance();
@@ -294,7 +297,6 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             @Override
             public void run() {
                 long playSecond = Math.round((double) time / 1000) * 1000;
-                mCurrentTime.setText(TimeUtil.getFormatTime(playSecond));
                 mPlaySeekBar.setProgress((int) playSecond);
             }
         });
@@ -368,6 +370,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     @Override
     public void videoPrepared() {
         startTimerTask();
+        IjkTimedText timedText;
+
     }
 
     @Override
@@ -559,24 +563,29 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 animatorSet.addListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {
+
                     }
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
+
                     }
 
                     @Override
                     public void onAnimationCancel(Animator animator) {
+
+
                     }
 
                     @Override
                     public void onAnimationRepeat(Animator animator) {
+
+
                     }
                 });
             }
         }
     };
-
 
     public interface SeekListener {
         void onBackSeek(long progress);

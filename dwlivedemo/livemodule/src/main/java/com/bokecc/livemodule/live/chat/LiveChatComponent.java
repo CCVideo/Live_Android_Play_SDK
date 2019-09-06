@@ -1,6 +1,7 @@
 package com.bokecc.livemodule.live.chat;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +30,6 @@ import com.bokecc.livemodule.live.chat.adapter.EmojiAdapter;
 import com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
-import com.bokecc.livemodule.live.chat.util.BaseOnItemTouch;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.util.SoftKeyBoardState;
 import com.bokecc.livemodule.utils.ChatImageUtils;
@@ -76,6 +76,13 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
 
     // 定义当前支持的最大的可输入的文字数量
     private short maxInput = 300;
+
+    private OnChatComponentClickListener mChatComponentClickListener;
+
+    public void setOnChatComponentClickListener(OnChatComponentClickListener listener){
+        mChatComponentClickListener = listener;
+    }
+
 
     public LiveChatComponent(Context context) {
         super(context);
@@ -130,10 +137,19 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         mChatList.setLayoutManager(new LinearLayoutManager(mContext));
         mChatAdapter = new LivePublicChatAdapter(mContext);
         mChatList.setAdapter(mChatAdapter);
-        mChatList.addOnItemTouchListener(new BaseOnItemTouch(mChatList, new com.bokecc.livemodule.live.chat.util.OnClickListener() {
+
+        mChatAdapter.setOnChatImageClickListener(new LivePublicChatAdapter.onChatComponentClickListener() {
             @Override
-            public void onClick(RecyclerView.ViewHolder viewHolder) {
-                int position = mChatList.getChildAdapterPosition(viewHolder.itemView);
+            public void onChatComponentClick(View view, Bundle bundle) {
+                if(mChatComponentClickListener != null){
+                    mChatComponentClickListener.onClickChatComponent(bundle);
+                }
+            }
+        });
+
+        mChatAdapter.setOnItemClickListener(new LivePublicChatAdapter.onItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
                 ChatEntity chatEntity = mChatAdapter.getChatEntities().get(position);
                 // 判断聊天的角色，目前机制只支持和主讲、助教、主持人进行私聊
                 // 主讲（publisher）、助教（teacher）、主持人（host）、学生或观众（student）、其他没有角色（unknow）
@@ -148,7 +164,15 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
                     dwLiveCoreHandler.jump2PrivateChat(chatEntity);
                 }
             }
-        }));
+        });
+
+//        mChatList.addOnItemTouchListener(new BaseOnItemTouch(mChatList, new com.bokecc.livemodule.live.chat.util.OnClickListener() {
+//            @Override
+//            public void onClick(RecyclerView.ViewHolder viewHolder) {
+//                int position = mChatList.getChildAdapterPosition(viewHolder.itemView);
+//
+//            }
+//        }));
 
         mChatList.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -218,7 +242,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
                 }
             }
         });
-
         onSoftInputChange();
     }
 
@@ -303,6 +326,12 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         return false;
     }
 
+    private void clearChatEntities(){
+        if(mChatAdapter != null){
+            mChatAdapter.clearData();
+        }
+    }
+
     public void addChatEntity(ChatEntity chatEntity) {
         mChatAdapter.add(chatEntity);
         if (mChatAdapter.getItemCount() - 1 > 0) {
@@ -366,18 +395,19 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     @Override
     public void onHistoryChatMessage(final ArrayList<ChatMessage> historyChats) {
         // 如果之前已经加载过了历史聊天信息，就不再接收
-        if (hasLoadedHistoryChat) {
-            return;
-        }
+//        if (hasLoadedHistoryChat) {
+//            return;
+//        }
         if (historyChats == null || historyChats.size() == 0) {
             return;
         }
-        hasLoadedHistoryChat = true;
+//        hasLoadedHistoryChat = true;
         // 注：历史聊天信息中 ChatMessage 的 currentTime = ""
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // 将历史聊天信息添加到UI
+                clearChatEntities();
                 for (int i = 0; i < historyChats.size(); i++) {
                     if (barrageLayout != null) {
                         // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕 && 聊天状态为显示

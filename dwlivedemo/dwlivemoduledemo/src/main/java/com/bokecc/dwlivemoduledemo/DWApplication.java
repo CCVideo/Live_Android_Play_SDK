@@ -40,6 +40,9 @@ public class DWApplication extends Application {
         LiveSDKHelper.initSDK(this);
     }
 
+
+
+
     public static Context getContext() {
         return context;
     }

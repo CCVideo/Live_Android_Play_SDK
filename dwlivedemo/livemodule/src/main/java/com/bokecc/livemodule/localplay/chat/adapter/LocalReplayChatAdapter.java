@@ -2,10 +2,16 @@ package com.bokecc.livemodule.localplay.chat.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,13 +31,30 @@ import com.bokecc.sdk.mobile.live.replay.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChatAdapter.ChatViewHolder> {
 
+    private final Pattern pattern;
     private Context mContext;
     private ArrayList<ChatEntity> mChatEntities;
     private LayoutInflater mInflater;
     private String selfId;
+
+    private OnChatComponentClickListener mChatcomponentClickListener;
+
+    public static final String CONTENT_IMAGE_COMPONENT = "content_image";
+    public static final String CONTENT_ULR_COMPONET = "content_url";
+
+    public interface OnChatComponentClickListener {
+        void OnChatComponentClickListener(View view, Bundle bundle);
+    }
+
+    public void setOnChatcomponentClickListener(OnChatComponentClickListener listener) {
+        mChatcomponentClickListener = listener;
+    }
+
 
     public LocalReplayChatAdapter(Context context) {
         mChatEntities = new ArrayList<>();
@@ -43,6 +66,8 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
         } else {
             selfId = viewer.getId();
         }
+
+        pattern = Pattern.compile("(https?://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
     }
 
     /**
@@ -114,8 +139,8 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
     }
 
     @Override
-    public void onBindViewHolder(LocalReplayChatAdapter.ChatViewHolder holder, int position) {
-        ChatEntity chatEntity = mChatEntities.get(position);
+    public void onBindViewHolder(final LocalReplayChatAdapter.ChatViewHolder holder, int position) {
+        final ChatEntity chatEntity = mChatEntities.get(position);
 
         // 判断是是否是广播，如果是，就展示广播信息
         if (chatEntity.getUserId().isEmpty() && chatEntity.getUserName().isEmpty() && !chatEntity.isPrivate()
@@ -139,13 +164,63 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
                 } else {
                     Glide.with(mContext).load(ChatImageUtils.getImgUrlFromChatMessage(chatEntity.getMsg())).asBitmap().into(holder.mChatImg);
                 }
+
+                holder.mChatImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mChatcomponentClickListener != null) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("type",CONTENT_IMAGE_COMPONENT);
+                            bundle.putString("url", ChatImageUtils.getImgUrlFromChatMessage(chatEntity.getMsg()));
+                            mChatcomponentClickListener.OnChatComponentClickListener(holder.mChatImg,bundle);
+                        }
+                    }
+                });
+
             } else {
                 String msg = chatEntity.getUserName() + ": " + chatEntity.getMsg();
+
+                String url = null;
+                Matcher matcher = pattern.matcher(msg);
+                int start = -1;
+                int end = -1;
+                if (matcher.find()) {
+                    start = matcher.start();
+                    end = matcher.end();
+                    url = matcher.group();
+                }
+
                 SpannableString ss = new SpannableString(msg);
                 ss.setSpan(UserRoleUtils.getUserRoleColorSpan(chatEntity.getUserRole()),
                         0, (chatEntity.getUserName() + ":").length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ss.setSpan(new ForegroundColorSpan(Color.parseColor("#1E1F21")),
                         (chatEntity.getUserName() + ":").length() + 1, msg.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+                if (url != null) {
+                    final String finalUrl = url;
+                    ss.setSpan(new ClickableSpan() {
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            if(mChatcomponentClickListener != null){
+                                Bundle bundle = new Bundle();
+                                bundle.putString("type",CONTENT_ULR_COMPONET);
+                                bundle.putString("url",finalUrl);
+                                mChatcomponentClickListener.OnChatComponentClickListener(widget,bundle);
+                            }
+                        }
+                        //去除连接下划线
+                        @Override
+                        public void updateDrawState(TextPaint ds) {
+                            ds.setUnderlineText(false);
+                        }
+
+                    },start,end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    ss.setSpan(new ForegroundColorSpan(Color.parseColor("#2292DD")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
+                }
+
                 holder.mContent.setText(EmojiUtil.parseFaceMsg(mContext, ss));
                 holder.mContent.setVisibility(View.VISIBLE);
                 holder.mChatImg.setVisibility(View.GONE);

@@ -15,10 +15,10 @@ import com.bokecc.dwlivemoduledemo.R;
  */
 public class FloatingPopupWindow {
     // 弹窗宽度
-    private static final int POPUP_WINDOW_WIDTH = 300;
+    public static final int POPUP_WINDOW_WIDTH = 300;
 
     // 弹窗高度
-    private static final int POPUP_WINDOW_HEIGHT = 225;
+    public static final int POPUP_WINDOW_HEIGHT = 225;
 
     private Context mContext;
 

@@ -209,10 +209,13 @@ public class DWReplayMixCoreHandler {
         }
         // 设置登录参数
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
+
             // 登录失败
             @Override
             public void onException(final DWLiveException exception) {
+
             }
+
             // 登录成功
             @Override
             public void onLogin(TemplateInfo templateInfo) {
@@ -228,6 +231,7 @@ public class DWReplayMixCoreHandler {
                 startPlayReplay();
             }
         }, info);
+
         // 执行登录操作
         DWLiveReplay.getInstance().stop();
         DWLiveReplay.getInstance().startLogin();

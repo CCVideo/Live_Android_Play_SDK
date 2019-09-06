@@ -1,16 +1,18 @@
 package com.bokecc.livemodule.localplay.chat;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.localplay.DWLocalDWReplayChatListener;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
@@ -22,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * 回放聊天控件
@@ -37,6 +37,13 @@ public class LocalReplayChatComponent extends RelativeLayout implements DWLocalD
     RecyclerView mChatList;
 
     int mChatInfoLength;
+
+
+    private OnChatComponentClickListener mChatComponentClickListener;
+
+    public void setOnChatComponentClickListener(OnChatComponentClickListener listener) {
+        mChatComponentClickListener = listener;
+    }
 
     public LocalReplayChatComponent(Context context) {
         super(context);
@@ -64,6 +71,15 @@ public class LocalReplayChatComponent extends RelativeLayout implements DWLocalD
         mChatList.setLayoutManager(new LinearLayoutManager(mContext));
         mChatAdapter = new LocalReplayChatAdapter(mContext);
         mChatList.setAdapter(mChatAdapter);
+
+        mChatAdapter.setOnChatcomponentClickListener(new LocalReplayChatAdapter.OnChatComponentClickListener() {
+            @Override
+            public void OnChatComponentClickListener(View view, Bundle bundle) {
+                if (mChatComponentClickListener != null) {
+                    mChatComponentClickListener.onClickChatComponent(bundle);
+                }
+            }
+        });
 
         // 设置监听
         DWLocalReplayCoreHandler dwReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
@@ -101,7 +117,7 @@ public class LocalReplayChatComponent extends RelativeLayout implements DWLocalD
     public void appendChatEntities(ArrayList<ChatEntity> chatEntities) {
         mChatAdapter.append(chatEntities);
         // 如果只是需要追加数据，而不滑动，可以注释掉下面的调用
-        mChatList.smoothScrollToPosition(mChatAdapter.getChatListSize()-1);
+        mChatList.smoothScrollToPosition(mChatAdapter.getChatListSize() - 1);
     }
 
     private ArrayList<ChatEntity> mChatEntities = new ArrayList<>();

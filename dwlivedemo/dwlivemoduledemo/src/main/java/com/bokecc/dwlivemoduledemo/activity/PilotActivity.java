@@ -21,7 +21,7 @@ import io.reactivex.functions.Consumer;
  * 观看直播 & 观看回放 & 离线回放 入口选择页
  */
 public class PilotActivity extends BaseActivity {
-
+    private static final String TAG = "PilotActivity";
     private RxPermissions rxPermissions;
     private int grantNum = 0;
 
@@ -73,11 +73,11 @@ public class PilotActivity extends BaseActivity {
         findViewById(R.id.btn_start_local_replay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
-                // startActivity(intent);
+                 Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
+//                 startActivity(intent);
 
                 // TODO Demo模版：跳转到在线和离线混合（支持列表切换）播放页 (ReplayMixPlayActivity)
-                Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
+//                Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
                 checkoutPermission(intent);
             }
         });
@@ -98,10 +98,10 @@ public class PilotActivity extends BaseActivity {
             @Override
             public void accept(Permission permission) {
                 if (permission.granted) {
-                    ELog.i(this, "permission granted:" + permission.name);
+                    ELog.i(TAG, "permission granted:" + permission.name);
                     grantNum++;
                     if (grantNum == 3) {
-                        ELog.i(this, "all permission is granted:");
+                        ELog.i(TAG, "all permission is granted:");
                         startActivity(intent);
                     }
                 }

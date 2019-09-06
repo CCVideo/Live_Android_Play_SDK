@@ -173,7 +173,7 @@ public final class CameraManager {
   }
 
   /**
-   * Tells the camera to stop drawing preview frames.
+   * Tells the camera to pause drawing preview frames.
    */
   public void stopPreview() {
     if (camera != null && previewing) {

@@ -110,6 +110,7 @@
             android:screenOrientation="portrait" />
         <!--离线下载界面-->
         <activity android:name=".activity.DownloadListActivity" />
+        <activity android:name=".activity.ImageDetailsActivity" />
 
     </application>
 

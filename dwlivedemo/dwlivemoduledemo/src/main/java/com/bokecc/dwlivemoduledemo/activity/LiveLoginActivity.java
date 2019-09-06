@@ -62,11 +62,13 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_login);
         initViews();
+
         preferences = getSharedPreferences("live_login_info", Activity.MODE_PRIVATE);
         getSharePreference();
         if (map != null) {
             initEditTextInfo();
         }
+
         //解析网页端URL跳转直播
         parseUriIntent();
 

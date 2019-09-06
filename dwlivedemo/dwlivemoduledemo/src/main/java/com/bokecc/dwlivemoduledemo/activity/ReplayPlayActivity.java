@@ -1,6 +1,8 @@
 package com.bokecc.dwlivemoduledemo.activity;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,7 @@ import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.dwlivemoduledemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivemoduledemo.popup.FloatingPopupWindow;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -27,6 +30,9 @@ import com.bokecc.sdk.mobile.live.logging.ELog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
 
 /**
  * 回放播放页（默认文档大屏，视频小屏，可手动切换）
@@ -85,7 +91,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        ELog.d(TAG,"onBackPressed()");
+        ELog.d(TAG, "onBackPressed()");
         if (!isPortrait()) {
             quitFullScreen();
             return;
@@ -167,8 +173,24 @@ public class ReplayPlayActivity extends BaseActivity {
         mChatTag.setVisibility(View.VISIBLE);
         mChatLayout = new ReplayChatComponent(this);
         mLiveInfoList.add(mChatLayout);
-        if(mChatLayout != null){
+        if (mChatLayout != null) {
             mReplayRoomLayout.setSeekListener(mChatLayout);
+            mChatLayout.setOnChatComponentClickListener(new OnChatComponentClickListener() {
+                @Override
+                public void onClickChatComponent(Bundle bundle) {
+                    if (bundle == null) return;
+                    String type = bundle.getString("type");
+                    if (CONTENT_IMAGE_COMPONENT.equals(type)) {
+                        Intent intent = new Intent(ReplayPlayActivity.this, ImageDetailsActivity.class);
+                        intent.putExtra("imageUrl", bundle.getString("url"));
+                        startActivity(intent);
+                    } else if (CONTENT_ULR_COMPONET.equals(type)) {
+                        Uri uri = Uri.parse(bundle.getString("url"));
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    }
+                }
+            });
         }
     }
 
@@ -204,7 +226,7 @@ public class ReplayPlayActivity extends BaseActivity {
         if (dwReplayCoreHandler == null) {
             return;
         }
-        ELog.d(TAG,"showFloatingDocLayout() hasPdfView:"+dwReplayCoreHandler.hasPdfView());
+        ELog.d(TAG, "showFloatingDocLayout() hasPdfView:" + dwReplayCoreHandler.hasPdfView());
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwReplayCoreHandler.hasPdfView()) {
             if (!mReplayFloatingView.isShowing()) {
@@ -306,7 +328,7 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
-                        lp.width =  ViewGroup.LayoutParams.MATCH_PARENT;
+                        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
                         lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
                         mDocLayout.setLayoutParams(lp);
                         mReplayFloatingView.addView(mDocLayout);
@@ -373,8 +395,13 @@ public class ReplayPlayActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mChatLayout.release();
-                    mReplayRoomLayout.release();
+                    if (mChatLayout != null) {
+                        mChatLayout.release();
+                    }
+                    if (mReplayRoomLayout != null) {
+                        mReplayRoomLayout.release();
+                    }
+
                     mExitPopupWindow.dismiss();
                     finish();
                 }

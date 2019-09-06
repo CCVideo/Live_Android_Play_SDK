@@ -16,6 +16,7 @@ import com.bokecc.livemodule.live.function.questionnaire.QuestionnaireHandler;
 import com.bokecc.livemodule.live.function.rollcall.RollCallHandler;
 import com.bokecc.livemodule.live.function.vote.VoteHandler;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeRankInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
@@ -366,6 +367,11 @@ public class FunctionHandler implements DWLiveFunctionListener {
                 practiceHandler.showPracticeStatis(rootView, info);
             }
         });
+    }
+
+    @Override
+    public void onPracticRanking(PracticeRankInfo info) {
+
     }
 
     /**

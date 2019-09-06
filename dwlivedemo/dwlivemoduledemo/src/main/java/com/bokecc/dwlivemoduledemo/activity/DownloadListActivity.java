@@ -88,6 +88,11 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         hideActionBar();
         setContentView(R.layout.activity_down_load_list);
 
+        FileDownloadLog.NEED_LOG = true;
+        FileDownloader.setup(this);
+        //注册TaskManager
+        TasksManager.getImpl().onCreate(new WeakReference<DownloadView>(this));
+
         //初始化控件
         mRoot = getWindow().getDecorView().findViewById(android.R.id.content);
         mDownloadListView = findViewById(R.id.id_download_list);
@@ -108,10 +113,7 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
         }
-        FileDownloadLog.NEED_LOG = true;
-        FileDownloader.setup(this);
-        //注册TaskManager
-        TasksManager.getImpl().onCreate(new WeakReference<DownloadView>(this));
+
     }
 
     @Override

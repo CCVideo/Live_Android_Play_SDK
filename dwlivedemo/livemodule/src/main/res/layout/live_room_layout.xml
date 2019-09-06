@@ -45,13 +45,12 @@
                     android:text="0"
                     android:visibility="gone" />
 
-
                 <TextView
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:id="@+id/id_scale_type"
                     style="@style/phoneLiveLandscapeTitleViewTheme"
                     android:paddingRight="5dp"
-                    android:text="模式" />
+                    android:text="centerInside" />
 
                 <TextView
                     android:id="@+id/video_doc_switch"
@@ -209,5 +208,14 @@
         </LinearLayout>
 
     </RelativeLayout>
+
+    <TextView
+
+        android:id="@+id/estimateStartTime"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:text="直播"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

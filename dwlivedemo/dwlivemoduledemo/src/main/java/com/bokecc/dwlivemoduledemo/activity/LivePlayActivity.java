@@ -2,9 +2,11 @@ package com.bokecc.dwlivemoduledemo.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,7 @@ import com.bokecc.livemodule.live.DWLiveBarrageListener;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveRTCListener;
 import com.bokecc.livemodule.live.chat.LiveChatComponent;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
 import com.bokecc.livemodule.live.doc.LiveDocComponent;
 import com.bokecc.livemodule.live.function.FunctionHandler;
@@ -40,6 +43,9 @@ import com.bokecc.livemodule.live.video.LiveVideoView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
 
 /**
  * 直播播放页（默认视频大屏，文档小屏，可手动切换）
@@ -96,7 +102,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                 mLiveVideoView.start();
                 showFloatingDocLayout();
             }
-        }, 1000);
+        }, 500);
     }
 
     @Override
@@ -168,7 +174,6 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
         // 检测权限（用于连麦）
         doPermissionCheck();
-
     }
 
     /**
@@ -225,10 +230,9 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                             mLiveFloatingView.removeAllView();
                             mLiveFloatingView.addView(mLiveVideoView);
                             ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
-                            lp.width =  ViewGroup.LayoutParams.MATCH_PARENT;
+                            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
                             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
                             mDocLayout.setLayoutParams(lp);
-
                             mLiveVideoContainer.addView(mDocLayout);
                         }
                     }
@@ -281,7 +285,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
         @Override
         public void onClickDocScaleType(int scaleType) {
-            if(mDocLayout != null){
+            if (mDocLayout != null) {
                 mDocLayout.setScaleType(scaleType);
             }
         }
@@ -528,6 +532,26 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         mChatLayout = new LiveChatComponent(this);
         mLiveInfoList.add(mChatLayout);
         mChatLayout.setBarrageLayout(mLiveBarrage);
+        mChatLayout.setOnChatComponentClickListener(new OnChatComponentClickListener() {
+            @Override
+            public void onClickChatComponent(Bundle bundle) {
+
+                if (bundle == null) return;
+
+                String type = bundle.getString("type");
+                if (CONTENT_IMAGE_COMPONENT.equals(type)) {
+                    Intent intent = new Intent(LivePlayActivity.this, ImageDetailsActivity.class);
+                    intent.putExtra("imageUrl", bundle.getString("url"));
+                    startActivity(intent);
+                } else if (CONTENT_ULR_COMPONET.equals(type)) {
+                    Uri uri = Uri.parse(bundle.getString("url"));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+
+
+            }
+        });
     }
 
     // 初始化文档布局区域

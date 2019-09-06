@@ -11,11 +11,13 @@ import com.bokecc.sdk.mobile.live.DWLiveListener;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeRankInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.PrivateChatInfo;
@@ -257,7 +259,8 @@ public class DWLiveCoreHandler {
             // 设置播放参数 （回调 及 上下文）
             dwLive.setDWLivePlayParams(dwLiveListener, DWLiveEngine.getInstance().getContext());
             // 调用开始播放逻辑
-            dwLive.start(surface);
+            dwLive.start(null);
+            DWLive.getInstance().getPracticeStatis("");
         }
     }
 
@@ -265,7 +268,6 @@ public class DWLiveCoreHandler {
      * 停止播放
      */
     public void stop() {
-//        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Stop");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             if (dwLivePlayer != null && dwLivePlayer.isPlaying()) {
@@ -279,7 +281,6 @@ public class DWLiveCoreHandler {
      * 释放资源
      */
     public void destroy() {
-//        LogHelper.getInstance().writeLog("Call DWLiveCoreHandler Destroy");
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             dwLive.onDestroy();
@@ -547,7 +548,7 @@ public class DWLiveCoreHandler {
         @Override
         public void onPageChange(String docId, String docName, int width ,int height, int pageNum, int docTotalPage) {
             Log.d("SocketRoomHandler", "onPageChange: width:"+width +"  height:"+height);
-            mDocSizeListener.updateSize(width,height);
+           // mDocSizeListener.updateSize(width,height);
         }
 
         /**
@@ -723,7 +724,7 @@ public class DWLiveCoreHandler {
         /**
          * 定制聊天
          *
-         * @param customMessage
+         * @param customMessage customMessage
          */
         @Override
         public void onCustomMessage(String customMessage) {
@@ -947,6 +948,13 @@ public class DWLiveCoreHandler {
         public void onPracticStatis(PracticeStatisInfo info) {
             if (dwLiveFunctionListener != null) {
                 dwLiveFunctionListener.onPracticStatis(info);
+            }
+        }
+
+        @Override
+        public void onPracticRanking(PracticeRankInfo info) {
+            if (dwLiveFunctionListener != null) {
+                dwLiveFunctionListener.onPracticRanking(info);
             }
         }
 

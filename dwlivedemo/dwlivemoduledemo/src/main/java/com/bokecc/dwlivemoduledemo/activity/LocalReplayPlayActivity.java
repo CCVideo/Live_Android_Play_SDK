@@ -2,6 +2,7 @@ package com.bokecc.dwlivemoduledemo.activity;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.dwlivemoduledemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivemoduledemo.popup.FloatingPopupWindow;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.localplay.chat.LocalReplayChatComponent;
 import com.bokecc.livemodule.localplay.doc.LocalReplayDocComponent;
@@ -31,6 +33,9 @@ import com.bokecc.livemodule.localplay.video.LocalReplayVideoView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
 
 /**
  * 离线回放播放页
@@ -302,6 +307,25 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         mQaLayout = new LocalReplayQAComponent(this);
         mIntroComponent = new LocalReplayIntroComponent(this);
         mDocLayout = new LocalReplayDocComponent(this);
+
+        mChatLayout.setOnChatComponentClickListener(new OnChatComponentClickListener() {
+            @Override
+            public void onClickChatComponent(Bundle bundle) {
+                if (bundle == null) return;
+
+                String type = bundle.getString("type");
+                if (CONTENT_IMAGE_COMPONENT.equals(type)) {
+                    Intent intent = new Intent(LocalReplayPlayActivity.this, ImageDetailsActivity.class);
+                    intent.putExtra("imageUrl", bundle.getString("url"));
+                    startActivity(intent);
+                } else if (CONTENT_ULR_COMPONET.equals(type)) {
+                    Uri uri = Uri.parse(bundle.getString("url"));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+
+            }
+        });
     }
 
 

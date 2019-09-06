@@ -226,8 +226,6 @@ public class LocalReplayVideoView extends RelativeLayout {
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
-                    mVideoProgressBar.setVisibility(GONE);
-                    break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
                     mVideoProgressBar.setVisibility(GONE);
                     break;

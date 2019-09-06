@@ -39,12 +39,12 @@
                 android:text="切换文档" />
 
             <TextView
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/doc_scale_type"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_toStartOf="@id/video_doc_switch"
                 android:paddingRight="5dp"
-                android:text="拉伸模式" />
+                android:text="CenterInside" />
 
         </RelativeLayout>
 

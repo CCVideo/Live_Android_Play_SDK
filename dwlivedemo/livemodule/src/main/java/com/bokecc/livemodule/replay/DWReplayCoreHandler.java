@@ -3,22 +3,26 @@ package com.bokecc.livemodule.replay;
 import android.util.Log;
 import android.view.Surface;
 
+import com.bokecc.livemodule.replay.doc.DocActionListener;
 import com.bokecc.livemodule.replay.doc.ReplayDocSizeChangeListener;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.replay.ReplayErrorListener;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLiveInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayPageInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
-import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
+
+import static com.bokecc.sdk.mobile.live.Exception.ErrorCode.DOC_LOAD_FAILED;
 
 /**
  * 回放相关逻辑核心处理机制
@@ -65,6 +69,11 @@ public class DWReplayCoreHandler {
         mDocSizeListener = listener;
     }
 
+    private DocActionListener mDocActionListener;
+
+    public void setDocActionListener(DocActionListener docActionListener) {
+        mDocActionListener = docActionListener;
+    }
 
     /**
      * 回放问答监听
@@ -124,10 +133,11 @@ public class DWReplayCoreHandler {
      * @param docView 文档展示控件
      */
     public void setDocView(DocView docView) {
-        ELog.i(this,"setDocView");
+
         this.docView = docView;
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
+            dwLiveReplay.setReplayErrorListener(mErrorListener);
             dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
             dwLiveReplay.setReplayDocView(this.docView);
         }
@@ -223,30 +233,29 @@ public class DWReplayCoreHandler {
         }
     }
 
-    public void playError(int code){
+    public void playError(int code) {
         if (replayRoomListener != null) {
             replayRoomListener.onPlayError(code);
         }
     }
 
-    public void bufferStart(){
-        if(replayRoomListener != null){
+    public void bufferStart() {
+        if (replayRoomListener != null) {
             replayRoomListener.bufferStart();
         }
     }
 
-    public void bufferEnd(){
-        if(replayRoomListener != null){
+    public void bufferEnd() {
+        if (replayRoomListener != null) {
             replayRoomListener.bufferEnd();
         }
     }
 
-    public void onPlayComplete(){
-        if(replayRoomListener != null){
+    public void onPlayComplete() {
+        if (replayRoomListener != null) {
             replayRoomListener.onPlayComplete();
         }
     }
-
 
 
     /**
@@ -299,7 +308,7 @@ public class DWReplayCoreHandler {
         public void onPageChange(String docId, String docName, int width, int height, int pageNum, int docTotalPage) {
             Log.d(TAG, "onPageChange: pageNum:" + pageNum + " docTotalPage:" + docTotalPage + " docId=" + docId);
             Log.d(TAG, "onPageChange: pageNum:" + "w:" + width + "height:" + height);
-            mDocSizeListener.updateSize(width,height);
+            mDocSizeListener.updateSize(width, height);
         }
 
         @Override
@@ -313,5 +322,14 @@ public class DWReplayCoreHandler {
         }
     };
 
+
+    public ReplayErrorListener mErrorListener = new ReplayErrorListener() {
+        @Override
+        public void onError(ErrorCode code, String msg) {
+            if (code == DOC_LOAD_FAILED) {
+                mDocActionListener.onDocLoadFailed();
+            }
+        }
+    };
 
 }

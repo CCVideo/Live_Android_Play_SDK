@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
+import com.bokecc.dwlivemoduledemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivemoduledemo.scan.qr_codescan.MipcaActivityCapture;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
@@ -41,6 +42,9 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
     Button btnLoginLive;
 
+    LoginPopupWindow loginPopupWindow;   // 登录Loading控件
+    private View mRoot;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         hideActionBar();
@@ -59,7 +63,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
     private void initViews() {
         findViewById(R.id.iv_back).setOnClickListener(this);
         findViewById(R.id.iv_scan).setOnClickListener(this);
-
+        mRoot = getWindow().getDecorView().findViewById(android.R.id.content);
         btnLoginLive = findViewById(com.bokecc.livemodule.R.id.btn_login_replay);
         lllLoginReplayUid = findViewById(com.bokecc.livemodule.R.id.lll_login_replay_uid);
         lllLoginReplayRoomid = findViewById(com.bokecc.livemodule.R.id.lll_login_replay_roomid);
@@ -78,6 +82,8 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
                 .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         preferences = getSharedPreferences("live_login_info", Activity.MODE_PRIVATE);
 
+        loginPopupWindow = new LoginPopupWindow(this);
+
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +92,19 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         });
     }
 
-
+    /**
+     * 隐藏弹窗
+     */
+    private void dismissPopupWindow() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (loginPopupWindow != null && loginPopupWindow.isShowing()) {
+                    loginPopupWindow.dismiss();
+                }
+            }
+        });
+    }
 
     //———————————————————————————————————— 登录相关方法（核心方法）  —————————————————————————————————————————
 
@@ -109,18 +127,22 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onException(final DWLiveException exception) {
+                dismissPopupWindow();
                 toastOnUiThread("登录失败");
             }
 
             @Override
             public void onLogin(TemplateInfo templateInfo) {
+                dismissPopupWindow();
                 writeSharePreference();
                 toastOnUiThread("登录成功");
                 go(ReplayPlayActivity.class); // 回放默认Demo页
                 // go(ReplayPlayDocActivity.class);  // 回放'文档大屏/视频小屏'的Demo页
+                dismissPopupWindow();
             }
         }, replayLoginInfo);
 
+        loginPopupWindow.show(mRoot);
         // 执行登录操作
         DWLiveReplay.getInstance().startLogin();
     }

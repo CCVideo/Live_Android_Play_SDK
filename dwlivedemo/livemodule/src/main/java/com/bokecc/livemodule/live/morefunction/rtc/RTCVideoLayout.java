@@ -78,6 +78,8 @@ public class RTCVideoLayout extends BaseLinearLayout {
         }
     }
 
+
+
     public void enterSpeak(final boolean isVideoRtc, String videoSize) {
         processRemoteVideoSize(videoSize);
         runOnUiThread(new Runnable() {

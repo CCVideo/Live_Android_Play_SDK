@@ -1,6 +1,7 @@
 package com.bokecc.livemodule.live;
 
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
+import com.bokecc.sdk.mobile.live.pojo.PracticeRankInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
@@ -134,6 +135,12 @@ public interface DWLiveFunctionListener {
     void onPracticStatis(PracticeStatisInfo info);
 
     /**
+     * 随堂测排名
+     * @param info
+     */
+    void onPracticRanking(PracticeRankInfo info);
+
+    /**
      * 收到停止随堂测
      *
      * @param practiceId 随堂测ID
@@ -153,5 +160,7 @@ public interface DWLiveFunctionListener {
      * 功能异常的回调
      */
     void onException(String message);
+
+
 
 }

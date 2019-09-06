@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        test {
-            storeFile file('F:\\CCDoc\\test.jks')
+        release {
+            storeFile file('F:/CC_Work/trunk/play/sdk_demo_as/signkey.jks')
             storePassword '123456'
-            keyAlias = 'test'
+            keyAlias = 'key0'
             keyPassword '123456'
         }
     }
@@ -17,23 +17,29 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         ndk {
             abiFilters 'armeabi'
         }
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.test
-            renderscriptDebuggable = true
+            signingConfig signingConfigs.release
         }
     }
 
     buildToolsVersion = '28.0.3'
+
+    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
 }
 
@@ -47,6 +53,9 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.liulishuo.filedownloader:library:1.7.6'
     implementation 'cn.dreamtobe.filedownloader:filedownloader-okhttp3-connection:1.1.0'
+
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+
     // CC SDK Module
     implementation project(':livemodule')
     // 二维码扫描库

@@ -1,15 +1,18 @@
 package com.bokecc.livemodule.replay.chat;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.replay.DWReplayChatListener;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
@@ -37,6 +40,13 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
     int mChatInfoLength;
 
     private ArrayList<ChatEntity> tempChatEntities;
+
+    private OnChatComponentClickListener mChatComponentClickListener;
+
+    public void setOnChatComponentClickListener(OnChatComponentClickListener listener){
+        mChatComponentClickListener = listener;
+    }
+
 
     public ReplayChatComponent(Context context) {
         super(context);
@@ -67,6 +77,15 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
         mChatRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mChatAdapter = new ReplayChatAdapter(mContext);
         mChatRecyclerView.setAdapter(mChatAdapter);
+
+        mChatAdapter.setOnChatcomponentClickListener(new ReplayChatAdapter.OnChatComponentClickListener() {
+            @Override
+            public void onChatComponentClick(View view, Bundle bundle) {
+                if(mChatComponentClickListener != null){
+                    mChatComponentClickListener.onClickChatComponent(bundle);
+                }
+            }
+        });
 
         // 设置监听
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
@@ -237,6 +256,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
             timerTask = null;
         }
     }
+
 
     public void release() {
         startTimerTask();

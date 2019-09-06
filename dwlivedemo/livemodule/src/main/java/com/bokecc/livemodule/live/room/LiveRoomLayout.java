@@ -31,7 +31,7 @@ import com.bokecc.livemodule.live.chat.adapter.EmojiAdapter;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.util.SoftKeyBoardState;
 import com.bokecc.sdk.mobile.live.DWLive;
-import com.bokecc.sdk.mobile.live.widget.DocView;
+import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 
 /**
  * 直播间信息组件
@@ -111,6 +111,13 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         mEmojiGrid = findViewById(R.id.id_push_emoji_grid);
         mChatSend = findViewById(R.id.id_push_chat_send);
         mInput = findViewById(R.id.id_push_chat_input);
+        TextView estimateStartTime = findViewById(R.id.estimateStartTime);
+
+        RoomInfo roomInfo = DWLive.getInstance().getRoomInfo();
+        if (roomInfo != null) {
+            estimateStartTime.setVisibility(VISIBLE);
+            estimateStartTime.setText(roomInfo.getEstimateStartTime());
+        }
 
         mDocScaleType = findViewById(R.id.id_scale_type);
 
