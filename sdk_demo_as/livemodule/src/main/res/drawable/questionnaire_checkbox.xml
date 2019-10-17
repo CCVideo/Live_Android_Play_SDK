@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@mipmap/questionnaire_checkbox" android:state_checked="false" />
+    <item android:drawable="@mipmap/questionnaire_checkbox_selected" android:state_checked="true" />
+</selector>

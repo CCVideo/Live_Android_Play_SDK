@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/id_popup_window_outside_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
+
+        <RelativeLayout
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="56dp"
+            android:background="#ffffff">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="#ffffff"
+                android:gravity="center"
+                android:text="随堂测"
+                android:textColor="#38404B"
+                android:textSize="15sp" />
+
+            <View
+                android:id="@+id/qs_line"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/title"
+                android:layout_centerHorizontal="true"
+                android:background="#f7f7f7" />
+
+            <ImageView
+                android:id="@+id/qs_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/qs_close" />
+
+            <LinearLayout
+                android:id="@+id/qs_select_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/qs_line"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/practiceing_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="答题进行中"
+                    android:textColor="#FFFF643D" />
+
+                <TextView
+                    android:id="@+id/practiceing_over_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    android:text="答题结束"
+                    android:textColor="#FF1E1F21" />
+
+                <TextView
+                    android:id="@+id/practice_people_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/qs_tips_bg"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingLeft="16dp"
+                    android:paddingTop="4dp"
+                    android:paddingRight="16dp"
+                    android:paddingBottom="4dp"
+                    android:text="共200人回答，正确率80%"
+                    android:textColor="#666666"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/practice_answer_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="您的答案：BC    正确答案：AC"
+                    android:textColor="#FF1E1F21" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/statis_list"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_height="wrap_content">
+                </android.support.v7.widget.RecyclerView>
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ItemLayout">
+        <attr name="leftSrc" format="reference"/>
+        <attr name="leftMarginStart" format="dimension|reference"/>
+        <attr name="leftMarginEnd" format="dimension|reference"/>
+        <attr name="leftVisbility" format="enum">
+            <enum name="VISIBLE" value="0"/>
+            <enum name="INVISIBLE" value="1"/>
+            <enum name="GONE" value="2"/>
+        </attr>
+        <attr name="rightSrc" format="reference"/>
+        <attr name="rightMarginStart" format="dimension|reference"/>
+        <attr name="rightMarginEnd" format="dimension|reference"/>
+        <attr name="rightVisbility" format="enum">
+            <enum name="VISIBLE" value="0"/>
+            <enum name="INVISIBLE" value="1"/>
+            <enum name="GONE" value="2"/>
+        </attr>
+        <attr name="tipTxt" format="string|reference"/>
+        <attr name="tipSize" format="dimension|reference"/>
+        <attr name="tipColor" format="color"/>
+        <attr name="tipMarginStart" format="dimension|reference"/>
+        <attr name="tipVisbility" format="enum">
+            <enum name="VISIBLE" value="0"/>
+            <enum name="INVISIBLE" value="1"/>
+            <enum name="GONE" value="2"/>
+        </attr>
+        <attr name="valueTxt" format="string|reference"/>
+        <attr name="valueSize" format="dimension|reference"/>
+        <attr name="valueColor" format="color|reference"/>
+        <attr name="valueMarginEnd" format="dimension|reference"/>
+        <attr name="valueVisbility" format="enum">
+            <enum name="VISIBLE" value="0"/>
+            <enum name="INVISIBLE" value="1"/>
+            <enum name="GONE" value="2"/>
+        </attr>
+        <attr name="lineMode" format="enum">
+            <enum name="TOP" value="0"/>
+            <enum name="BOTTOM" value="1"/>
+            <enum name="BOTH" value="2"/>
+            <enum name="NONE" value="3"/>
+        </attr>
+        <attr name="topLineColor" format="color|reference"/>
+        <attr name="topLineMarginStart" format="dimension|reference"/>
+        <attr name="topLineMarginEnd" format="dimension|reference"/>
+        <attr name="bottomLineColor" format="color|reference"/>
+        <attr name="bottomLineMarginStart" format="dimension|reference"/>
+        <attr name="bottomLineMarginEnd" format="dimension|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="ToggleButton">
+        <attr name="thumbMargin" format="dimension|reference"/>
+        <attr name="thumbMarginTop" format="dimension|reference"/>
+        <attr name="thumbMarginBottom" format="dimension|reference"/>
+        <attr name="thumbMarginEnd" format="dimension|reference"/>
+        <attr name="thumbMarginStart" format="dimension|reference"/>
+        <attr name="thumbColor" format="color|reference"/>
+        <attr name="thumbColorHov" format="color|reference"/>
+        <attr name="backColor" format="color|reference"/>
+        <attr name="backColorHov" format="color|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="HeadView">
+        <attr name="hv_border_width" format="dimension|reference"/>
+        <attr name="hv_border_color" format="color|reference"/>
+        <attr name="hv_shadow_width" format="dimension|reference"/>
+        <attr name="hv_shadow_color" format="color|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="a_zhon">
+        <!--两个按钮间的间距-->
+        <attr name="fab_spacing" format="dimension" />
+        <!--展开的方向-->
+        <attr name="fab_orientation" format="enum">
+            <enum name="top" value="1" />
+            <enum name="bottom" value="2" />
+            <enum name="left" value="3" />
+            <enum name="right" value="4" />
+        </attr>
+    </declare-styleable>
+
+</resources>

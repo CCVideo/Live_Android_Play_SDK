@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#fafafa"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_qa_container"
+        android:layout_above="@id/rl_qa_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/rl_qa_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="#FFFFFF"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/id_qa_send"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="58dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="11dp"
+            android:background="@drawable/push_send_bg"
+            android:text="@string/send_question"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"/>
+
+        <LinearLayout
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="11dp"
+            android:layout_toStartOf="@id/id_qa_send"
+            android:background="@drawable/push_input_bg">
+
+            <ImageView
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/qa_current_status_image"
+                android:id="@+id/self_qa_invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <EditText
+                android:id="@+id/id_qa_input"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:paddingLeft="2dp"
+                android:background="@null"
+                android:hint="@string/question_input_hint"
+                android:imeOptions="flagNoExtractUi"
+                android:textColorHint="#666666"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

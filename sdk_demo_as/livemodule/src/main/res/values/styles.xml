@@ -1,0 +1,226 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <!--导航的按钮样式 parent="@style/Widget.AppCompat.Button.Borderless"-->
+    <style name="pilotButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">260dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/pilot_button_bg</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="ThemeNew" parent="AppTheme">
+        <item name="android:windowAnimationStyle">@style/Animation</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Animation">
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:activityOpenExitAnimation">@null</item>
+        <item name="android:activityCloseEnterAnimation">@null</item>
+        <item name="android:activityCloseExitAnimation">@null</item>
+        <item name="android:taskOpenEnterAnimation">@null</item>
+        <item name="android:taskOpenExitAnimation">@null</item>
+        <item name="android:taskCloseEnterAnimation">@null</item>
+        <item name="android:taskCloseExitAnimation">@null</item>
+        <item name="android:taskToFrontEnterAnimation">@null</item>
+        <item name="android:taskToFrontExitAnimation">@null</item>
+        <item name="android:taskToBackEnterAnimation">@null</item>
+        <item name="android:taskToBackExitAnimation">@null</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--登录页样式-->
+    <style name="loginTipsTheme">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginLeft">19dp</item>
+        <item name="android:textColor">#666666</item>
+        <item name="android:textSize">@dimen/activity_top_tip_size</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="loginInfosLayoutTheme">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginTop">9dp</item>
+        <item name="android:background">@drawable/login_info_bg</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="loginLayoutTheme">
+        <item name="android:layout_marginLeft">81dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="loginLineLayoutTheme">
+        <item name="android:layout_marginLeft">19dp</item>
+        <item name="android:layout_marginRight">19dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">45dp</item>
+    </style>
+
+    <style name="loginLineTextViewTheme">
+        <item name="android:textSize">@dimen/item_tip_size</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="loginLineEditTextTheme">
+        <item name="android:textSize">@dimen/item_tip_size</item>
+        <item name="android:background">@null</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginLeft">81dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="loginLineEditTextPasswordTheme" parent="loginLineEditTextTheme">
+        <item name="android:inputType">textPassword</item>
+    </style>
+
+    <style name="loginLineBottomViewTheme">
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:background">#e8e8e8</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0.33dp</item>
+    </style>
+
+    <style name="loginButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">42dp</item>
+        <item name="android:layout_marginEnd">36dp</item>
+        <item name="android:layout_marginStart">36dp</item>
+        <item name="android:layout_marginTop">45dp</item>
+        <item name="android:background">@drawable/login_button_bg</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:enabled">false</item>
+    </style>
+
+    <style name="baseTitleImageTheme">
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="phoneLiveLandscapeTitleViewTheme" parent="baseTitleImageTheme">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/pc_live_top_title</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:maxEms">15</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="userCountTextViewTheme">
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:drawableLeft">@mipmap/portrait_people</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:shadowColor">#80666666</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+
+    <style name="ActivityAnim">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_start_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_start_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_finish_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_finish_exit</item>
+    </style>
+
+    <style name="qs_single_select_theme">
+        <item name="android:background">@drawable/qs_single_select_bg</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:textColor">#FF643d</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="qs_single_select_sign_theme">
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:src">@drawable/qs_choose_label</item>
+    </style>
+
+    <style name="qs_single_select_layout_theme">
+        <item name="android:layout_width">54dp</item>
+        <item name="android:layout_height">54dp</item>
+    </style>
+
+    <!--问卷单选按钮-->
+    <style name="QuestionnaireRadio" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/questionnaire_radio</item>
+    </style>
+
+    <!--问卷多选按钮-->
+    <style name="QuestionnaireCheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/questionnaire_checkbox</item>
+    </style>
+
+    <!-- 随堂测选项按钮 -->
+    <style name="practice_single_select_theme">
+        <item name="android:background">@drawable/practice_single_selete_bg</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">#FF643d</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="practice_single_select_layout_theme">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+    </style>
+
+    <style name="practiceButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">260dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/practice_button_bg</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+
+</resources>
+
+

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_replay_login_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/loginBg"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/loginTipsTheme"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="直播间信息" />
+
+    <LinearLayout style="@style/loginInfosLayoutTheme">
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="CC账号ID" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_uid"
+                style="@style/loginLayoutTheme" />
+
+            <View style="@style/loginLineBottomViewTheme" />
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="直播间ID" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_roomid"
+                style="@style/loginLayoutTheme" />
+
+            <View style="@style/loginLineBottomViewTheme" />
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="直播ID" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_liveid"
+                style="@style/loginLayoutTheme" />
+
+            <View style="@style/loginLineBottomViewTheme" />
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="回放ID" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_recordid"
+                style="@style/loginLayoutTheme" />
+
+            <View style="@style/loginLineBottomViewTheme" />
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="昵称" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_name"
+                style="@style/loginLayoutTheme" />
+
+            <View style="@style/loginLineBottomViewTheme" />
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/loginLineLayoutTheme">
+
+            <TextView
+                style="@style/loginLineTextViewTheme"
+                android:text="密码" />
+
+            <com.bokecc.livemodule.login.LoginLineLayout
+                android:id="@+id/lll_login_replay_password"
+                style="@style/loginLayoutTheme" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_login_replay"
+        style="@style/loginButtonTheme"
+        android:text="登录" />
+
+    <TextView
+        android:id="@+id/replay_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginTop="50dp" />
+</LinearLayout>

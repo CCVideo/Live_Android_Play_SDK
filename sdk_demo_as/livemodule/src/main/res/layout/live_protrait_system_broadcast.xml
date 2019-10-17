@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="9dp"
+    android:orientation="vertical">
+
+    <com.bokecc.livemodule.view.HeadView
+        android:id="@id/id_private_head"
+        style="@style/HeadIconStyle"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="9dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/pc_chat_single_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/pc_chat_single_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/pc_chat_system_broadcast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:paddingBottom="7.5dp"
+        android:paddingLeft="9dp"
+        android:gravity="center|left"
+        android:paddingRight="9dp"
+        android:paddingTop="7.5dp"
+        android:textColor="#f88119"
+        android:textSize="15dp" />
+
+</LinearLayout>

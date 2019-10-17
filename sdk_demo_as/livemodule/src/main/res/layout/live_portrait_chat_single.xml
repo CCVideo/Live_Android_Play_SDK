@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/chat_item_layout"
+    android:orientation="horizontal">
+
+    <com.bokecc.livemodule.view.HeadView
+        android:id="@+id/id_private_head"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="11dp"
+        android:src="@drawable/user_head_icon" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="5dp"
+        android:minHeight="30dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/chat_public_bg"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/pc_chat_single_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="10dp"
+                android:padding="8dp"
+                android:textColor="#333333"
+                android:textSize="@dimen/pc_live_chat_content" />
+
+            <ImageView
+                android:id="@+id/pc_chat_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="10dp"
+                android:adjustViewBounds="true"
+                android:maxHeight="200dp"
+                android:maxWidth="200dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:paddingBottom="8dp"
+                android:paddingLeft="8dp"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/pc_chat_system_broadcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

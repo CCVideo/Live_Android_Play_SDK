@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#51000000">
+
+    <RelativeLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true" >
+
+        <RelativeLayout
+            android:layout_centerInParent="true"
+            android:id="@+id/rl_vote"
+            android:background="@drawable/rollcall_bg"
+            android:layout_width="286dp"
+            android:layout_height="195dp">
+
+            <View
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="12dp"
+                android:background="#80ff6633"
+                android:layout_width="260dp"
+                android:layout_height="1dp" />
+
+            <TextView
+                android:id="@+id/rollcall_reverse_time"
+                android:text="签到倒计时：00:06"
+                android:layout_above="@+id/btn_rollcall"
+                android:layout_marginBottom="44dp"
+                android:textSize="19sp"
+                android:textColor="#ff512c"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btn_rollcall"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="25dp"
+                android:layout_width="152dp"
+                android:layout_height="45dp"
+                android:text="我要签到"
+                style="@style/pilotButtonTheme" />
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/rollcall_end"
+                android:text="签到结束"
+                android:textSize="19sp"
+                android:textColor="#ff512c"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-30dp"
+            android:layout_above="@id/rl_vote"
+            android:src="@drawable/rollcall_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

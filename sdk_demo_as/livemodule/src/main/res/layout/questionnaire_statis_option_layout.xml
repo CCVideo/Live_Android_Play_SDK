@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/option"
+        android:layout_width="match_parent"
+        android:layout_marginTop="15dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/true_flag"
+            android:layout_width="26dp"
+            android:layout_height="wrap_content"
+            android:textColor="#43b50f"
+            android:textSize="10dp"
+            android:visibility="invisible"
+            android:text="正确"/>
+
+        <TextView
+            android:id="@+id/option_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:textColor="#666666"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/option_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="14dp"
+            android:textColor="#666666"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="15dp" >
+
+        <ProgressBar
+            android:id="@+id/select_proportion"
+            android:layout_width="145dp"
+            android:layout_height="10dp"
+            android:layout_marginLeft="50dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateOnly="false"
+            android:progressDrawable="@drawable/questionnaire_statis_progress" />
+
+        <TextView
+            android:id="@+id/select_count"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/select_proportion"
+            android:textSize="12dp"
+            android:textColor="#8e939c"
+            android:layout_marginLeft="4dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/select_precent"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/select_count"
+            android:textSize="12dp"
+            android:textColor="#333333"
+            android:layout_marginLeft="4dp"
+            android:layout_height="wrap_content" />
+
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,84 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!--导航的按钮样式 parent="@style/Widget.AppCompat.Button.Borderless"-->
+    <style name="pilotButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">260dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/pilot_button_bg</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="baseTitleImageTheme">
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="phoneLiveLandscapeTitleViewTheme" parent="baseTitleImageTheme">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/pc_live_top_title</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:maxEms">15</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="liveRadioButtonTheme">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#333333</item>
+        <item name="android:textSize">@dimen/pc_live_infos_tag</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/portrait_tag_bg</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="HeadIconStyle">
+        <item name="android:layout_width">38dp</item>
+        <item name="android:layout_height">38dp</item>
+        <item name="android:src">@drawable/user_head_icon</item>
+        <item name="hv_border_color">#fff</item>
+        <item name="hv_border_width">1dp</item>
+        <item name="hv_shadow_color">#cccccc</item>
+        <item name="hv_shadow_width">2dp</item>
+    </style>
+
+    <style name="userCountTextViewTheme">
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:drawableLeft">@mipmap/portrait_people</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:shadowColor">#80666666</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+
+
+
+</resources>

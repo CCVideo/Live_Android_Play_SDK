@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/option"
+        android:layout_width="match_parent"
+        android:layout_marginTop="15dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/true_flag"
+            android:layout_width="26dp"
+            android:layout_height="wrap_content"
+            android:textColor="#43b50f"
+            android:textSize="10dp"
+            android:visibility="invisible"
+            android:text="正确"/>
+
+        <RadioButton
+            android:id="@+id/option_radio"
+            style="@style/QuestionnaireRadio"
+            android:layout_marginLeft="2dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <CheckBox
+            android:id="@+id/option_checkbox"
+            style="@style/QuestionnaireCheckBox"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/option_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:textColor="#666666"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/option_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="14dp"
+            android:textColor="#666666"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+</LinearLayout>

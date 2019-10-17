@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_pc_portrait_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_portrait_live_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/living_top_bg"
+        android:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_portrait_live_close"
+                style="@style/phoneLiveLandscapeTitleViewTheme"
+                android:layout_alignParentLeft="true"
+                android:paddingRight="5dp"
+                android:src="@mipmap/title_back" />
+
+            <TextView
+                android:id="@+id/tv_portrait_live_title"
+                style="@style/phoneLiveLandscapeTitleViewTheme"
+                android:layout_toRightOf="@id/iv_portrait_live_close"
+                android:paddingLeft="0dp"
+                android:text="直播间标题" />
+
+
+            <TextView
+                android:id="@+id/video_doc_switch"
+                style="@style/phoneLiveLandscapeTitleViewTheme"
+                android:layout_alignParentRight="true"
+                android:paddingRight="5dp"
+                android:text="切换文档" />
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/doc_scale_type"
+                style="@style/phoneLiveLandscapeTitleViewTheme"
+                android:layout_toStartOf="@id/video_doc_switch"
+                android:paddingRight="5dp"
+                android:text="CenterInside" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_portrait_live_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/living_bottom_bg"
+        android:visibility="visible">
+
+        <!-- 视频全屏 -->
+        <ImageView
+            android:id="@+id/iv_portrait_live_full"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/video_full_screen" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@id/iv_portrait_live_full"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/replay_play_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/replay_play_status" />
+
+            <TextView
+                android:id="@+id/replay_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:text="00:00"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/pc_live_top_title" />
+
+            <SeekBar
+                android:id="@+id/replay_progressbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:focusable="true"
+                android:maxHeight="3dp"
+                android:minHeight="3dp"
+                android:progressDrawable="@drawable/seekbar_define_style"
+                android:thumb="@drawable/seekbar_thumb" />
+
+            <TextView
+                android:id="@+id/replay_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="00:00"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/pc_live_top_title" />
+
+            <Button
+                android:id="@+id/replay_speed"
+                android:layout_width="46dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="10dp"
+                android:background="@drawable/speed_bg"
+                android:text="1.0x"
+                android:textColor="#FFFFFF"
+                android:textSize="13dp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:id="@+id/id_error_layout"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/id_msg_tips"
+            android:textSize="@dimen/pc_live_top_title"
+            android:textColor="#fff"
+            android:text="视频加载失败"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:background="@drawable/write_edge_rectangle_selector"
+            android:id="@+id/id_try"
+            android:textSize="@dimen/pc_live_top_title"
+            android:textColor="@color/write_color_selector"
+            android:padding="3dp"
+            android:text="点击重试"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

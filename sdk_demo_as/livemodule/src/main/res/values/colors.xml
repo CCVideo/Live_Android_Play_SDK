@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--导航页的颜色-->
+    <color name="colorPilotButtonBg">#FF6633</color>
+    <color name="colorPilotButtonPressBg">#D54616</color>
+
+    <!--登录页的颜色-->
+    <color name="colorButtonBgDisble">#FF9c7a</color>
+    <color name="divideLine">#e8e8e8</color>
+    <color name="loginBg">#fafafa</color>
+
+
+    <color name="colorPrimary">#FF6633</color>
+    <color name="colorPrimaryDark">#D54616</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <!--togglebutton color-->
+    <color name="colorThumb">#FFFFFF</color>
+    <color name="colorThumbHov">#FFFFFF</color>
+    <color name="colorBack">#999999</color>
+    <color name="colorBackHov">#FF6633</color>
+
+    <!--标题背景色-->
+    <color name="colorTitleBg">#FF6633</color>
+    <!--内容区域背景色-->
+    <color name="colorContentBg">#FAFAFA</color>
+    <!--item 分割线-->
+    <color name="colorItemLine">#DDDDDD</color>
+    <color name="colorItemNormal">#FFFFFF</color>
+    <color name="colorItemPressed">#DDDDDD</color>
+    <color name="colorItemClip">#4CBBBBBB</color>
+    <!--界面提示文字颜色-->
+    <color name="colorTopTip">#666666</color>
+    <color name="colorItemTip">#333333</color>
+    <color name="colorItemValue">#666666</color>
+
+    <!--扫描界面-->
+    <color name="result_view">#b0000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
+
+    <!--公告-->
+    <color name="announce_line">#19ffffff</color>
+
+    <color name="vertical_scroll_bar">#80ffffff</color>
+
+    <color name="qa_list_divider_color">#f5f5f5</color>
+
+
+
+    <color name="withe">#FFFFFF</color>
+    <color name="reply_button_disable">#f5f5f5</color>
+    <color name="reply_button_text">#dfFFFFFF</color>
+    <color name="reply_button_text_disable">#b8b8b8</color>
+    <color name="text_primary">#df000000</color>
+    <color name="bg_edittext_color">#00000000</color>
+    <color name="bg_horizontal_line_color">#80a3a4a7</color>
+    <color name="bg_horizontal_btn_normal">#eeeeee</color>
+    <color name="bg_horizontal_btn_selected">#70a3a4a7</color>
+    <color name="bg_indicator_point_normal">#D8D8D8</color>
+    <color name="bg_indicator_point_selected">#A6A6A6</color>
+
+</resources>

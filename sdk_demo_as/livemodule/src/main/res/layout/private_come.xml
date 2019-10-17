@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="9dp"
+    android:paddingTop="9dp">
+
+    <com.bokecc.livemodule.view.HeadView
+        android:id="@id/id_private_head"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/user_head_icon" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="50dp"
+        android:layout_marginEnd="61dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/chat_public_bg"
+        android:layout_alignTop="@id/id_private_head"
+        android:layout_toEndOf="@id/id_private_head"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@id/id_private_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chat_public_bg"
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp"
+            android:paddingEnd="11dp"
+            android:paddingStart="16dp"
+            android:paddingTop="6dp"
+            android:textColor="#333333"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/pc_chat_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="10dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="200dp"
+            android:maxWidth="200dp"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#f2efed"
+              android:orientation="vertical"
+              android:paddingBottom="19dp"
+              android:paddingEnd="10dp"
+              android:paddingStart="10dp"
+              android:paddingTop="19dp">
+
+    <ImageView
+        android:id="@+id/id_item_emoji"
+        android:layout_width="29dp"
+        android:layout_height="29dp"/>
+
+</LinearLayout>

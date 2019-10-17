@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <!--私聊用户列表-->
+    <LinearLayout
+        android:id="@+id/id_private_chat_user_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/id_chat_bottom"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line"
+            android:background="#DDDDDD" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="end"
+                android:maxEms="15"
+                android:maxLines="1"
+                android:text="@string/private_chat_list_tip"
+                android:textColor="#333333"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:id="@+id/id_private_chat_user_close"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:src="@mipmap/window_close" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line"
+            android:background="#DDDDDD" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/id_private_chat_user_list"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="#ffffff"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+    </LinearLayout>
+
+    <!--私聊列表-->
+    <LinearLayout
+        android:id="@+id/id_private_chat_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/id_chat_bottom"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line"
+            android:background="#DDDDDD" />
+
+        <RelativeLayout
+            android:id="@+id/id_private_chat_top_layout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#ffffff">
+
+            <ImageView
+                android:id="@+id/id_private_chat_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/private_back" />
+
+            <TextView
+                android:id="@+id/id_private_chat_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="end"
+                android:maxEms="15"
+                android:maxLines="1"
+                android:textColor="#333333"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:id="@+id/id_private_chat_close"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:src="@mipmap/window_close" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/line"
+            android:background="#DDDDDD" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/id_private_chat_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#e6FAFAFA"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+    </LinearLayout>
+
+    <!-- 下方输入聊天信息框 -->
+    <LinearLayout
+        android:id="@+id/id_chat_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <!--下面聊天区 android:layout_marginBottom="0dp" 解决显示问题 具体原因不详-->
+        <FrameLayout
+            android:id="@+id/id_private_chat_msg_mask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#00000000">
+
+            <RelativeLayout
+                android:id="@+id/id_push_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginBottom="0dp"
+                android:background="#FFFFFF"
+                android:visibility="visible">
+
+                <Button
+                    android:id="@+id/id_push_chat_send"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="58dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="11dp"
+                    android:background="@drawable/push_send_bg"
+                    android:text="@string/send_chat"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_toStartOf="@id/id_push_chat_send"
+                    android:background="@drawable/push_input_bg"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+
+                    <ImageView
+                        android:id="@+id/id_push_chat_emoji"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginBottom="9dp"
+                        android:layout_marginEnd="9dp"
+                        android:layout_marginTop="9dp"
+                        android:clickable="true"
+                        android:src="@drawable/push_chat_emoji_normal" />
+
+                    <EditText
+                        android:id="@+id/id_push_chat_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_toStartOf="@id/id_push_chat_emoji"
+                        android:background="@drawable/push_input_bg"
+                        android:hint="@string/chat_input_hint"
+                        android:imeOptions="flagNoExtractUi"
+                        android:textColorHint="#666666"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </FrameLayout>
+
+        <GridView
+            android:id="@+id/id_push_emoji_grid"
+            android:layout_width="match_parent"
+            android:layout_height="207dp"
+            android:background="#f2efed"
+            android:numColumns="7"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+</RelativeLayout>

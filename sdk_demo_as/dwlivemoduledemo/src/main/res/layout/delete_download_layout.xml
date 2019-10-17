@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#51000000">
+
+    <LinearLayout
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/id_delete_item"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:text="删除当前任务"
+            android:padding="10dp"
+            android:textColor="#0088FF"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <View
+            android:background="#aaaaaa"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+        <TextView
+            android:id="@+id/id_cancel"
+            android:textSize="15sp"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="取消"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+</RelativeLayout>

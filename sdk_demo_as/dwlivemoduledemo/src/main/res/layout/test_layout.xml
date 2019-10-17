@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:background="#ffff0000"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"/>
+
+
+    <ListView
+        android:stackFromBottom="true"
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:id="@+id/id_private_chat_msg_mask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000">
+
+        <RelativeLayout
+            android:id="@+id/id_push_chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="0dp"
+            android:background="#FFFFFF"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/id_push_chat_send"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="58dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="11dp"
+                android:background="@drawable/push_send_bg"
+                android:text="@string/send_chat"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="11dp"
+                android:layout_marginEnd="12dp"
+                android:layout_toStartOf="@id/id_push_chat_send"
+                android:background="@drawable/push_input_bg"
+                android:focusable="true"
+                android:focusableInTouchMode="true">
+
+                <ImageView
+                    android:id="@+id/id_push_chat_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="9dp"
+                    android:layout_marginEnd="9dp"
+                    android:layout_marginBottom="9dp"
+                    android:clickable="true"
+                    android:src="@drawable/push_chat_emoji_normal" />
+
+                <EditText
+                    android:id="@+id/id_push_chat_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_toStartOf="@id/id_push_chat_emoji"
+                    android:background="@drawable/push_input_bg"
+                    android:hint="@string/chat_input_hint"
+                    android:imeOptions="flagNoExtractUi"
+                    android:textColorHint="#666666"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>

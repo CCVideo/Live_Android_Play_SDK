@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/id_popup_window_outside_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#51000000">
+
+    <LinearLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="281dp"
+        android:layout_height="155dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="43dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/rollcall_bg"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="37dp"
+            android:gravity="center"
+            android:text="问卷已停止回收，点击确定后关闭问卷"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+        <Button
+            android:id="@+id/confirm_stop"
+            style="@style/pilotButtonTheme"
+            android:layout_width="134dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="30dp"
+            android:text="确定"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

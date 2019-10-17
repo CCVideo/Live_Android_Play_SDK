@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#33000000">
+
+    <RelativeLayout
+        android:layout_width="185dp"
+        android:layout_height="60dp"
+        android:layout_centerInParent="true"
+        android:background="#000000"
+        android:alpha="0.69"
+        android:minHeight="165dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:indeterminateTint="#99FFFFFF"
+                android:indeterminateTintMode="src_atop" />
+
+            <TextView
+                android:id="@+id/exit_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="正在登录"
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

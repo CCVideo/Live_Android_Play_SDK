@@ -1,0 +1,48 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!--
+Refer to App Widget Documentation for margin information
+http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
+    -->
+    <dimen name="widget_margin">8dp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!--activity顶部提示需要尺寸-->
+    <dimen name="activity_top_tip_size">13sp</dimen>
+    <dimen name="activity_top_tip_margin_top">15dp</dimen>
+    <dimen name="activity_top_tip_margin_bottom">9dp</dimen>
+    <dimen name="activity_top_tip_margin_start">19dp</dimen>
+    <!--item需要尺寸-->
+    <dimen name="item_height">49dp</dimen>
+    <dimen name="item_tip_size">15sp</dimen>
+    <dimen name="item_value_size">14sp</dimen>
+    <dimen name="item_margin_start">19dp</dimen>
+    <dimen name="item_margin_end">19dp</dimen>
+    <dimen name="item_value_end">7dp</dimen>
+    <!--分割线-->
+    <dimen name="line">0.33dp</dimen>
+
+    <!--pc播放界面textview-->
+
+    <dimen name="pc_live_infos_tag">15sp</dimen>
+
+    <dimen name="pc_live_qa_answer">13sp</dimen>
+    <dimen name="pc_live_qa_question_content">14sp</dimen>
+    <dimen name="pc_live_qa_question_name">12sp</dimen>
+    <dimen name="pc_live_qa_question_time">11sp</dimen>
+
+    <dimen name="pc_live_chat_content">14sp</dimen>
+    <dimen name="pc_live_chat_name">12sp</dimen>
+
+    <dimen name="pc_live_intro_title">15sp</dimen>
+    <dimen name="pc_live_intro_content">14sp</dimen>
+
+    <dimen name="pc_live_top_title">14sp</dimen>
+    <dimen name="pc_live_top_living_sign">12sp</dimen>
+
+</resources>

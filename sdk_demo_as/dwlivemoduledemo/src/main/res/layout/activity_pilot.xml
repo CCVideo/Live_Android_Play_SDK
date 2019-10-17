@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_pilot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/default_bg"
+    tools:context="com.bokecc.dwlivemoduledemo.activity.PilotActivity">
+
+    <TextView
+        android:id="@+id/about_version_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="@string/pilot_version"
+        android:textColor="#AAAAAA"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btn_start_local_replay"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@id/about_version_code"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_local_replay" />
+
+    <Button
+        android:id="@+id/btn_start_replay"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@id/btn_start_local_replay"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_replay" />
+
+    <Button
+        android:id="@+id/btn_start_live"
+        style="@style/pilotButtonTheme"
+        android:layout_above="@+id/btn_start_replay"
+        android:layout_marginBottom="30dp"
+        android:text="@string/pilot_live" />
+
+</RelativeLayout>

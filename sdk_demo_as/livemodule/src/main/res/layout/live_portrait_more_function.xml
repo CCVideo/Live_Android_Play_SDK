@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:a_zhon="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.bokecc.livemodule.live.morefunction.announce.AnnounceLayout
+        android:id="@+id/announce_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <com.bokecc.livemodule.live.morefunction.privatechat.LivePrivateChatLayout
+        android:id="@+id/private_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <com.bokecc.livemodule.live.morefunction.fab.MoreFunctionFab
+        android:id="@+id/fab_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="60dp"
+        android:background="@null"
+        a_zhon:fab_orientation="top"
+        a_zhon:fab_spacing="10dp" />
+
+    <com.bokecc.livemodule.live.morefunction.rtc.RTCControlLayout
+        android:id="@+id/rtc_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fab_top"
+        android:layout_marginRight="5dp"
+        android:visibility="gone"/>
+
+
+</RelativeLayout>

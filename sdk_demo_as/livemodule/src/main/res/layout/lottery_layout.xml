@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#51000000">
+
+    <RelativeLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" >
+
+        <RelativeLayout
+            android:layout_centerHorizontal="true"
+            android:id="@+id/rl_lottery_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/iv_lottery_nav"
+                android:src="@drawable/lottery_nav"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/lottery_nav_tips"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:layout_centerInParent="true"
+                android:text="正在抽奖"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/lottery_close"
+                android:layout_alignRight="@+id/iv_lottery_nav"
+                android:layout_marginRight="30dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/lottery_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/lottery_bg"
+            android:layout_below="@id/rl_lottery_nav"
+            android:layout_width="257dp"
+            android:layout_height="180dp">
+
+            <ImageView
+                android:visibility="gone"
+                android:layout_marginTop="-20dp"
+                android:scaleType="centerInside"
+                android:id="@+id/iv_lottery_loading"
+                android:src="@drawable/lottery_loading_gif"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/ll_lottery_win"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textStyle="bold"
+                    android:id="@+id/lottery_code"
+                    android:paddingLeft="35dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#ff412e"
+                    android:textSize="34sp"
+                    android:background="@drawable/lottery_win_bg"
+                    android:text="9678"
+                    android:typeface="sans"
+                    android:layout_width="199dp"
+                    android:layout_height="88dp" />
+                
+                <TextView
+                    android:textColor="#666666"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:text="请牢记您的中奖码"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_lottery_lose"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textColor="#666666"
+                    android:layout_gravity="center_horizontal"
+                    android:text="中奖者"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingLeft="10dp"
+                    android:id="@+id/lottery_winnner_name"
+                    android:textColor="#ff512c"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="19dp"
+                    android:text="巴巴贝拉…afsd…"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="20sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

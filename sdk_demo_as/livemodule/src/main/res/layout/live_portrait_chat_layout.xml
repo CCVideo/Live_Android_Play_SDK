@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fafafa">
+    <!-- 公聊列表 -->
+
+
+
+    <!-- 下方输入聊天信息框 -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#fafafa" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="52dp" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/id_push_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="0dp"
+        android:background="#FFFFFF"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/id_push_chat_send"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="58dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="11dp"
+            android:background="@drawable/push_send_bg"
+            android:text="@string/send_chat"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="11dp"
+            android:layout_marginEnd="12dp"
+            android:layout_toStartOf="@id/id_push_chat_send"
+            android:background="@drawable/push_input_bg"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <EditText
+                android:id="@+id/id_push_chat_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_toStartOf="@id/id_push_chat_emoji"
+                android:background="@drawable/push_input_bg"
+                android:hint="@string/chat_input_hint"
+                android:imeOptions="flagNoExtractUi"
+                android:textColorHint="#666666"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/id_push_chat_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="9dp"
+                android:layout_marginEnd="9dp"
+                android:layout_marginBottom="9dp"
+                android:clickable="true"
+                android:src="@drawable/push_chat_emoji_normal" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <!--    </LinearLayout>-->
+    <GridView
+        android:layout_gravity="bottom"
+        android:id="@+id/id_push_emoji_grid"
+        android:layout_width="match_parent"
+        android:layout_height="207dp"
+        android:background="#f2efed"
+        android:numColumns="7"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:visibility="invisible" />
+
+</FrameLayout>

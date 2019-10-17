@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_pc_live_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:id="@+id/rl_video_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.bokecc.livemodule.live.doc.LiveDocComponent
+                android:id="@+id/live_doc_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+        <com.bokecc.livemodule.live.chat.barrage.BarrageLayout
+            android:id="@+id/live_barrage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.bokecc.livemodule.live.chat.barrage.BarrageLayout>
+
+        <com.bokecc.livemodule.live.room.LiveRoomLayout
+            android:id="@+id/live_room_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include layout="@layout/live_pc_portrait_play_layout" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_pc_live_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <include layout="@layout/live_pc_portrait_msg_layout" />
+
+    </LinearLayout>
+
+</LinearLayout>
