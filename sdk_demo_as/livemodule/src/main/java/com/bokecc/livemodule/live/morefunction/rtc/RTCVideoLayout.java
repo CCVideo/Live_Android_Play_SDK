@@ -73,10 +73,10 @@ public class RTCVideoLayout extends BaseLinearLayout {
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // 连麦时切换全屏，自动适配大小
-        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
-        if (dwLiveCoreHandler != null && dwLiveCoreHandler.isRtcing() && needAdjust) {
-            mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
-        }
+//        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
+//        if (dwLiveCoreHandler != null && dwLiveCoreHandler.isRtcing() && needAdjust) {
+////            mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
+//        }
     }
 
     boolean needAdjust = false;
@@ -92,7 +92,7 @@ public class RTCVideoLayout extends BaseLinearLayout {
                     mLocalRender.setVisibility(View.INVISIBLE);
                     mRemoteRender.setVisibility(View.VISIBLE);
                     if (needAdjust) {
-                        mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
+//                        mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
                     }
                     DWLive.getInstance().removeLocalRender();
                 } else {
@@ -100,7 +100,7 @@ public class RTCVideoLayout extends BaseLinearLayout {
                     mLocalRender.setVisibility(View.INVISIBLE);
                     mRemoteRender.setVisibility(View.VISIBLE);
                     if (needAdjust) {
-                        mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
+//                        mRemoteRender.setLayoutParams(getRemoteRenderSizeParams());
                     }
                 }
                 // 由于rtc是走的通话音频，所以需要做处理
@@ -136,48 +136,48 @@ public class RTCVideoLayout extends BaseLinearLayout {
     }
 
     //***************************************** 工具方法 *****************************************
-
-    // 连麦远端视频组件等比缩放
-    private LinearLayout.LayoutParams getRemoteRenderSizeParams() {
-        int width;
-        int height;
-
-        if (isPortrait()) {
-            width = wm.getDefaultDisplay().getWidth();
-            height = wm.getDefaultDisplay().getHeight() / 3; //TODO 可以根据当前布局方式更改此参数
-        } else {
-            width = wm.getDefaultDisplay().getWidth();
-            height = wm.getDefaultDisplay().getHeight();
-        }
-
-        int vWidth = mVideoSizes[0];
-        int vHeight = mVideoSizes[1];
-
-        if (vWidth == 0) {
-            vWidth = 600;
-        }
-        if (vHeight == 0) {
-            vHeight = 400;
-        }
-
-        if (vWidth > width || vHeight > height) {
-            float wRatio = (float) vWidth / (float) width;
-            float hRatio = (float) vHeight / (float) height;
-            float ratio = Math.max(wRatio, hRatio);
-
-            width = (int) Math.ceil((float) vWidth / ratio);
-            height = (int) Math.ceil((float) vHeight / ratio);
-        } else {
-            float wRatio = (float) width / (float) vWidth;
-            float hRatio = (float) height / (float) vHeight;
-            float ratio = Math.min(wRatio, hRatio);
-
-            width = (int) Math.ceil((float) vWidth * ratio);
-            height = (int) Math.ceil((float) vHeight * ratio);
-        }
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
-        params.gravity = Gravity.CENTER;
-        return params;
-    }
+//
+//    // 连麦远端视频组件等比缩放
+//    private LinearLayout.LayoutParams getRemoteRenderSizeParams() {
+//        int width;
+//        int height;
+//
+//        if (isPortrait()) {
+//            width = wm.getDefaultDisplay().getWidth();
+//            height = wm.getDefaultDisplay().getHeight() / 3; //TODO 可以根据当前布局方式更改此参数
+//        } else {
+//            width = wm.getDefaultDisplay().getWidth();
+//            height = wm.getDefaultDisplay().getHeight();
+//        }
+//
+//        int vWidth = mVideoSizes[0];
+//        int vHeight = mVideoSizes[1];
+//
+//        if (vWidth == 0) {
+//            vWidth = 600;
+//        }
+//        if (vHeight == 0) {
+//            vHeight = 400;
+//        }
+//
+//        if (vWidth > width || vHeight > height) {
+//            float wRatio = (float) vWidth / (float) width;
+//            float hRatio = (float) vHeight / (float) height;
+//            float ratio = Math.max(wRatio, hRatio);
+//
+//            width = (int) Math.ceil((float) vWidth / ratio);
+//            height = (int) Math.ceil((float) vHeight / ratio);
+//        } else {
+//            float wRatio = (float) width / (float) vWidth;
+//            float hRatio = (float) height / (float) vHeight;
+//            float ratio = Math.min(wRatio, hRatio);
+//
+//            width = (int) Math.ceil((float) vWidth * ratio);
+//            height = (int) Math.ceil((float) vHeight * ratio);
+//        }
+//
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
+//        params.gravity = Gravity.CENTER;
+//        return params;
+//    }
 }

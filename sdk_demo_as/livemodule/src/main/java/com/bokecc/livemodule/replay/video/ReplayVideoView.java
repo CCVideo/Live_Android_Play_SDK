@@ -2,11 +2,7 @@ package com.bokecc.livemodule.replay.video;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -18,8 +14,9 @@ import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
-import com.bokecc.livemodule.view.ResizeTextureView;
+import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -29,23 +26,14 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
  */
 public class ReplayVideoView extends RelativeLayout {
     private static final String TAG = "ReplayVideoView";
-
     private Context mContext;
-
-    private ResizeTextureView mTextureView;
-
+    private TextureView mTextureView;
     private TextView mVideoNoPlayTip;
-
     private ProgressBar mVideoProgressBar;
-
     private DWReplayPlayer player;
 
-    private Bitmap tempBitmap;
-
-    private long allTime = 0;
-
-    private int videoWidth;
-    private int videoHeight;
+    private SurfaceTexture mSurfaceTexture;
+    private Surface mSurface;
 
     public ReplayVideoView(Context context) {
         super(context);
@@ -86,8 +74,7 @@ public class ReplayVideoView extends RelativeLayout {
         player.setOnBufferingUpdateListener(bufferingUpdateListener);
         player.setOnErrorListener(errorListener);
         player.setOnCompletionListener(completionListener);
-        player.setOnVideoSizeChangedListener(videoSizeChangedListener);
-
+        player.setBufferTimeout(20);
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
             dwReplayCoreHandler.setPlayer(player);
@@ -121,47 +108,26 @@ public class ReplayVideoView extends RelativeLayout {
     }
 
 
-    // 缓存视频的切换前的画面
-    public void cacheScreenBitmap() {
-        tempBitmap = mTextureView.getBitmap();
-    }
-
-
-
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
+
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
-            // 使用新的surfaceTexture生成surface
-            ELog.i(TAG, "onSurfaceTextureAvailable");
-            Surface surface = new Surface(surfaceTexture);
-            // 正在播放中或者暂停中，只需要将新的surface给player即可
-            if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
-                // 尝试绘制之前的画面
-                try {
-                    if (tempBitmap != null && !tempBitmap.isRecycled() && surface.isValid()) {
-                        RectF rectF = new RectF(0, 0, mTextureView.getWidth(), mTextureView.getHeight());
-                        Canvas canvas = surface.lockCanvas(new Rect(0, 0, mTextureView.getWidth(), mTextureView.getHeight()));
-                        if (canvas != null) {
-                            canvas.drawBitmap(tempBitmap, null, rectF, null);
-                            surface.unlockCanvasAndPost(canvas);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if (mSurfaceTexture != null) {
+                mTextureView.setSurfaceTexture(mSurfaceTexture);
+            } else {
+                mSurfaceTexture = surfaceTexture;
+                mSurface = new Surface(surfaceTexture);
+                player.updateSurface(mSurface);
             }
-            player.updateSurface(surface);
         }
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            ELog.i(TAG, "onSurfaceTextureSizeChanged");
         }
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            ELog.i(TAG, "onSurfaceTextureDestroyed");
             return false;
         }
 
@@ -192,9 +158,6 @@ public class ReplayVideoView extends RelativeLayout {
             mVideoNoPlayTip.post(new Runnable() {
                 @Override
                 public void run() {
-                    long duration = player.getDuration();
-                    allTime = Math.round((double) duration / 1000) * 1000;
-                    mVideoNoPlayTip.setVisibility(GONE);
                     DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.replayVideoPrepared();
@@ -216,22 +179,20 @@ public class ReplayVideoView extends RelativeLayout {
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.bufferStart();
                     }
-                    ELog.e(TAG, "buffer start");
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
                     dismissProgress();
-                    ELog.e(TAG, "buffer end");
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.bufferEnd();
                     }
                     break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+                    mVideoNoPlayTip.setVisibility(GONE);
                     dismissProgress();
                     if (dwReplayCoreHandler != null) {
-                        dwReplayCoreHandler.bufferEnd();
+                        dwReplayCoreHandler.onRenderStart();
                     }
-                    ELog.e(TAG, "render start");
                     break;
                 default:
                     break;
@@ -251,28 +212,11 @@ public class ReplayVideoView extends RelativeLayout {
     };
 
 
-    IMediaPlayer.OnVideoSizeChangedListener videoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
-        @Override
-        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-            int videoWidth = mp.getVideoWidth();
-            int videoHeight = mp.getVideoHeight();
-            if (videoWidth != 0 && videoHeight != 0) {
-                mTextureView.setVideoSize(videoWidth, videoHeight);
-            }
-        }
-    };
-
-
     IMediaPlayer.OnErrorListener errorListener = new IMediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(IMediaPlayer mp, int what, int extra) {
             DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
-            mVideoProgressBar.post(new Runnable() {
-                @Override
-                public void run() {
-                    dismissProgress();
-                }
-            });
+            dismissProgress();
             if (dwReplayCoreHandler != null) {
                 dwReplayCoreHandler.playError(what);
             }
@@ -284,14 +228,11 @@ public class ReplayVideoView extends RelativeLayout {
         @Override
         public void onCompletion(IMediaPlayer mp) {
             dismissProgress();
-            long progress = player.getCurrentPosition();
-            long progressTime = Math.round((double) progress / 1000) * 1000;
-            if (allTime - progressTime < 3000) {
-                DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
-                if (dwReplayCoreHandler != null) {
-                    dwReplayCoreHandler.onPlayComplete();
-                }
+            DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
+            if (dwReplayCoreHandler != null) {
+                dwReplayCoreHandler.onPlayComplete();
             }
         }
     };
+
 }

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -301,9 +300,9 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
         @Override
         public void onClickDocScaleType(int scaleType) {
-            if (mDocLayout != null) {
-                mDocLayout.setScaleType(scaleType);
-            }
+//            if (mDocLayout != null) {
+//                mDocLayout.setScaleType(scaleType);
+//            }
         }
     };
 
@@ -326,8 +325,9 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
     /**
      * isVideoRtc always is true
+     *
      * @param isVideoRtc 当前连麦是否是视频连麦
-     * @param videoSize 视频的宽高，值为"600x400"
+     * @param videoSize  视频的宽高，值为"600x400"
      */
     @Override
     public void onEnterSpeak(final boolean isVideoRtc, final boolean needAdjust, final String videoSize) {
@@ -338,7 +338,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                     mLiveVideoView.enterRtcMode(isVideoRtc);
                 }
                 if (mLiveRtcView != null) {
-                    mLiveRtcView.enterSpeak(isVideoRtc,needAdjust, videoSize);
+                    mLiveRtcView.enterSpeak(isVideoRtc, needAdjust, videoSize);
                 }
             }
         });
@@ -475,6 +475,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             public void onPageScrollStateChanged(int state) {
             }
         });
+
+        
         mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -575,7 +577,6 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
     }
 
 
-
 //    public void initChatView() {
 //        //构建传递参数
 //        Bundle bundle = new Bundle();
@@ -591,8 +592,6 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 //        //提交修改
 //        transaction.commit();
 //    }
-
-
 
 
     // 初始化文档布局区域

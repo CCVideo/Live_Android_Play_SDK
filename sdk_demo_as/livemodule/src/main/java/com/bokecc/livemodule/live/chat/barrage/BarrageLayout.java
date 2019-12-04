@@ -82,7 +82,6 @@ public class BarrageLayout extends RelativeLayout{
             offset = DensityUtil.dp2px(context, 32);
         }
 
-
         Iterator<String> iterator = infos.iterator();
         int i = 0;
         while (iterator.hasNext()) {

@@ -40,7 +40,6 @@ public class EmojiUtil {
     public static Pattern pattern = Pattern.compile("\\[em2_[0-2][0-9]\\]");
 
     public static SpannableString parseFaceMsg(Context context, SpannableString faceMsg) {
-
         Matcher m = pattern.matcher(faceMsg.toString());
         while (m.find()) {
             String imgStr = m.group();

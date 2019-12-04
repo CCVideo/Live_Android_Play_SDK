@@ -121,12 +121,11 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         TextView estimateStartTime = findViewById(R.id.estimateStartTime);
 
         RoomInfo roomInfo = DWLive.getInstance().getRoomInfo();
-        if (roomInfo != null) {
-            estimateStartTime.setVisibility(VISIBLE);
-            estimateStartTime.setText(roomInfo.getEstimateStartTime());
-        }
+//        if (roomInfo != null) {
+//            estimateStartTime.setVisibility(VISIBLE);
+//            estimateStartTime.setText(roomInfo.getEstimateStartTime());
+//        }
 
-//        mDocScaleType = findViewById(R.id.id_scale_type);
 
         initEmojiAndChat();
 
@@ -176,6 +175,29 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
             }
         });
 
+//        findViewById(R.id.id_center_inside).setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                liveRoomStatusListener.onClickDocScaleType(0);
+//            }
+//        });
+//
+//        findViewById(R.id.id_fit_xy).setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                liveRoomStatusListener.onClickDocScaleType(1);
+//            }
+//        });
+//
+//        findViewById(R.id.id_crop_center).setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                liveRoomStatusListener.onClickDocScaleType(2);
+//
+//            }
+//        });
+
+
 //
 //        mDocScaleType.setOnClickListener(new OnClickListener() {
 //            @Override
@@ -188,11 +210,10 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
 //                        currentType = 2;
 //                        mDocScaleType.setText("CropCenter");
 //                    } else if (currentType == 2) {
-//                        currentType = 0;
-//                        mDocScaleType.setText("centerInside");
+//
 //                    }
 //
-//                    liveRoomStatusListener.onClickDocScaleType(currentType);
+//
 //                }
 //            }
 //        });

@@ -8,7 +8,6 @@ import android.view.View;
 import com.bokecc.dwlivemoduledemo.R;
 import com.bokecc.dwlivemoduledemo.base.BaseActivity;
 import com.bokecc.sdk.mobile.live.logging.ELog;
-import com.bokecc.dwlivemoduledemo.TestActivity;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -73,18 +72,11 @@ public class PilotActivity extends BaseActivity {
         findViewById(R.id.btn_start_local_replay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 Intent intent = new Intent(PilotActivity.this, TestActivity.class);
-//                 startActivity(intent);
-
-                // TODO Demo模版：跳转到在线和离线混合（支持列表切换）播放页 (ReplayMixPlayActivity)
-//                Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
+                Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
                 checkoutPermission(intent);
             }
         });
     }
-
-
-
 
     private void checkoutPermission(final Intent intent){
         grantNum = 0;

@@ -45,24 +45,24 @@
                     android:gravity="center"
                     android:text="0"
                     android:visibility="gone" />
-                <TextView
-                    android:visibility="visible"
-                    android:id="@+id/id_center_inside"
-                    style="@style/phoneLiveLandscapeTitleViewTheme"
-                    android:paddingRight="5dp"
-                    android:text="centerInside" />
-                <TextView
-                    android:visibility="visible"
-                    android:id="@+id/id_fit_xy"
-                    style="@style/phoneLiveLandscapeTitleViewTheme"
-                    android:paddingRight="5dp"
-                    android:text="fit_xy" />
-                <TextView
-                    android:visibility="visible"
-                    android:id="@+id/id_crop_center"
-                    style="@style/phoneLiveLandscapeTitleViewTheme"
-                    android:paddingRight="5dp"
-                    android:text="crop_center" />
+<!--                <TextView-->
+<!--                    android:id="@+id/id_center_inside"-->
+<!--                    android:visibility="visible"-->
+<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
+<!--                    android:paddingRight="5dp"-->
+<!--                    android:text="centerInside" />-->
+<!--                <TextView-->
+<!--                    android:visibility="visible"-->
+<!--                    android:id="@+id/id_fit_xy"-->
+<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
+<!--                    android:paddingRight="5dp"-->
+<!--                    android:text="fit_xy" />-->
+<!--                <TextView-->
+<!--                    android:visibility="visible"-->
+<!--                    android:id="@+id/id_crop_center"-->
+<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
+<!--                    android:paddingRight="5dp"-->
+<!--                    android:text="crop_center" />-->
 
                 <TextView
                     android:id="@+id/video_doc_switch"

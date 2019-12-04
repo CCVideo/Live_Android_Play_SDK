@@ -38,7 +38,7 @@ public class DWApplication extends Application {
         FileDownloader.setupOnApplicationOnCreate(this)
                 .connectionCreator(new OkHttp3Connection.Creator(builder))
                 .commit();
-//         初始化SDK
+//      初始化SDK
         LiveSDKHelper.initSDK(this);
     }
 

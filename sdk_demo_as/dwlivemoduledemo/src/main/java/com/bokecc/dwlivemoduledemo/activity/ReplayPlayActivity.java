@@ -293,7 +293,6 @@ public class ReplayPlayActivity extends BaseActivity {
                 public void run() {
                     if (isVideoMain) {
                         // 缓存视频的切换前的画面
-                        mReplayVideoView.cacheScreenBitmap();
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         mReplayFloatingView.addView(mReplayVideoView);
@@ -302,7 +301,6 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayRoomLayout.setVideoDocSwitchText("切换视频");
                     } else {
                         // 缓存视频的切换前的画面
-                        mReplayVideoView.cacheScreenBitmap();
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();

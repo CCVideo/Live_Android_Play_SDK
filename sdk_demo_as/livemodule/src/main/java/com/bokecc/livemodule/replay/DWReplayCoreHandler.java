@@ -225,6 +225,17 @@ public class DWReplayCoreHandler {
     }
 
     /**
+     * 重试播放
+     * @param time:时间点，是否强制更新流地址
+     */
+    public void retryReplay(long time,boolean updateStream){
+        DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        if (dwLiveReplay != null) {
+            dwLiveReplay.retryReplay(time,updateStream);
+        }
+    }
+
+    /**
      * 更新当前缓冲进度
      */
     public void updateBufferPercent(int percent) {
@@ -257,6 +268,12 @@ public class DWReplayCoreHandler {
         }
     }
 
+    public void onRenderStart(){
+        if(replayRoomListener != null){
+            replayRoomListener.startRending();
+        }
+    }
+
 
     /**
      * 回放视频准备好了
@@ -266,7 +283,7 @@ public class DWReplayCoreHandler {
         replayRoomListener.videoPrepared();
     }
 
-    /******************************* 实现 LiveListener 定义的方法 ***************************************/
+    /******************************* 实现 DWLiveListener 定义的方法 ***************************************/
 
     private DWLiveReplayListener dwLiveReplayListener = new DWLiveReplayListener() {
 

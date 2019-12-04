@@ -214,9 +214,7 @@ public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdap
 
     /* 获取问卷的答案*/
     public String getQuestionnaireAnswer() throws JSONException {
-
         JSONArray answerArray = new JSONArray();  // 所有问卷答案的容器
-
         if (hasQAQuestionnaire) {
             // 整理问答题的回答
             for (int i = 0; i < mEditViews.size(); i++) {

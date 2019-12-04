@@ -174,8 +174,6 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                 }
             });
         }
-
-
         // 判断是是否是广播，如果是，就展示广播信息
         if (chatEntity.getUserId().isEmpty() && chatEntity.getUserName().isEmpty()
                 && !chatEntity.isPrivate() && chatEntity.isPublisher()

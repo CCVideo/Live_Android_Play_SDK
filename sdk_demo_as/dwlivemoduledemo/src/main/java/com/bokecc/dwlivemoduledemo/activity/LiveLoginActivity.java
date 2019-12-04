@@ -182,6 +182,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         loginInfo.setUserId(lllLoginLiveUid.getText());
         loginInfo.setViewerName(lllLoginLiveName.getText());
         loginInfo.setViewerToken(lllLoginLivePassword.getText());
+
         if (!"".equals(mGroupId.trim())) {
             loginInfo.setGroupId(mGroupId);
         }

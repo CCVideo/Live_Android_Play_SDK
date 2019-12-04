@@ -165,7 +165,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
             surface = new Surface(surfaceTexture);
 
             // 正在播放中或者暂停中，只需要将新的surface给player即可
-            if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
+            if (player.isPlaying() || (player.isPlayable())) {
                 onSurfaceAvailable(false);
                 // 尝试绘制之前的画面
                 try {

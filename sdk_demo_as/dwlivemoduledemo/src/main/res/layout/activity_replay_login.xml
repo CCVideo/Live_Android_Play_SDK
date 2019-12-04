@@ -73,7 +73,7 @@
 
                     <TextView
                         style="@style/loginLineTextViewTheme"
-                        android:text="CC账号ID" />
+                        android:text="HD账号ID" />
 
                     <com.bokecc.livemodule.login.LoginLineLayout
                         android:id="@+id/lll_login_replay_uid"

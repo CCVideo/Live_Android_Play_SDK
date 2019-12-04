@@ -80,23 +80,13 @@ public class LocalReplayVideoView extends RelativeLayout {
     }
 
     /**
-     * 添加此字段的意义在于：
-     * 部分手机HOME到桌面回来时不触发onSurfaceTextureAvailable，需要由onResume来触发一次调用逻辑。
-     */
-    boolean hasCallStartPlay = false;
-
-    /**
      * 开始播放
      */
     public void start() {
-        if (hasCallStartPlay) {
-            return;
-        }
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLocalReplayCoreHandler != null) {
-            dwLocalReplayCoreHandler.start(surface);
+            dwLocalReplayCoreHandler.start();
         }
-        hasCallStartPlay = true;
     }
 
     long currentPosition;
@@ -106,7 +96,6 @@ public class LocalReplayVideoView extends RelativeLayout {
      * 停止播放
      */
     public void stop() {
-        hasCallStartPlay = false;  // 准备正常播放了，将字段回归为false
         if (player != null) {
             player.pause();
             if (player.getCurrentPosition() != 0) {
@@ -125,7 +114,6 @@ public class LocalReplayVideoView extends RelativeLayout {
             player.pause();
             player.stop();
         }
-
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLocalReplayCoreHandler != null) {
             dwLocalReplayCoreHandler.destroy();
@@ -144,35 +132,17 @@ public class LocalReplayVideoView extends RelativeLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    private Surface mSurface;
+    private SurfaceTexture mSurfaceTexture;
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
-
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
-            // 使用新的surfaceTexture生成surface
-            surface = new Surface(surfaceTexture);
-            // 正在播放中或者暂停中，只需要将新的surface给player即可
-            if (player.isPlaying() || (player.isPlayable() && !TextUtils.isEmpty(player.getDataSource()))) {
-                // 尝试绘制之前的画面
-                try {
-                    if (tempBitmap != null && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
-                        RectF rectF = new RectF(0, 0, mTextureView.getWidth(), mTextureView.getHeight());
-                        Canvas canvas = surface.lockCanvas(new Rect(0, 0, mTextureView.getWidth(), mTextureView.getHeight()));
-                        if (canvas != null) {
-                            canvas.drawBitmap(tempBitmap, null, rectF, null);
-                            surface.unlockCanvasAndPost(canvas);
-                        }
-                    }
-                    player.setSurface(surface);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if (mSurfaceTexture != null) {
+                mTextureView.setSurfaceTexture(mSurfaceTexture);
             } else {
-                // 如果不是播放中或者暂停中，就触发开始播放的操作（此操作是从头开始播放）
-                if (hasCallStartPlay) {
-                    return;
-                }
-                start();
-                hasCallStartPlay = true;
+                mSurfaceTexture = surfaceTexture;
+                mSurface = new Surface(surfaceTexture);
+                player.updateSurface(mSurface);
             }
         }
 
@@ -200,7 +170,6 @@ public class LocalReplayVideoView extends RelativeLayout {
                 @Override
                 public void run() {
                     player.start();
-                    hasCallStartPlay = false;  // 准备正常播放了，将字段回归为false
                     if (currentPosition > 0) {
                         player.seekTo(currentPosition);
                         player.setSpeed(currentSpeed);

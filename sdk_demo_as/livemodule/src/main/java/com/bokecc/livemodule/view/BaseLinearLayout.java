@@ -42,7 +42,6 @@ public abstract class BaseLinearLayout extends LinearLayout {
     public abstract void initViews();
 
     //***************************************** 工具方法 *****************************************
-
     // 在Ui线程上进行吐司提示
     public void toastOnUiThread(final String msg) {
         // 判断是否处在UI线程

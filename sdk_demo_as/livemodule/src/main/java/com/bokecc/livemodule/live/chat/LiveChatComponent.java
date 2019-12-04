@@ -386,6 +386,8 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     //------------------------ 处理直播聊天回调信息 ------------------------------------
 
     // 收到历史聊天信息
+
+    //TODO:这里可能是相对时间
     @Override
     public void onHistoryChatMessage(final ArrayList<ChatMessage> historyChats) {
         // 如果之前已经加载过了历史聊天信息，就不再接收
@@ -441,7 +443,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         if (TextUtils.isEmpty(msgStatusJson)) {
             return;
         }
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

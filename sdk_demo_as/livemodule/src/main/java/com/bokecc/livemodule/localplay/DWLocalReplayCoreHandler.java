@@ -188,10 +188,10 @@ public class DWLocalReplayCoreHandler {
     /**
      * 开始播放
      */
-    public void start(Surface surface) {
+    public void start() {
         DWLiveLocalReplay dwLiveLocalReplay = DWLiveLocalReplay.getInstance();
         if (dwLiveLocalReplay != null) {
-            dwLiveLocalReplay.start(surface);
+            dwLiveLocalReplay.start(null);
         }
     }
 

@@ -59,17 +59,16 @@ public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeL
         }
     }
 
-    public void setScaleType(int type) {
-        mCurrentScaleType = type;
-        if (SCALE_CENTER_INSIDE == mCurrentScaleType) {
-            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
-        } else if (SCALE_FIT_XY == mCurrentScaleType) {
-            DWLive.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
-        } else if (SCALE_CROP_CENTER == mCurrentScaleType) {
-            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
-        }
-    }
-
+//    public void setScaleType(int type) {
+//        mCurrentScaleType = type;
+//        if (SCALE_CENTER_INSIDE == mCurrentScaleType) {
+//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
+//        } else if (SCALE_FIT_XY == mCurrentScaleType) {
+//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
+//        } else if (SCALE_CROP_CENTER == mCurrentScaleType) {
+//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
+//        }
+//    }
 
     public void updateSize(int srcWidth, int srcHeight) {
 

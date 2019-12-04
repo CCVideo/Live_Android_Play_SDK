@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical">
 
     <com.bokecc.sdk.mobile.live.rtc.CCRTCRender
@@ -11,11 +12,7 @@
 
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/svr_local_render"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_width="100dp"
-        android:layout_marginRight="48dp"
-        android:layout_marginBottom="10dp"
-        android:layout_height="100dp" />
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
 
 </LinearLayout>

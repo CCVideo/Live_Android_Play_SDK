@@ -121,7 +121,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         replayLoginInfo.setRecordId(lllLoginReplayRecordid.getText());
         replayLoginInfo.setViewerName(lllLoginReplayName.getText());
         replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText());
-
+//        replayLoginInfo.setViewerToken("XjbetHY9Wn84uEkUpNauVq");
         // 设置登录参数
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
 
@@ -285,6 +285,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         if (params.length < 2) {
             return null;
         }
+
         for (String p : params) {
             String[] en = p.split("=");
             map.put(en[0], en[1]);

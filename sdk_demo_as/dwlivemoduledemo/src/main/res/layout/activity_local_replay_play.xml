@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/rl_pc_live_top_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
         android:layout_weight="1">
 
         <RelativeLayout
@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#000000">
-
             <com.bokecc.livemodule.localplay.video.LocalReplayVideoView
                 android:id="@+id/replay_video_view"
                 android:layout_width="match_parent"
