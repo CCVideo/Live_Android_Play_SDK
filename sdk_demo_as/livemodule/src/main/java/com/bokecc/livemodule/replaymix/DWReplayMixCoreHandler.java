@@ -200,6 +200,10 @@ public class DWReplayMixCoreHandler {
      * 开始播放在线回放
      */
     public void startLiveReplay(ReplayLoginInfo info) {
+        if(mCurrentPlayType == PlayType.LOCAL){
+            DWLiveLocalReplay.getInstance().releasePlayer();
+        }
+
         mCurrentPlayType = PlayType.LIVE;
         docView.getWebView().setVisibility(View.VISIBLE);
         docView.getImageView().setFastDoc(true);
@@ -283,6 +287,11 @@ public class DWReplayMixCoreHandler {
             final DWLiveReplay liveReplay = DWLiveReplay.getInstance();
             liveReplay.stop();
         }
+
+        final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
+        if(mCurrentPlayType == PlayType.LOCAL){
+            liveLocalReplay.releasePlayer();
+        }
         mCurrentPlayType = PlayType.LOCAL;
         if (dwReplayMixVideoListener != null) {
             dwReplayMixVideoListener.onPlayOtherReplayVideo();
@@ -292,7 +301,7 @@ public class DWReplayMixCoreHandler {
             dwReplayMixRoomListener.onPlayOtherReplayVideo();
         }
 
-        final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
+
         liveLocalReplay.setReplayParams(localReplayListener, ijkMediaPlayer, docView, localPath);
         startPlayReplay();
     }
@@ -410,6 +419,11 @@ public class DWReplayMixCoreHandler {
             if (dwReplayMixIntroListener != null) {
                 dwReplayMixIntroListener.updateRoomInfo(roomInfo);
             }
+        }
+
+        @Override
+        public void onResourceParserFinish() {
+
         }
 
         @Override

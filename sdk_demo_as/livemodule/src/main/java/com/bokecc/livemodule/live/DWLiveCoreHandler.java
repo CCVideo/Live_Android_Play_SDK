@@ -25,6 +25,8 @@ import com.bokecc.sdk.mobile.live.pojo.QualityInfo;
 import com.bokecc.sdk.mobile.live.pojo.Question;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
+import com.bokecc.sdk.mobile.live.pojo.SettingInfo;
+import com.bokecc.sdk.mobile.live.pojo.TeacherInfo;
 import com.bokecc.sdk.mobile.live.rtc.CCRTCRender;
 import com.bokecc.sdk.mobile.live.rtc.RtcClient;
 import com.bokecc.sdk.mobile.live.widget.DocView;
@@ -535,6 +537,11 @@ public class DWLiveCoreHandler {
             }
         }
 
+        @Override
+        public void onOnlineTeachers(List<TeacherInfo> infoList) {
+
+        }
+
         /**
          * 回调当前翻页的信息<br/>
          * 注意：<br/>
@@ -585,6 +592,11 @@ public class DWLiveCoreHandler {
             if (dwLiveRoomListener != null) {
                 dwLiveRoomListener.onSwitchVideoDoc(isVideoMain);
             }
+        }
+
+        @Override
+        public void onRoomSettingInfo(SettingInfo info) {
+
         }
 
         /**

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_pc_live_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/rl_video_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- 视频组件 -->
+                <com.bokecc.livemodule.live.video.LiveVideoView
+                    android:id="@+id/live_video_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+            <!--- 连麦视频组件 -->
+            <com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout
+                android:id="@+id/live_rtc_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
+        <!-- 弹幕组件 -->
+        <com.bokecc.livemodule.live.chat.barrage.BarrageLayout
+            android:id="@+id/live_barrage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.bokecc.livemodule.live.room.LiveRoomLayout
+            android:id="@+id/live_room_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ll_pc_live_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <include layout="@layout/live_pc_portrait_msg_layout" />
+
+        <com.bokecc.livemodule.live.morefunction.MoreFunctionLayout
+            android:id="@+id/more_function_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+    <FrameLayout
+        android:id="@+id/layout_emotion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

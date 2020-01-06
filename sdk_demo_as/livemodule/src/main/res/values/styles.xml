@@ -219,7 +219,15 @@
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textSize">17sp</item>
     </style>
-
+    <style name="HeadIconStyle">
+        <item name="android:layout_width">38dp</item>
+        <item name="android:layout_height">38dp</item>
+        <item name="android:src">@drawable/user_head_icon</item>
+        <item name="hv_border_color">#fff</item>
+        <item name="hv_border_width">1dp</item>
+        <item name="hv_shadow_color">#cccccc</item>
+        <item name="hv_shadow_width">2dp</item>
+    </style>
 
 </resources>
 

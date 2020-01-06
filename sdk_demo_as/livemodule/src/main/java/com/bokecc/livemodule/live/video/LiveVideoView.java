@@ -60,8 +60,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     private DWLivePlayer player;
 
-    private Surface surface;
-
     /**
      * 缓存切换视频文档时的图像防止黑屏
      */
@@ -181,7 +179,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     public void exitRtcMode() {
         try {
-            DWLive.getInstance().restartVideo(surface);
+            DWLive.getInstance().restartVideo(mSurface);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (DWLiveException e) {
@@ -195,13 +193,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      *
      */
     public synchronized void start() {
-        ELog.i(TAG,"---start--- hasCallStartPlay: "+hasCallStartPlay);
-        if (hasCallStartPlay || null == surface) {
-            return;
-        }
-        hasCallStartPlay = true;
+//        ELog.i(TAG,"---start--- hasCallStartPlay: "+hasCallStartPlay);
+//        if (hasCallStartPlay || null == surface) {
+//            return;
+//        }
+//        hasCallStartPlay = true;
         // 启动直播播放器
-        DWLiveCoreHandler.getInstance().start(surface);
+        DWLiveCoreHandler.getInstance().start(null);
         if (mVideoProgressBar != null) {
             mVideoProgressBar.setVisibility(VISIBLE);
         }
@@ -245,49 +243,48 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 恢复暂停时的图像
-     *
-     */
-    public void showPauseCover() {
-        if (tempBitmap != null
-                && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
-            try {
-                int width = mVideoContainer.getWidth();
-                int height = mVideoContainer.getHeight();
-                RectF rectF = new RectF(0, 0, width, height);
-                Canvas canvas = surface.lockCanvas(new Rect(0, 0, width, height));
-                if (canvas != null) {
-                    canvas.drawBitmap(tempBitmap, null, rectF, null);
-                    surface.unlockCanvasAndPost(canvas);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (null != tempBitmap && !tempBitmap.isRecycled()) {
-                    try {
-                        tempBitmap.recycle();
-                        tempBitmap = null;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
+//     *
+//     */
+//    public void showPauseCover() {
+//        if (tempBitmap != null
+//                && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
+//            try {
+//                int width = mVideoContainer.getWidth();
+//                int height = mVideoContainer.getHeight();
+//                RectF rectF = new RectF(0, 0, width, height);
+//                Canvas canvas = surface.lockCanvas(new Rect(0, 0, width, height));
+//                if (canvas != null) {
+//                    canvas.drawBitmap(tempBitmap, null, rectF, null);
+//                    surface.unlockCanvasAndPost(canvas);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//                if (null != tempBitmap && !tempBitmap.isRecycled()) {
+//                    try {
+//                        tempBitmap.recycle();
+//                        tempBitmap = null;
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+//    }
 
+    private SurfaceTexture mSurfaceTexture;
+    private Surface mSurface;
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             Log.i(TAG, "onSurfaceTextureAvailable:");
-            surface = new Surface(surfaceTexture);
-            if (player.isPlaying()) {
-                player.setSurface(surface);
+            if (mSurfaceTexture != null) {
+                mVideoContainer.setSurfaceTexture(mSurfaceTexture);
             } else {
-                if (hasCallStartPlay) {
-                    return;
-                }
-                start();
-                hasCallStartPlay = true;
+                mSurfaceTexture = surfaceTexture;
+                mSurface = new Surface(surfaceTexture);
+                player.setSurface(mSurface);
             }
         }
 
@@ -297,8 +294,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-            surface.release();
-            surface = null;
             return false;
         }
 
@@ -317,11 +312,10 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 @Override
                 public void run() {
                     // 准备正常播放了，将字段回归为false;
-                    hasCallStartPlay = false;
-                    if (null != surface) {
-                        player.setSurface(surface);
+                    if (null != mSurface) {
+                        player.setSurface(mSurface);
                     }
-                    player.start();
+                    ELog.i("sdk_bokecc","onPrepared...");
                     mVideoProgressBar.setVisibility(VISIBLE);
                     // 通知直播视频已经准备就绪
                     if (null != preparedCallback) {
@@ -495,10 +489,10 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     @Override
     public void onUnbanStream() {
-        if (surface != null) {
+        if (mSurface != null) {
             DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
             if (dwLiveCoreHandler != null) {
-                dwLiveCoreHandler.start(surface);
+                dwLiveCoreHandler.start(mSurface);
             }
         }
     }

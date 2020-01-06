@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#51000000">
+
+    <LinearLayout
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/id_url_input"
+            android:textSize="15sp"
+            android:padding="10dp"
+            android:textColor="#0088FF"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/id_add_new_url"
+            android:textSize="15sp"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="添加"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="10dp"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:textColor="#000000"
+        android:id="@+id/id_file_name"
+        android:textSize="16sp"
+        android:text="455556.ccr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textSize="11sp"
+        android:textColor="#aaaaaa"
+        android:id="@+id/id_download_progress_numberic"
+        android:text="202.32MB/256.78MB (80%)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/id_download_progressbar"
+            android:layout_gravity="center_vertical"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/id_download_icon"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/download_wait"
+            android:layout_width="15dp"
+            android:layout_height="15dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:textSize="11sp"
+        android:textColor="#aaaaaa"
+        android:id="@+id/id_download_speed"
+        android:text="下载中  77.86KB/S"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

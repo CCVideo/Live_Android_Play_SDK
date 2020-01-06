@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'io.objectbox'
 android {
     compileSdkVersion 28
 
@@ -33,13 +33,14 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     // Glide
     api 'com.github.bumptech.glide:glide:3.7.0'
-       api files('libs/dwlivesdk.jar')
-       api files('libs/rtc.jar')
-       api files('libs/tbs_sdk_thirdapp_v4.3.0.1020.jar')
-       api files('libs/libjingle_peerconnection.jar')
-       api files('libs/drmlib.jar')
-       api 'com.squareup.okhttp3:okhttp:3.10.0'
-       api('io.socket:socket.io-client:0.8.3') {
-           exclude group: 'org.json', module: 'json'
-       }
+    //  CC SDK
+        api files('libs/dwlivesdk.jar')
+        api files('libs/drmlib.jar')
+        api files('libs/rtc.jar')
+        api files('libs/engine-0.8.3.jar')
+        api files('libs/tbs_sdk_thirdapp_v4.3.0.1020.jar')
+        api files('libs/libjingle_peerconnection.jar')
+        api 'com.squareup.okhttp3:okhttp:3.10.0'
+
+  
 }

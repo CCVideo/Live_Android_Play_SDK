@@ -1,1 +1,1 @@
-include ':livemodule', ':dwlivemoduledemo',':livesdk'
+include ':livemodule', ':dwlivedemo'

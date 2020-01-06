@@ -126,7 +126,9 @@ public class QuestionnairePopup extends BasePopupWindow implements SocketQuestio
         return mHasSubmited;
     }
 
-    /* 隐藏输入法 */
+    /**
+     *  隐藏输入法
+     */
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(rv_questionnaire_list.getWindowToken(), 0);
@@ -154,7 +156,6 @@ public class QuestionnairePopup extends BasePopupWindow implements SocketQuestio
         // 提交成功后关闭对话框
         if (isSucceed) {
             mHasSubmited = true;
-            //
             if (mSubmitedaction == 1) {
                 rv_questionnaire_list.post(new Runnable() {
                     @Override
