@@ -267,13 +267,6 @@ public class DWLocalReplayCoreHandler {
             }
         }
 
-        /**
-         * 资源解析完毕
-         */
-        @Override
-        public void onResourceParserFinish() {
-
-        }
 
         @Override
         public void onInitFinished() {

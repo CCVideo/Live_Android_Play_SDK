@@ -38,6 +38,7 @@ import com.bokecc.livemodule.utils.ChatImageUtils;
 import com.bokecc.livemodule.view.BaseRelativeLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
+import com.bokecc.sdk.mobile.live.response.MsgAck;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -325,7 +326,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     }
 
     public void addChatEntity(ChatEntity chatEntity) {
-
         mChatAdapter.add(chatEntity);
         if (mChatAdapter.getItemCount() - 1 > 0) {
             mChatList.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
@@ -345,6 +345,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         chatEntity.setUserName(msg.getUserName());
         chatEntity.setPrivate(!msg.isPublic());
         chatEntity.setUserRole(msg.getUserRole());
+
         if (msg.getUserId().equals(DWLive.getInstance().getViewer().getId())) {
             chatEntity.setPublisher(true);
         } else {
@@ -390,7 +391,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     //TODO:这里可能是相对时间
     @Override
     public void onHistoryChatMessage(final ArrayList<ChatMessage> historyChats) {
-
         // 如果之前已经加载过了历史聊天信息，就不再接收
 //        if (hasLoadedHistoryChat) {
 //            return;

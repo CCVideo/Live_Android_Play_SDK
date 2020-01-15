@@ -33,8 +33,6 @@ public class LocalReplayVideoView extends RelativeLayout {
 
     DWReplayPlayer player;
 
-    Surface surface;
-
     String playPath;
 
     public LocalReplayVideoView(Context context) {

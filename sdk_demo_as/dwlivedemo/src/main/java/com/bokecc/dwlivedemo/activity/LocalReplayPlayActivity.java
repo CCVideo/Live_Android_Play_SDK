@@ -261,7 +261,6 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
     @Override
     protected void onResume() {
         super.onResume();
-
         mRoot.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -452,10 +451,11 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
             quitFullScreen();
             return;
         }
-        if (mExitPopupWindow != null) {
-            mExitPopupWindow.setConfirmExitRoomListener(confirmExitRoomListener);
-            mExitPopupWindow.show(mRoot);
-        }
+        finish();
+//        if (mExitPopupWindow != null) {
+//            mExitPopupWindow.setConfirmExitRoomListener(confirmExitRoomListener);
+//            mExitPopupWindow.show(mRoot);
+//        }
     }
 
 

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveMoreFunctionListener;
+import com.bokecc.livemodule.live.chat.KeyboardHeightObserver;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.morefunction.announce.AnnounceLayout;
 import com.bokecc.livemodule.live.morefunction.fab.FabAttributes;
@@ -22,7 +23,7 @@ import com.bokecc.sdk.mobile.live.pojo.PrivateChatInfo;
 /**
  * 更多功能 布局 （公告、私聊）
  */
-public class MoreFunctionLayout extends BaseRelativeLayout implements OnFabClickListener, DWLiveMoreFunctionListener {
+public class MoreFunctionLayout extends BaseRelativeLayout implements OnFabClickListener, DWLiveMoreFunctionListener, KeyboardHeightObserver {
 
     private static final int ANNOUNCE = 1;
     private static final int RTC = 2;
@@ -131,7 +132,7 @@ public class MoreFunctionLayout extends BaseRelativeLayout implements OnFabClick
 
     @Override
     public void onFabVisible(boolean visible) {
-        if(!visible){
+        if (!visible) {
             mRTCControlLayout.setVisibility(GONE);
         }
     }
@@ -199,5 +200,12 @@ public class MoreFunctionLayout extends BaseRelativeLayout implements OnFabClick
         mPrivateChatLayout.setVisibility(VISIBLE);
         // 通知私聊控件，展示私聊列表
         mPrivateChatLayout.jump2PrivateChat(chatEntity);
+    }
+
+    @Override
+    public void onKeyboardHeightChanged(int height, int orientation) {
+        if (mPrivateChatLayout != null && mPrivateChatLayout.getVisibility() == VISIBLE) {
+            mPrivateChatLayout.onKeyboardHeightChanged(height, orientation);
+        }
     }
 }

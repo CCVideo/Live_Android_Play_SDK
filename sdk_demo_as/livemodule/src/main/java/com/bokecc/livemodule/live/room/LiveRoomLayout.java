@@ -34,6 +34,7 @@ import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.util.SoftKeyBoardState;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
+import com.bokecc.sdk.mobile.live.response.MsgAck;
 
 /**
  * 直播间信息组件

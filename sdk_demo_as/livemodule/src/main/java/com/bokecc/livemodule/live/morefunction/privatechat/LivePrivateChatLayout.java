@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +57,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
     private ImageView mPrivateChatClose;
     private ImageView mPrivateChatUserClose;
 
-    private LinearLayout mPrivateChatInputLayout;
+    private RelativeLayout mPrivateChatInputLayout;
     private Button mChatSend;
     private EditText mInput;
     private ImageView mEmoji;
@@ -81,6 +83,11 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
     // 聊天id与信息映射表
     private Map<String, ChatEntity> mChaIdMap;
 
+    //软键盘的高度
+    private int softKeyHeight;
+    private boolean showEmojiAction = false;
+
+
     public LivePrivateChatLayout(Context context) {
         super(context);
         initPrivateChatView();
@@ -96,11 +103,13 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         initPrivateChatView();
     }
 
+
+
     public void initViews() {
         LayoutInflater.from(mContext).inflate(R.layout.live_portrait_private_chat, this, true);
         mPrivateChatUserLayout = findViewById(R.id.id_private_chat_user_layout);
         mPrivateChatMsgLayout = findViewById(R.id.id_private_chat_msg_layout);
-        mPrivateChatInputLayout = findViewById(R.id.id_chat_bottom);
+        mPrivateChatInputLayout = findViewById(R.id.id_push_chat_layout);
         mPrivateChatUserList = findViewById(R.id.id_private_chat_user_list);
         mPrivateChatMsgList = findViewById(R.id.id_private_chat_list);
         mPrivateChatUserName = findViewById(R.id.id_private_chat_title);
@@ -116,6 +125,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
             @Override
             public void onClick(View v) {
                 // do nothing
+                hideKeyboard();
             }
         });
 
@@ -123,6 +133,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
             @Override
             public void onClick(View v) {
                 // do nothing
+                hideKeyboard();
             }
         });
 
@@ -130,6 +141,8 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mPrivateChatBack.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyboard();
+                mPrivateChatInputLayout.setTranslationY(0);
                 mPrivateChatMsgLayout.setVisibility(GONE);
                 mPrivateChatUserLayout.setVisibility(VISIBLE);
                 mPrivateChatInputLayout.setVisibility(GONE);
@@ -140,6 +153,8 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mPrivateChatUserClose.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyboard();
+                mPrivateChatInputLayout.setTranslationY(0);
                 mPrivateChatMsgLayout.setVisibility(GONE);
                 mPrivateChatUserLayout.setVisibility(VISIBLE);
                 mPrivateChatInputLayout.setVisibility(GONE);
@@ -151,9 +166,12 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mPrivateChatClose.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyboard();
+                mPrivateChatInputLayout.setTranslationY(0);
                 mPrivateChatMsgLayout.setVisibility(GONE);
                 mPrivateChatUserLayout.setVisibility(VISIBLE);
                 mPrivateChatInputLayout.setVisibility(GONE);
+
                 setVisibility(GONE);
             }
         });
@@ -162,17 +180,24 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mEmoji.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isEmojiShow) {
-                    hideEmoji();
-                    mInput.requestFocus();
-                    mInput.setSelection(mInput.getEditableText().length());
-                    InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                } else {
+                //如果当前软键盘处于显示状态
+                if (isSoftInput) {
+                    showEmojiAction = true;
+                    //1显示表情键盘
+                    showEmoji();
+                    //2隐藏软键盘
+                    mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
+                }else if(isEmojiShow){  //表情键盘显示，软键盘没有显示，则直接显示软键盘
+                    mImm.showSoftInput(mInput, 0);
+                }else{ //软键盘和表情键盘都没有显示
+                    //显示表情键盘
                     showEmoji();
                 }
             }
         });
+
+
+
 
         // 私聊发送按钮
         mChatSend.setOnClickListener(new OnClickListener() {
@@ -203,26 +228,31 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
      * 显示emoji
      */
     public void showEmoji() {
-        if (isSoftInput) {
-            isEmoji = true; // 需要显示emoji
-            mInput.clearFocus();
-            mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-        } else {
-            mEmojiGrid.setVisibility(View.VISIBLE);// 避免闪烁
-            isEmojiShow = true; // 修改emoji显示标记
+        if (mEmojiGrid.getHeight() != softKeyHeight && softKeyHeight != 0) {
+            ViewGroup.LayoutParams lp = mEmojiGrid.getLayoutParams();
+            lp.height = softKeyHeight;
+            mEmojiGrid.setLayoutParams(lp);
         }
+        mEmojiGrid.setVisibility(View.VISIBLE);
         mEmoji.setImageResource(R.drawable.push_chat_emoji);
+        isEmojiShow = true;
+        float transY ;
+        if(softKeyHeight == 0){
+            transY = -mEmojiGrid.getHeight();
+        }else {
+            transY = -softKeyHeight;
+        }
+        mPrivateChatInputLayout.setTranslationY(transY);
     }
+
 
     /**
      * 隐藏emoji
      */
     public void hideEmoji() {
-        if (isEmojiShow) { // 如果emoji显示
-            mEmojiGrid.setVisibility(View.GONE);
-            isEmojiShow = false; // 修改emoji显示标记
-            mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
-        }
+        mEmojiGrid.setVisibility(View.GONE);
+        mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
+        isEmojiShow = false;
     }
 
     public void initPrivateChatView() {
@@ -289,9 +319,9 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mPrivateChatUserList.addOnItemTouchListener(new BaseOnItemTouch(mPrivateChatUserList, new com.bokecc.livemodule.live.chat.util.OnClickListener() {
             @Override
             public void onClick(RecyclerView.ViewHolder viewHolder) {
+                hideKeyboard();
                 // 隐藏用户列表
                 mPrivateChatUserLayout.setVisibility(View.GONE);
-
                 int position = mPrivateChatUserList.getChildAdapterPosition(viewHolder.itemView);
                 PrivateUser privateUser = mPrivateUserAdapter.getPrivateUsers().get(position);
                 privateUser.setRead(true);
@@ -308,6 +338,16 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mPrivateChatMsgList.setLayoutManager(new LinearLayoutManager(mContext));
         mPrivateChatAdapter = new PrivateChatAdapter(mContext);
         mPrivateChatMsgList.setAdapter(mPrivateChatAdapter);
+
+        mPrivateChatMsgList.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mPrivateChatInputLayout.setTranslationY(0);
+                hideKeyboard();
+                return false;
+            }
+        });
+
     }
 
     /**
@@ -469,4 +509,28 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
             }
         });
     }
+
+    /**
+     *
+     */
+    public void onKeyboardHeightChanged(int height, int orientation) {
+        if (height > 10) {
+            isSoftInput = true;
+            softKeyHeight = height;
+            mPrivateChatInputLayout.setTranslationY(-softKeyHeight);
+            mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
+            isEmojiShow = false;
+        } else {
+            if(!showEmojiAction){
+                mPrivateChatInputLayout.setTranslationY(0);
+                hideEmoji();
+            }
+            isSoftInput = false;
+
+        }
+        //结束动作指令
+        showEmojiAction = false;
+
+    }
+
 }

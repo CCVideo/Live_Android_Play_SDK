@@ -73,7 +73,7 @@ public class PilotActivity extends BaseActivity {
         findViewById(R.id.btn_start_local_replay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PilotActivity.this, ReplayMixPlayActivity.class);
+                Intent intent = new Intent(PilotActivity.this, DownloadListActivity.class);
                 checkoutPermission(intent);
             }
         });

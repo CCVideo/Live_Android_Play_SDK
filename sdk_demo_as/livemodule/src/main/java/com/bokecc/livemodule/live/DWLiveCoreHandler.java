@@ -11,7 +11,6 @@ import com.bokecc.sdk.mobile.live.DWLiveListener;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
-import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;

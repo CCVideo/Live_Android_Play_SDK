@@ -247,7 +247,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
     String userIdStr = "userid";  // 用户id
     String roomIdStr = "roomid";  // 房间id
-
+    String viewNameStr = "viewername";//用户名称
     Map<String, String> map;
 
     // 跳转到扫码页面
@@ -289,6 +289,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
         if (map.containsKey(userIdStr)) {
             lllLoginLiveUid.setText(map.get(userIdStr));
+        }
+        if (map.containsKey(viewNameStr)) {
+            lllLoginLiveName.setText(map.get(viewNameStr));
         }
     }
 
@@ -348,7 +351,12 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         }
         for (String p : params) {
             String[] en = p.split("=");
-            map.put(en[0], en[1]);
+            if(en.length<2){
+                map.put(en[0],"");
+            }else{
+                map.put(en[0], en[1]);
+            }
+
         }
         return map;
     }

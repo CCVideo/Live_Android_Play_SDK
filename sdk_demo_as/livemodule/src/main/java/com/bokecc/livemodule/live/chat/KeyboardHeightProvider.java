@@ -1,4 +1,4 @@
-/*
+package com.bokecc.livemodule.live.chat;/*
  * This file is part of Siebe Projects samples.
  *
  * Siebe Projects samples is free software: you can redistribute it and/or modify
@@ -15,7 +15,6 @@
  * along with Siebe Projects samples.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.bokecc.livemodule.live.chat;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -76,6 +75,9 @@ public class KeyboardHeightProvider extends PopupWindow {
      */
     private Activity activity;
 
+    private int bottom = 0;
+
+
     /**
      * Construct a new KeyboardHeightProvider
      *
@@ -94,10 +96,21 @@ public class KeyboardHeightProvider extends PopupWindow {
         setWidth(0);
         setHeight(LayoutParams.MATCH_PARENT);
         popupView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-
             @Override
             public void onGlobalLayout() {
                 if (popupView != null) {
+                    popupView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    Rect rect = new Rect();
+                    popupView.getWindowVisibleDisplayFrame(rect);
+                    bottom = rect.bottom;
+                }
+            }
+        });
+        popupView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (popupView != null) {
+                    if (bottom < 10) return;
                     handleOnGlobalLayout();
                 }
             }
@@ -122,6 +135,7 @@ public class KeyboardHeightProvider extends PopupWindow {
      */
     public void close() {
         this.observerList = null;
+        bottom = 0;
         dismiss();
     }
 
@@ -161,8 +175,8 @@ public class KeyboardHeightProvider extends PopupWindow {
      */
     private void handleOnGlobalLayout() {
 
-        Point screenSize = new Point();
-        activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
+//        Point screenSize = new Point();
+//        activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
 
         Rect rect = new Rect();
         popupView.getWindowVisibleDisplayFrame(rect);
@@ -171,7 +185,8 @@ public class KeyboardHeightProvider extends PopupWindow {
         // and also using the status bar and navigation bar heights of the phone to calculate
         // the keyboard height. But this worked fine on a Nexus.
         int orientation = getScreenOrientation();
-        int keyboardHeight = screenSize.y - rect.bottom;
+//        int keyboardHeight = screenSize.y - rect.bottom;
+        int keyboardHeight = bottom - rect.bottom;
 
         if (keyboardHeight == 0) {
             notifyKeyboardHeightChanged(0, orientation);

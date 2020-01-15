@@ -119,6 +119,7 @@ public class ReplayVideoView extends RelativeLayout {
                 mSurfaceTexture = surfaceTexture;
                 mSurface = new Surface(surfaceTexture);
                 player.updateSurface(mSurface);
+
             }
         }
 

@@ -422,11 +422,6 @@ public class DWReplayMixCoreHandler {
         }
 
         @Override
-        public void onResourceParserFinish() {
-
-        }
-
-        @Override
         public void onInitFinished() {
 
         }

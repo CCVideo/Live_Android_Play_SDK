@@ -105,6 +105,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         keyboardHeightProvider.addKeyboardHeightObserver(mChatLayout);
         keyboardHeightProvider.addKeyboardHeightObserver(mLiveRoomLayout);
         keyboardHeightProvider.addKeyboardHeightObserver(mQaLayout);
+        keyboardHeightProvider.addKeyboardHeightObserver(mMoreFunctionLayout);
         mFunctionHandler.setRootView(mRoot);
         // 判断是否开启了弹幕
         if (isBarrageOn) {
