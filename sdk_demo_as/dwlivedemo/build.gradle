@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.objectbox'
 android {
     buildToolsVersion = '28.0.3'
     compileSdkVersion 28
@@ -11,24 +10,24 @@ android {
         versionName "1.0"
         multiDexEnabled true
         ndk {
-            abiFilters 'armeabi','armeabi-v7a'
+            abiFilters 'armeabi-v7a'
         }
     }
-    signingConfigs {
-        release {
-            storeFile file('F:/CC_Work/trunk/play/sdk_demo_as/signkey.jks')
-            storePassword '123456'
-            keyAlias = 'key0'
-            keyPassword '123456'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('F:/CC_Work/trunk/play/sdk_demo_as/signkey.jks')
+//            storePassword '123456'
+//            keyAlias = 'key0'
+//            keyPassword '123456'
+//        }
+//    }
 
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 }
@@ -47,7 +46,7 @@ dependencies {
     // CC SDK Module
     implementation project(':livemodule')
     // 二维码扫描库
-    implementation files('libs/core.jar')
+    implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     debugImplementation 'cn.dreamtobe.threaddebugger:threaddebugger:1.3.3'
     releaseImplementation 'cn.dreamtobe.threaddebugger:threaddebugger-no-op:1.3.3'

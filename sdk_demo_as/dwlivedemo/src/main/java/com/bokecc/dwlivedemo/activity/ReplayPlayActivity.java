@@ -1,5 +1,6 @@
 package com.bokecc.dwlivedemo.activity;
 
+import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -24,6 +25,7 @@ import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +146,8 @@ public class ReplayPlayActivity extends BaseActivity {
         }
         // 直播间简介
         initIntroLayout();
+        //设置跑马灯
+        //mReplayVideoView.setMarquee(this,(Marquee) getIntent().getSerializableExtra("marquee"));
     }
 
     /********************************* 重要组件相关 ***************************************/

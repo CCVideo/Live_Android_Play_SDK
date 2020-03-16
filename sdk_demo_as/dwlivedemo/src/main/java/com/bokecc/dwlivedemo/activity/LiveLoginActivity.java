@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import com.bokecc.sdk.mobile.live.DWLiveLoginListener;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.LoginInfo;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.PublishInfo;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
@@ -173,11 +175,16 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         loginPopupWindow.show(mRoot);
 
         // 创建登录信息
-        LoginInfo loginInfo = new LoginInfo();
-        loginInfo.setRoomId(lllLoginLiveRoomid.getText());
-        loginInfo.setUserId(lllLoginLiveUid.getText());
-        loginInfo.setViewerName(lllLoginLiveName.getText());
-        loginInfo.setViewerToken(lllLoginLivePassword.getText());
+        final LoginInfo loginInfo = new LoginInfo();
+        loginInfo.setRoomId(lllLoginLiveRoomid.getText().trim());
+        loginInfo.setUserId(lllLoginLiveUid.getText().trim());
+        loginInfo.setViewerName(lllLoginLiveName.getText().trim());
+        loginInfo.setViewerToken(lllLoginLivePassword.getText().trim());
+
+//        loginInfo.setRoomId("D7123DC27A274C9C9C33DC5901307461");
+//        loginInfo.setUserId("358B27E7B04F3B02");
+//        loginInfo.setViewerName(lllLoginLiveName.getText());
+//        loginInfo.setViewerToken(lllLoginLivePassword.getText());
 
         if (!"".equals(mGroupId.trim())) {
             loginInfo.setGroupId(mGroupId);
@@ -190,7 +197,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
                 // 缓存登陆的参数
                 writeSharePreference();
                 dismissPopupWindow();
-                go(LivePlayActivity.class); // 直播默认Demo页
+                Bundle bundle = new Bundle();
+//                bundle.putSerializable("marquee", viewer.getMarquee());
+                go(LivePlayActivity.class,bundle); // 直播默认Demo页
             }
 
             @Override
@@ -198,6 +207,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
                 toastOnUiThread("登录失败" + e.getLocalizedMessage());
                 dismissPopupWindow();
             }
+
         }, loginInfo);
 
         // 执行登录操作
@@ -227,10 +237,10 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
     private void writeSharePreference() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("liveuid", lllLoginLiveUid.getText());
-        editor.putString("liveroomid", lllLoginLiveRoomid.getText());
-        editor.putString("liveusername", lllLoginLiveName.getText());
-        editor.putString("livepassword", lllLoginLivePassword.getText());
+        editor.putString("liveuid", lllLoginLiveUid.getText().trim());
+        editor.putString("liveroomid", lllLoginLiveRoomid.getText().trim());
+        editor.putString("liveusername", lllLoginLiveName.getText().trim());
+        editor.putString("livepassword", lllLoginLivePassword.getText().trim());
         editor.commit();
     }
 

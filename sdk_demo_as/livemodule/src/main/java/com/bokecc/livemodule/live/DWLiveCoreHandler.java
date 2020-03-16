@@ -499,6 +499,13 @@ public class DWLiveCoreHandler {
             }
         }
 
+        @Override
+        public void onBanDeleteChat(String userId) {
+            if (dwLiveChatListener != null) {
+                dwLiveChatListener.onBanDeleteChat(userId);
+            }
+        }
+
         /**
          * 别人私聊我
          *

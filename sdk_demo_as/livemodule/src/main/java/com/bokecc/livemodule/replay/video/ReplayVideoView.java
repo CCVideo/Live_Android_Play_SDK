@@ -1,9 +1,10 @@
 package com.bokecc.livemodule.replay.video;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -13,11 +14,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.bean.MarqueeAction;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
-import com.bokecc.sdk.mobile.live.DWLiveEngine;
-import com.bokecc.sdk.mobile.live.logging.ELog;
-import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
+import com.bokecc.livemodule.view.MarqueeView;
+import com.bokecc.livemodule.view.ResizeTextureView;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -27,13 +32,15 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 public class ReplayVideoView extends RelativeLayout {
     private static final String TAG = "ReplayVideoView";
     private Context mContext;
-    private TextureView mTextureView;
+    private ResizeTextureView mTextureView;
     private TextView mVideoNoPlayTip;
     private ProgressBar mVideoProgressBar;
     private DWReplayPlayer player;
 
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
+    private Activity mActivity;
+    private MarqueeView mMarqueeView;
 
     public ReplayVideoView(Context context) {
         super(context);
@@ -74,6 +81,7 @@ public class ReplayVideoView extends RelativeLayout {
         player.setOnBufferingUpdateListener(bufferingUpdateListener);
         player.setOnErrorListener(errorListener);
         player.setOnCompletionListener(completionListener);
+        player.setOnVideoSizeChangedListener(videoSizeChangedListener);
         player.setBufferTimeout(20);
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
@@ -211,7 +219,14 @@ public class ReplayVideoView extends RelativeLayout {
             }
         }
     };
-
+    IMediaPlayer.OnVideoSizeChangedListener videoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
+        @Override
+        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            if (width != 0 && height != 0) {
+                mTextureView.setVideoSize(width, height);
+            }
+        }
+    };
 
     IMediaPlayer.OnErrorListener errorListener = new IMediaPlayer.OnErrorListener() {
         @Override
@@ -236,4 +251,38 @@ public class ReplayVideoView extends RelativeLayout {
         }
     };
 
+    public void setMarquee(Activity activity, Marquee marquee) {
+//        if (marquee!=null&&marquee.getAction()!=null) {
+//            this.mActivity = activity;
+//            mMarqueeView = findViewById(R.id.marquee_view);
+//            mMarqueeView.setVisibility(VISIBLE);
+//            List<MarqueeAction> marqueeActions = new ArrayList<>();
+//            for (int x = 0; x < marquee.getAction().size(); x++) {
+//                com.bokecc.sdk.mobile.live.pojo.MarqueeAction marqueeAction1 = marquee.getAction().get(x);
+//                MarqueeAction marqueeAction = new MarqueeAction();
+//                marqueeAction.setIndex(x);
+//                marqueeAction.setDuration(marqueeAction1.getDuration());
+//                marqueeAction.setStartXpos((float) marqueeAction1.getStart().getXpos());
+//                marqueeAction.setStartYpos((float) marqueeAction1.getStart().getYpos());
+//                marqueeAction.setStartAlpha((float) marqueeAction1.getStart().getAlpha());
+//                marqueeAction.setEndXpos((float) marqueeAction1.getEnd().getXpos());
+//                marqueeAction.setEndYpos((float) marqueeAction1.getEnd().getYpos());
+//                marqueeAction.setEndAlpha((float) marqueeAction1.getEnd().getAlpha());
+//                marqueeActions.add(marqueeAction);
+//            }
+//            mMarqueeView.setLoop(marquee.getLoop());
+//            mMarqueeView.setMarqueeActions(marqueeActions);
+//            if (marquee.getType().equals("text")) {
+//                mMarqueeView.setTextContent(marquee.getText().getContent());
+//                mMarqueeView.setTextColor(marquee.getText().getColor());
+//                mMarqueeView.setTextFontSize(marquee.getText().getFont_size());
+//                mMarqueeView.setType(1);
+//            } else {
+//                mMarqueeView.setMarqueeImage(mActivity, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
+//                mMarqueeView.setType(2);
+//            }
+//
+//            mMarqueeView.start();
+//        }
+    }
 }

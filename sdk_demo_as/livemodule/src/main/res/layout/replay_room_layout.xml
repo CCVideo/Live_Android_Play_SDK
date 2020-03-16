@@ -92,7 +92,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="@dimen/pc_live_top_title" />
 
-            <SeekBar
+            <com.bokecc.livemodule.view.RePlaySeekBar
                 android:id="@+id/replay_progressbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

@@ -216,7 +216,7 @@
             android:numColumns="7"
             android:paddingEnd="10dp"
             android:paddingStart="10dp"
-            android:visibility="invisible" />
+            android:visibility="gone" />
 
     </RelativeLayout>
 

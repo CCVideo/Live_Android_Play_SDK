@@ -20,6 +20,7 @@ import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.DWReplayRoomListener;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
 import com.bokecc.livemodule.utils.TimeUtil;
+import com.bokecc.livemodule.view.RePlaySeekBar;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
@@ -47,7 +48,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     // 当前播放时间
     TextView mCurrentTime;
     // 进度条
-    SeekBar mPlaySeekBar;
+    RePlaySeekBar mPlaySeekBar;
     // 播放时长
     TextView mDurationView;
     // 播放/暂停 按钮
@@ -371,6 +372,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     @Override
     public void startRending() {
         retryTime = 0;
+        mPlaySeekBar.setCanSeek(true);
     }
 
     @Override

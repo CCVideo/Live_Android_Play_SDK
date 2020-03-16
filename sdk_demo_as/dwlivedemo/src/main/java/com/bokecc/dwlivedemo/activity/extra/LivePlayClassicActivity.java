@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
@@ -60,7 +59,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
     MoreFunctionLayout mMoreFunctionLayout;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate( Bundle savedInstanceState) {
         // 隐藏ActionBar
         hideActionBar();
         // 屏幕常亮

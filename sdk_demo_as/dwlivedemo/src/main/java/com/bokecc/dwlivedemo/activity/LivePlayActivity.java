@@ -42,6 +42,7 @@ import com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout;
 import com.bokecc.livemodule.live.qa.LiveQAComponent;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.live.video.LiveVideoView;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
     MoreFunctionLayout mMoreFunctionLayout;
     private KeyboardHeightProvider keyboardHeightProvider;
     private View mRootView;
+
 
 
     @Override
@@ -527,6 +529,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         initIntroLayout();
         // 设置弹幕状态监听
         dwLiveCoreHandler.setDwLiveBarrageListener(this);
+        //设置跑马灯
+        mLiveVideoView.setMarquee(this,(Marquee) getIntent().getSerializableExtra("marquee"));
     }
 
     // 初始化简介布局区域

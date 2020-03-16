@@ -2,6 +2,7 @@ package com.bokecc.dwlivedemo.base;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.ActionBar;
@@ -33,11 +34,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     // 跳转到其他的Activity
+    public void go(Class clazz, Bundle bundle) {
+        Intent intent = new Intent(this, clazz);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+    // 跳转到其他的Activity
     public void go(Class clazz) {
         Intent intent = new Intent(this, clazz);
         startActivity(intent);
     }
-
     // 在UI线程上进行吐司提示
     public void toastOnUiThread(final String msg) {
         // 判断是否处在UI线程

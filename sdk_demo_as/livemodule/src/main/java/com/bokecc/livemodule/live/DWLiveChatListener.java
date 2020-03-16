@@ -25,6 +25,11 @@ public interface DWLiveChatListener {
     void onPublicChatMessage(ChatMessage msg);
 
     /**
+     * 用户被禁止发言，删除界面上的聊天消息
+     */
+    void onBanDeleteChat(String userId);
+
+    /**
      * 收到聊天信息状态管理事件
      *
      * @param msgStatusJson 聊天信息状态管理事件json

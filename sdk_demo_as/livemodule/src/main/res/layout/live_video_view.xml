@@ -8,7 +8,13 @@
         android:id="@+id/live_video_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+    <!--跑马灯-->
+<!--    <com.bokecc.livemodule.view.MarqueeView-->
+<!--        android:id="@+id/marquee_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:background="#00000000"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:visibility="gone"/>-->
     <TextView
         android:id="@+id/tv_video_no_play_tip"
         android:layout_width="match_parent"

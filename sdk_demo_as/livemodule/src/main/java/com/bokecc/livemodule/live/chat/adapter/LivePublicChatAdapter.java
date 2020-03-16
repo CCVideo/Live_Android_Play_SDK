@@ -31,6 +31,8 @@ import com.bokecc.sdk.mobile.live.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,6 +118,30 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
         }
         if ("0".equals(chatEntity.getStatus()) || selfId.equals(chatEntity.getUserId())) {
             mChatEntitiesForShow.add(chatEntity);
+        }
+        notifyDataSetChanged();
+    }
+
+
+    /**
+     * 禁言删除聊天
+     * @param userId
+     */
+    public void banDeleteChat(String userId){
+        if(userId.equals(selfId)) return;
+        Iterator<ChatEntity> it = mChatEntities.iterator();
+        while(it.hasNext()){
+            ChatEntity entity = it.next();
+            if(entity.getUserId().equals(userId)){
+                it.remove();
+            }
+        }
+        Iterator<ChatEntity> it2 = mChatEntitiesForShow.iterator();
+        while(it2.hasNext()){
+            ChatEntity entity = it2.next();
+            if(entity.getUserId().equals(userId)){
+                it2.remove();
+            }
         }
         notifyDataSetChanged();
     }

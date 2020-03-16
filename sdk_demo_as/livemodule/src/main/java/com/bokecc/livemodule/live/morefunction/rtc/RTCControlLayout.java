@@ -46,12 +46,12 @@ public class RTCControlLayout extends BaseLinearLayout implements DWLiveRTCStatu
     }
 
     public void initViews() {
+
         LayoutInflater.from(mContext).inflate(R.layout.live_portrait_rtc_control, this, true);
 
         mRTCChooseLayout = findViewById(R.id.rtc_choose_layout);
         mVideoRTCChoose = findViewById(R.id.video_rtc_choose);
         mAudioRTCChoose = findViewById(R.id.audio_rtc_choose);
-
         mRTCApplyLayout = findViewById(R.id.rtc_applying);
         mRTCApplyDesc = findViewById(R.id.rtc_applying_desc);
         mCancelRTCApply = findViewById(R.id.cancel_rtc_apply);
@@ -80,6 +80,7 @@ public class RTCControlLayout extends BaseLinearLayout implements DWLiveRTCStatu
             }
         });
 
+
         mAudioRTCChoose.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +96,7 @@ public class RTCControlLayout extends BaseLinearLayout implements DWLiveRTCStatu
             }
         });
 
+
         mCancelRTCApply.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,6 +108,7 @@ public class RTCControlLayout extends BaseLinearLayout implements DWLiveRTCStatu
             }
         });
 
+
         mHangUpRTC.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +116,7 @@ public class RTCControlLayout extends BaseLinearLayout implements DWLiveRTCStatu
                 DWLive.getInstance().disConnectSpeak();
             }
         });
+
     }
 
 

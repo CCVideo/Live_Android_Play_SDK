@@ -1,11 +1,9 @@
 package com.bokecc.livemodule.live.video;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,15 +17,20 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.bean.MarqueeAction;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveVideoListener;
+import com.bokecc.livemodule.view.MarqueeView;
 import com.bokecc.livemodule.view.ResizeTextureView;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -69,7 +72,10 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      * 直播视频通知接口
      */
     private OnPreparedCallback preparedCallback;
-
+    /**
+     * 跑马灯view
+     */
+    private MarqueeView mMarqueeView;
     /**
      * 添加此字段的意义在于：
      * 部分手机HOME到桌面回来时不触发onSurfaceTextureAvailable，需要由onResume来触发一次调用逻辑。
@@ -77,6 +83,41 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     boolean hasCallStartPlay = false;
     private View mVideoNoplayTip;
+    private Activity mActivity;
+
+    public void setMarquee(Activity activity,Marquee marquee) {
+//        if (marquee!=null&&marquee.getAction()!=null){
+//            this.mActivity=activity;
+//            mMarqueeView = findViewById(R.id.marquee_view);
+//            mMarqueeView.setVisibility(VISIBLE);
+//            List<MarqueeAction> marqueeActions = new ArrayList<>();
+//            for (int x = 0;x<marquee.getAction().size();x++){
+//                com.bokecc.sdk.mobile.live.pojo.MarqueeAction marqueeAction1 = marquee.getAction().get(x);
+//                MarqueeAction marqueeAction = new MarqueeAction();
+//                marqueeAction.setIndex(x);
+//                marqueeAction.setDuration(marqueeAction1.getDuration());
+//                marqueeAction.setStartXpos((float) marqueeAction1.getStart().getXpos());
+//                marqueeAction.setStartYpos((float) marqueeAction1.getStart().getYpos());
+//                marqueeAction.setStartAlpha((float) marqueeAction1.getStart().getAlpha());
+//                marqueeAction.setEndXpos((float) marqueeAction1.getEnd().getXpos());
+//                marqueeAction.setEndYpos((float) marqueeAction1.getEnd().getYpos());
+//                marqueeAction.setEndAlpha((float) marqueeAction1.getEnd().getAlpha());
+//                marqueeActions.add(marqueeAction);
+//            }
+//            mMarqueeView.setLoop(marquee.getLoop());
+//            mMarqueeView.setMarqueeActions(marqueeActions);
+//            if (marquee.getType().equals("text")){
+//                mMarqueeView.setTextContent(marquee.getText().getContent());
+//                mMarqueeView.setTextColor(marquee.getText().getColor());
+//                mMarqueeView.setTextFontSize(marquee.getText().getFont_size());
+//                mMarqueeView.setType(1);
+//            }else{
+//                mMarqueeView.setMarqueeImage(mActivity,marquee.getImage().getImage_url(),marquee.getImage().getWidth(),marquee.getImage().getHeight());
+//            }
+//
+//            mMarqueeView.start();
+//        }
+    }
 
     /**
      * 直播视频通知接口
@@ -317,6 +358,8 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     }
                     ELog.i("sdk_bokecc","onPrepared...");
                     mVideoProgressBar.setVisibility(VISIBLE);
+                    //显示跑马灯
+
                     // 通知直播视频已经准备就绪
                     if (null != preparedCallback) {
                         preparedCallback.onPrepared(LiveVideoView.this);
@@ -420,7 +463,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     //------------------------------------- SDK 回调相关 ---------------------------------------
     // 由 DWLiveListener(DWLiveCoreHandler) --> DWLiveVideoListener(LiveVideoView)
-
     @Override
     public void onStreamEnd(boolean isNormal) {
         mRootView.post(new Runnable() {

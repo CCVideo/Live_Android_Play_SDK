@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.bokecc.dwlivedemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivedemo.scan.qr_codescan.MipcaActivityCapture;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
@@ -115,20 +117,13 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
         // 创建登录信息
         ReplayLoginInfo replayLoginInfo = new ReplayLoginInfo();
-        replayLoginInfo.setUserId(lllLoginReplayUid.getText());
-        replayLoginInfo.setRoomId(lllLoginReplayRoomid.getText());
-        replayLoginInfo.setLiveId(lllLoginReplayLiveid.getText());
-        replayLoginInfo.setRecordId(lllLoginReplayRecordid.getText());
-        replayLoginInfo.setViewerName(lllLoginReplayName.getText());
-        replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText());
-
-
-        replayLoginInfo.setUserId("358B27E7B04F3B02");
-        replayLoginInfo.setRoomId("59261EA8EED5CD919C33DC5901307461");
-        replayLoginInfo.setLiveId("DF591DCD32DF5C1A");
-        replayLoginInfo.setRecordId("D7B39691C40AC4D1");
-        replayLoginInfo.setViewerName("Sivin");
-        replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText());
+        replayLoginInfo.setUserId(lllLoginReplayUid.getText().trim());
+        replayLoginInfo.setRoomId(lllLoginReplayRoomid.getText().trim());
+        replayLoginInfo.setLiveId(lllLoginReplayLiveid.getText().trim());
+        replayLoginInfo.setRecordId(lllLoginReplayRecordid.getText().trim());
+        replayLoginInfo.setViewerName(lllLoginReplayName.getText().trim());
+        replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText().trim());
+        replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText().trim());
 //        replayLoginInfo.setViewerToken("XjbetHY9Wn84uEkUpNauVq");
         // 设置登录参数
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
@@ -140,11 +135,13 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
             }
 
             @Override
-            public void onLogin(TemplateInfo templateInfo) {
+            public void onLogin(TemplateInfo templateInfo, Marquee marquee) {
                 dismissPopupWindow();
                 writeSharePreference();
                 toastOnUiThread("登录成功");
-                go(ReplayPlayActivity.class); // 回放默认Demo页
+                Bundle bundle = new Bundle();
+//                bundle.putSerializable("marquee", marquee);
+                go(ReplayPlayActivity.class,bundle); // 回放默认Demo页
                 // go(ReplayPlayDocActivity.class);  // 回放'文档大屏/视频小屏'的Demo页
                 dismissPopupWindow();
             }
@@ -161,12 +158,12 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
     private void writeSharePreference() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("replayuid", lllLoginReplayUid.getText());
-        editor.putString("replayroomid", lllLoginReplayRoomid.getText());
-        editor.putString("replayliveid", lllLoginReplayLiveid.getText());
-        editor.putString("replayrecordid", lllLoginReplayRecordid.getText());
-        editor.putString("replayusername", lllLoginReplayName.getText());
-        editor.putString("replaypassword", lllLoginReplayPassword.getText());
+        editor.putString("replayuid", lllLoginReplayUid.getText().trim());
+        editor.putString("replayroomid", lllLoginReplayRoomid.getText().trim());
+        editor.putString("replayliveid", lllLoginReplayLiveid.getText().trim());
+        editor.putString("replayrecordid", lllLoginReplayRecordid.getText().trim());
+        editor.putString("replayusername", lllLoginReplayName.getText().trim());
+        editor.putString("replaypassword", lllLoginReplayPassword.getText().trim());
         editor.commit();
     }
 

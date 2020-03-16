@@ -193,11 +193,15 @@ public class DWReplayCoreHandler {
     /******************************* 视频播放相关 ***************************************/
 
 
+
+
     /**
      * 开始播放
      */
     public void start(Surface surface) {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        dwLiveReplay.setReplayErrorListener(mErrorListener);
+        dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
         if (dwLiveReplay != null) {
             dwLiveReplay.start(null);
         }
@@ -283,7 +287,7 @@ public class DWReplayCoreHandler {
         replayRoomListener.videoPrepared();
     }
 
-    /******************************* 实现 DWLiveListener 定义的方法 ***************************************/
+    /******************************* 实现 DWLiveListener 定义的方法 *********************************/
 
     private DWLiveReplayListener dwLiveReplayListener = new DWLiveReplayListener() {
 

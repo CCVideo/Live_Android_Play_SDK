@@ -434,6 +434,18 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         });
     }
 
+    @Override
+    public void onBanDeleteChat(final String userId){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mChatAdapter != null){
+                    mChatAdapter.banDeleteChat(userId);
+                }
+            }
+        });
+    }
+
     /**
      * 收到聊天信息状态管理事件
      *
