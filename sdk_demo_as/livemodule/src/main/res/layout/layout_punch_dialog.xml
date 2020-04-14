@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#51000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@id/id_popup_window_anim_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+            <View
+                android:layout_width="257dp"
+                android:layout_height="257dp"
+                android:background="@drawable/dialog_bg" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="257dp"
+            android:layout_height="307dp"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/pop_top_icon" />
+
+                <TextView
+                    android:id="@+id/id_count_down_time"
+                    android:text="30s"
+                    android:textColor="#ffffffff"
+                    android:textSize="25sp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/id_text_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="签到"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="17dp"
+                android:text="各位同学开始签到"
+                android:textColor="#ff999999"
+                android:textSize="15sp" />
+
+            <com.bokecc.livemodule.live.function.punch.view.SubmitButton
+                android:id="@+id/id_submit_btn"
+                android:layout_width="200dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="13dp"
+                app:buttonText="签到"
+                app:buttonTextSize="18sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

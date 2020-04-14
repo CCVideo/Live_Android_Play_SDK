@@ -3,7 +3,6 @@ package com.bokecc.livemodule.localplay.chat.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -31,12 +30,12 @@ import com.bokecc.sdk.mobile.live.replay.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular1;
 
 public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChatAdapter.ChatViewHolder> {
 
-    private final Pattern pattern;
     private Context mContext;
     private ArrayList<ChatEntity> mChatEntities;
     private LayoutInflater mInflater;
@@ -67,7 +66,6 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
             selfId = viewer.getId();
         }
 
-        pattern = Pattern.compile("(https?://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
     }
 
     /**
@@ -181,13 +179,23 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
                 String msg = chatEntity.getUserName() + ": " + chatEntity.getMsg();
 
                 String url = null;
-                Matcher matcher = pattern.matcher(msg);
+
                 int start = -1;
                 int end = -1;
-                if (matcher.find()) {
-                    start = matcher.start();
-                    end = matcher.end();
-                    url = matcher.group();
+                if (msg.contains(regular)){
+                    int i = msg.indexOf(regular);
+                    if (msg.contains(regular1)){
+                        int j = msg.indexOf(regular1);
+                        if (i<j){
+                            start = i;
+                            end=j+1;
+                            url = msg.substring(start,end);
+                            String substring = msg.substring(start + 5, end - 1);
+                            msg = msg.replace(url,substring);
+                            start-=1;
+                            end-=6;
+                        }
+                    }
                 }
 
                 SpannableString ss = new SpannableString(msg);
@@ -204,8 +212,9 @@ public class LocalReplayChatAdapter extends RecyclerView.Adapter<LocalReplayChat
                         public void onClick(@NonNull View widget) {
                             if(mChatcomponentClickListener != null){
                                 Bundle bundle = new Bundle();
+                                String url = finalUrl.substring(5,finalUrl.length()-1);
                                 bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",finalUrl);
+                                bundle.putString("url",url);
                                 mChatcomponentClickListener.OnChatComponentClickListener(widget,bundle);
                             }
                         }

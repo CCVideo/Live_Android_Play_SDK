@@ -13,8 +13,6 @@ import org.json.JSONObject;
  * 直播 功能 回调监听（签到、答题卡/投票、问卷、抽奖）
  */
 public interface DWLiveFunctionListener {
-
-
     //**************************** 签到 ************************************
 
     /**

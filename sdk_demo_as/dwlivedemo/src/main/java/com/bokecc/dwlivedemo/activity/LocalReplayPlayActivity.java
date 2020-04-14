@@ -1,8 +1,11 @@
 package com.bokecc.dwlivedemo.activity;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -400,6 +403,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
                 public void run() {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     mReplayMsgLayout.setVisibility(View.GONE);
+                    getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
                 }
             });
         }
@@ -412,6 +416,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mReplayMsgLayout.setVisibility(View.VISIBLE);
         mReplayRoomLayout.quitFullScreen();
+        getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
     }
 
     //---------------------------------- 退出相关逻辑 --------------------------------------------/
@@ -457,6 +462,29 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
 //            mExitPopupWindow.show(mRoot);
 //        }
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 横屏隐藏状态栏
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+    }
 
+    @TargetApi(19)
+    private static int getSystemUiVisibility(boolean isFull) {
+        if (isFull) {
+            int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            return flags;
+        } else {
+            return View.SYSTEM_UI_FLAG_VISIBLE;
+        }
+
+    }
 
 }

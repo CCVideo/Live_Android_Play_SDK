@@ -808,7 +808,6 @@ public class DWLiveCoreHandler {
                 dwLiveFunctionListener.onStartLottery(lotteryId);
             }
         }
-
         /**
          * 抽奖结果
          *

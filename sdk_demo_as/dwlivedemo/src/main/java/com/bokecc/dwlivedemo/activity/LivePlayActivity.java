@@ -1,12 +1,14 @@
 package com.bokecc.dwlivedemo.activity;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -159,8 +161,29 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // 横屏隐藏状态栏
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+
         mLiveBarrage.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mLiveBarrage.init();
+    }
+
+    @TargetApi(19)
+    private static int getSystemUiVisibility(boolean isFull) {
+        if (isFull) {
+            int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            return flags;
+        } else {
+            return View.SYSTEM_UI_FLAG_VISIBLE;
+        }
+
     }
 
     private void initViews() {
@@ -478,7 +501,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             }
         });
 
-        
+
         mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -530,7 +553,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         // 设置弹幕状态监听
         dwLiveCoreHandler.setDwLiveBarrageListener(this);
         //设置跑马灯
-        mLiveVideoView.setMarquee(this,(Marquee) getIntent().getSerializableExtra("marquee"));
+        mLiveVideoView.setMarquee(this, (Marquee) getIntent().getSerializableExtra("marquee"));
     }
 
     // 初始化简介布局区域

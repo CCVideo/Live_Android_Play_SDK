@@ -6,7 +6,6 @@ import android.view.View;
 
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
@@ -223,7 +222,7 @@ public class DWReplayMixCoreHandler {
 
             // 登录成功
             @Override
-            public void onLogin(TemplateInfo templateInfo, Marquee marquee) {
+            public void onLogin(TemplateInfo templateInfo) {
                 hasLogin = true;
                 if (dwReplayMixVideoListener != null) {
                     dwReplayMixVideoListener.onPlayOtherReplayVideo();

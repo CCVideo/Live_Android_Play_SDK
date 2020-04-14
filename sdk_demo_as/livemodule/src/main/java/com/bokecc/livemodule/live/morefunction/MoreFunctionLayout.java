@@ -156,15 +156,20 @@ public class MoreFunctionLayout extends BaseRelativeLayout implements OnFabClick
      * @param announcement 公告内容
      */
     @Override
-    public void onAnnouncement(boolean isRemove, String announcement) {
-        if (isRemove) {
-            mAnnounceLayout.removeAnnounce();
-        } else {
-            if (mAnnounceLayout.getVisibility() != VISIBLE) {
-                mFabTop.getFabFromTag(ANNOUNCE).setImageResource(R.drawable.more_function_announce_new);
+    public void onAnnouncement(final boolean isRemove, final String announcement) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isRemove) {
+                    mAnnounceLayout.removeAnnounce();
+                } else {
+                    if (mAnnounceLayout.getVisibility() != VISIBLE) {
+                        mFabTop.getFabFromTag(ANNOUNCE).setImageResource(R.drawable.more_function_announce_new);
+                    }
+                    mAnnounceLayout.setAnnounce(announcement);
+                }
             }
-            mAnnounceLayout.setAnnounce(announcement);
-        }
+        });
     }
 
     /**

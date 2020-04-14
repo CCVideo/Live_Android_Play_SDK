@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -19,7 +18,6 @@ import com.bokecc.dwlivedemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivedemo.scan.qr_codescan.MipcaActivityCapture;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
@@ -135,7 +133,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
             }
 
             @Override
-            public void onLogin(TemplateInfo templateInfo, Marquee marquee) {
+            public void onLogin(TemplateInfo templateInfo) {
                 dismissPopupWindow();
                 writeSharePreference();
                 toastOnUiThread("登录成功");

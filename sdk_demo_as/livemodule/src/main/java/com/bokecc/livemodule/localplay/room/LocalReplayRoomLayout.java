@@ -18,12 +18,11 @@ import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.localplay.DWLocalReplayRoomListener;
 import com.bokecc.livemodule.utils.TimeUtil;
+import com.bokecc.livemodule.view.RePlaySeekBar;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 
 /**
@@ -43,7 +42,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     // 当前播放时间
     TextView mCurrentTime;
     // 进度条
-    SeekBar mPlaySeekBar;
+    RePlaySeekBar mPlaySeekBar;
     // 播放时长
     TextView mDurationView;
     // 播放/暂停 按钮
@@ -83,7 +82,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
         mPlayIcon.setSelected(true);
 
         // 隐藏 "文档/视频" 切换
-       // mVideoDocSwitch.setVisibility(GONE);
+        // mVideoDocSwitch.setVisibility(GONE);
 
         this.setOnClickListener(mRoomAnimatorListener);
 
@@ -125,7 +124,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                 }
             }
         });
-
+        mPlaySeekBar.setCanSeek(true);
         mPlaySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             int progress;

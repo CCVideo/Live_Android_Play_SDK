@@ -85,8 +85,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:clickable="true"
-                android:paddingEnd="15dp"
                 android:paddingStart="15dp"
+                android:paddingEnd="15dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/private_back" />
 
@@ -120,7 +120,8 @@
             android:id="@+id/id_private_chat_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#e6FAFAFA"
+            android:layout_marginBottom="52dp"
+            android:background="#FFFAFAFA"
             android:overScrollMode="never"
             android:scrollbars="none" />
     </LinearLayout>
@@ -188,14 +189,14 @@
     </RelativeLayout>
     <!--    </LinearLayout>-->
     <GridView
-        android:layout_gravity="bottom"
         android:id="@+id/id_push_emoji_grid"
         android:layout_width="match_parent"
         android:layout_height="207dp"
+        android:layout_gravity="bottom"
         android:background="#f2efed"
         android:numColumns="7"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
 </FrameLayout>

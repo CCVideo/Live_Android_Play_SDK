@@ -12,13 +12,17 @@ import com.bokecc.livemodule.live.DWLiveFunctionListener;
 import com.bokecc.livemodule.live.function.lottery.LotteryHandler;
 import com.bokecc.livemodule.live.function.practice.PracticeHandler;
 import com.bokecc.livemodule.live.function.prize.PrizeHandler;
+import com.bokecc.livemodule.live.function.punch.PunchHandler;
 import com.bokecc.livemodule.live.function.questionnaire.QuestionnaireHandler;
 import com.bokecc.livemodule.live.function.rollcall.RollCallHandler;
 import com.bokecc.livemodule.live.function.vote.VoteHandler;
+import com.bokecc.sdk.mobile.live.BaseCallback;
+import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeRankInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
+import com.bokecc.sdk.mobile.live.pojo.PunchAction;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
 
@@ -38,6 +42,7 @@ public class FunctionHandler implements DWLiveFunctionListener {
     private QuestionnaireHandler questionnaireHandler; // '问卷' 功能处理机制
     private PracticeHandler practiceHandler;  // '随堂测' 功能处理机制
     private PrizeHandler prizeHandler;  // '奖品' 功能处理机制
+    private PunchHandler punchHandler;//'打卡' 功能处理机制
 
     public void initFunctionHandler(Context context) {
         this.context = context.getApplicationContext();
@@ -64,6 +69,31 @@ public class FunctionHandler implements DWLiveFunctionListener {
 
         prizeHandler = new PrizeHandler();
         prizeHandler.initPrize(this.context);
+
+        punchHandler = new PunchHandler();
+        punchHandler.initPunch(this.context);
+        //注册打卡事件
+        DWLive.getInstance().setPunchCallback(new BaseCallback<PunchAction>() {
+            @Override
+            public void onError(final String error) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        punchHandler.stopPunch(error);
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(final PunchAction msg) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        punchHandler.startPunch(rootView, msg);
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -79,6 +109,7 @@ public class FunctionHandler implements DWLiveFunctionListener {
     public void removeRootView() {
         this.rootView = null;
     }
+
 
     /**
      * 开始签到回调

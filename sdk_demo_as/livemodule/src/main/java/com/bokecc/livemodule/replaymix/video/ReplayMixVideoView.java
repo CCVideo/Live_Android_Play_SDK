@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -20,6 +21,7 @@ import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.livemodule.replaymix.DWReplayMixVideoListener;
 
+import com.bokecc.livemodule.view.ResizeTextureView;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -32,7 +34,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
 
     View mRootView;
 
-    TextureView mTextureView;
+    ResizeTextureView mTextureView;
 
     TextView mVideoNoplayTip;
 
@@ -159,8 +161,12 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
 
     TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
 
+        private Surface mSurface;
+        private SurfaceTexture mSurfaceTexture;
+
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            Log.e("###"," onSurfaceTextureAvailable");
             // 使用新的surfaceTexture生成surface
             surface = new Surface(surfaceTexture);
 
@@ -174,6 +180,9 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                         Canvas canvas = surface.lockCanvas(new Rect(0, 0, mTextureView.getWidth(), mTextureView.getHeight()));
                         if (canvas != null) {
                             canvas.drawBitmap(tempBitmap, null, rectF, null);
+                            surface.unlockCanvasAndPost(canvas);
+                            // 重新锁一次
+                            surface.lockCanvas(new Rect(0, 0, 0, 0));
                             surface.unlockCanvasAndPost(canvas);
                         }
                     }
@@ -189,7 +198,15 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                 hasCallStartPlay = true;
             }
             if(player != null){
-                player.updateSurface(surface);
+                if (mSurfaceTexture != null) {
+                    mTextureView.setSurfaceTexture(mSurfaceTexture);
+                } else {
+                    mSurfaceTexture = surfaceTexture;
+                    mSurface = new Surface(surfaceTexture);
+                    player.updateSurface(mSurface);
+
+                }
+//                player.updateSurface(surface);
             }
         }
 
@@ -206,13 +223,21 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
     };
-
+    IMediaPlayer.OnVideoSizeChangedListener videoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
+        @Override
+        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            if (width != 0 && height != 0) {
+                mTextureView.setVideoSize(width, height);
+            }
+        }
+    };
 
     /******************************************* 播放器相关监听 ***********************************/
 
     IMediaPlayer.OnPreparedListener preparedListener = new IMediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(IMediaPlayer mp) {
+            Log.e("###"," preparedListener");
             mVideoNoplayTip.post(new Runnable() {
                 @Override
                 public void run() {
@@ -237,6 +262,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
     IMediaPlayer.OnInfoListener infoListener = new IMediaPlayer.OnInfoListener() {
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+            Log.e("###"," infoListener what =  "+what);
             switch (what) {
                 // 缓冲开始
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
@@ -259,6 +285,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
     IMediaPlayer.OnBufferingUpdateListener bufferingUpdateListener = new IMediaPlayer.OnBufferingUpdateListener() {
         @Override
         public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+            Log.e("###"," bufferingUpdateListener");
             DWReplayMixCoreHandler mixCoreHandler = DWReplayMixCoreHandler.getInstance();
             if (mixCoreHandler != null) {
                 mixCoreHandler.updateBufferPercent(percent);

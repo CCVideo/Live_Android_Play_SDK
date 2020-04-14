@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -210,6 +211,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
                 }
                 DWLive.getInstance().sendPrivateChatMsg(mTo.getUserId(), msg);
                 clearChatInput();
+                onKeyboardHeightChanged(0,getContext().getResources().getConfiguration().orientation);
             }
         });
     }
@@ -236,13 +238,28 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mEmojiGrid.setVisibility(View.VISIBLE);
         mEmoji.setImageResource(R.drawable.push_chat_emoji);
         isEmojiShow = true;
-        float transY ;
+        final float[] transY = new float[1];
         if(softKeyHeight == 0){
-            transY = -mEmojiGrid.getHeight();
+            //这一步主要针对首次进入私聊界面 不弹出软键盘 直接打开表情
+            if (mEmojiGrid.getHeight()!=0){
+                transY[0] = -mEmojiGrid.getHeight();
+                mPrivateChatInputLayout.setTranslationY(transY[0]);
+            }else{
+                ViewTreeObserver observer = mEmojiGrid.getViewTreeObserver();
+                observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        mEmojiGrid.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        transY[0] = mEmojiGrid.getMeasuredHeight();
+                        mPrivateChatInputLayout.setTranslationY(-transY[0]);
+                    }
+                });
+            }
         }else {
-            transY = -softKeyHeight;
+            transY[0] = -softKeyHeight;
+            mPrivateChatInputLayout.setTranslationY(transY[0]);
         }
-        mPrivateChatInputLayout.setTranslationY(transY);
+
     }
 
 
@@ -250,9 +267,11 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
      * 隐藏emoji
      */
     public void hideEmoji() {
-        mEmojiGrid.setVisibility(View.GONE);
         mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
         isEmojiShow = false;
+        mEmojiGrid.setVisibility(View.GONE);
+
+
     }
 
     public void initPrivateChatView() {
@@ -533,4 +552,18 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
 
     }
 
+
+    @Override
+    public void setVisibility(int visibility) {
+        if (visibility == View.VISIBLE) {
+            if (mPrivateChatUserLayout.getVisibility() == VISIBLE) {
+                mPrivateChatInputLayout.setVisibility(View.GONE);
+            }
+
+            if (mPrivateChatMsgLayout.getVisibility() == VISIBLE) {
+                mPrivateChatInputLayout.setVisibility(View.VISIBLE);
+            }
+        }
+        super.setVisibility(visibility);
+    }
 }

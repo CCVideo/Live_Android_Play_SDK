@@ -370,10 +370,10 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
             // 回放切换
             case R.id.replay_one:
                 ReplayLoginInfo replayLoginInfoOne = new ReplayLoginInfo();
-                replayLoginInfoOne.setRoomId("7A69CC542B18A9AB9C33DC5901307461");
-                replayLoginInfoOne.setUserId("B27039502337407C");
-                replayLoginInfoOne.setLiveId("C5E179F3DA38A94A");
-                replayLoginInfoOne.setRecordId("DAF45492DF286EDA");
+                replayLoginInfoOne.setRoomId("F4F90F55B2BF615F9C33DC5901307461");
+                replayLoginInfoOne.setUserId("E038C54084076CA5");
+                replayLoginInfoOne.setLiveId("8FB99F8B711B58DE");
+                replayLoginInfoOne.setRecordId("AAA549815FF39AAB");
                 replayLoginInfoOne.setViewerName("111");
                 replayLoginInfoOne.setViewerToken("111");
                 startLiveReplay(replayLoginInfoOne);

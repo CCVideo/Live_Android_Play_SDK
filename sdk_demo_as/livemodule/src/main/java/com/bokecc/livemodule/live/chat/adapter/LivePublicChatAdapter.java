@@ -26,15 +26,11 @@ import com.bokecc.livemodule.utils.ChatImageUtils;
 import com.bokecc.livemodule.utils.UserRoleUtils;
 import com.bokecc.livemodule.view.HeadView;
 import com.bokecc.sdk.mobile.live.DWLive;
-import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 直播公聊适配器
@@ -48,8 +44,8 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
     private String selfId;
     private onChatComponentClickListener mChatCompontentClickListener;
     private onItemClickListener onItemClickListener;
-    private final Pattern pattern;
-
+    public static final String regular = "[uri_";
+    public static final String regular1 = "]";
     public static final String CONTENT_IMAGE_COMPONENT = "content_image";
     public static final String CONTENT_ULR_COMPONET = "content_url";
 
@@ -80,7 +76,6 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
         } else {
             selfId = viewer.getId();
         }
-        pattern = Pattern.compile("(https?://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
     }
 
     /**
@@ -248,15 +243,26 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
 
 
                 String url = null;
-                Matcher matcher = pattern.matcher(msg);
                 int start = -1;
                 int end = -1;
-                if (matcher.find()) {
-                    start = matcher.start();
-                    end = matcher.end();
-                    url = matcher.group();
+                if (msg.contains(regular)){
+                    int i = msg.indexOf(regular);
+                    if (msg.contains(regular1)){
+                        int j = msg.indexOf(regular1);
+                        if (i<j){
+                            start = i;
+                            end=j+1;
+                            url = msg.substring(start,end);
+                            String substring = msg.substring(start + 5, end - 1);
+                            msg = msg.replace(url,substring);
+                            start-=1;
+                            end-=6;
+                        }
+                    }
                 }
 
+                holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
+                //如果确定有url 需要匹配url之前的uri_ 并删除
                 SpannableString ss = new SpannableString(msg);
                 ss.setSpan(getRoleNameColorSpan(chatEntity), 0, (chatEntity.getUserName() + ":").length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ss.setSpan(new ForegroundColorSpan(Color.parseColor("#1E1F21")),
@@ -267,10 +273,13 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                     ss.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(@NonNull View widget) {
+
                             if(mChatCompontentClickListener != null){
+                                //截取字符串
+                                String url = finalUrl.substring(5,finalUrl.length()-1);
                                 Bundle bundle = new Bundle();
                                 bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",finalUrl);
+                                bundle.putString("url",url);
                                 mChatCompontentClickListener.onChatComponentClick(widget,bundle);
                             }
                         }
@@ -283,7 +292,6 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                     },start,end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     ss.setSpan(new ForegroundColorSpan(Color.parseColor("#2292DD")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
                 }
 
                 holder.mContent.setText(EmojiUtil.parseFaceMsg(mContext, ss));

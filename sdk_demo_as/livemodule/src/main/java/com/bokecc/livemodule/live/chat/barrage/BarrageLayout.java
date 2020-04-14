@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular1;
+
 /**
  * 弹幕布局类
  *
@@ -86,6 +89,18 @@ public class BarrageLayout extends RelativeLayout{
         int i = 0;
         while (iterator.hasNext()) {
             String info = iterator.next();
+            //判断是否是连接 并且要去掉
+            if (info.contains(regular)){
+                int x = info.indexOf(regular);
+                if (info.contains(regular1)){
+                    int y = info.indexOf(regular1);
+                    if (x<y){
+                        String url = info.substring(x, y+1);
+                        String substring = info.substring(x + 5, y);
+                        info = info.replace(url,substring);
+                    }
+                }
+            }
 //			addBarrageView(height * i / maxBrragePerShow, duration, info + "");
             addBarrageView((height - offset) * i / maxBrragePerShow + offset, duration, info + "");
             iterator.remove();

@@ -1,7 +1,6 @@
 package com.bokecc.livemodule.live.chat;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,12 +32,10 @@ import com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
-import com.bokecc.livemodule.live.chat.util.SoftKeyBoardState;
 import com.bokecc.livemodule.utils.ChatImageUtils;
 import com.bokecc.livemodule.view.BaseRelativeLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
-import com.bokecc.sdk.mobile.live.response.MsgAck;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,6 +134,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
                 }
                 DWLive.getInstance().sendPublicChatMsg(msg);
                 clearChatInput();
+                mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
             }
         });
     }

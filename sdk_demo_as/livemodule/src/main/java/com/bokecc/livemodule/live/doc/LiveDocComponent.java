@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
-import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 /**
@@ -43,7 +42,7 @@ public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeL
         mDocView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         addView(mDocView);
 
-        mDocView.changeBackgroundColor("#000000");
+        mDocView.changeBackgroundColor("#ffffff");
 
         DWLiveCoreHandler liveCoreHandler = DWLiveCoreHandler.getInstance();
         if (liveCoreHandler != null) {

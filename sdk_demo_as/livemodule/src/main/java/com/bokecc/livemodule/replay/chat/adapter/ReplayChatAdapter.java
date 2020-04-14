@@ -12,7 +12,6 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,11 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
-import com.bokecc.livemodule.utils.UserRoleUtils;
 import com.bokecc.livemodule.utils.ChatImageUtils;
+import com.bokecc.livemodule.utils.UserRoleUtils;
 import com.bokecc.livemodule.view.HeadView;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.pojo.Viewer;
@@ -34,12 +32,12 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular1;
 
 public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.ChatViewHolder> {
 
-    private final Pattern pattern;
 
     public interface OnChatComponentClickListener {
         void onChatComponentClick(View view, Bundle bundle);
@@ -71,7 +69,6 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
         } else {
             selfId = viewer.getId();
         }
-        pattern = Pattern.compile("(https?://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
     }
 
     /**
@@ -185,13 +182,22 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
                 String msg = chatEntity.getUserName() + ": " + chatEntity.getMsg();
 
                 String url = null;
-                Matcher matcher = pattern.matcher(msg);
                 int start = -1;
                 int end = -1;
-                if (matcher.find()) {
-                    start = matcher.start();
-                    end = matcher.end();
-                    url = matcher.group();
+                if (msg.contains(regular)){
+                    int i = msg.indexOf(regular);
+                    if (msg.contains(regular1)){
+                        int j = msg.indexOf(regular1);
+                        if (i<j){
+                            start = i;
+                            end=j+1;
+                            url = msg.substring(start,end);
+                            String substring = msg.substring(start + 5, end - 1);
+                            msg = msg.replace(url,substring);
+                            start-=1;
+                            end-=6;
+                        }
+                    }
                 }
 
                 SpannableString ss = new SpannableString(msg);
@@ -204,10 +210,11 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
                     ss.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(@NonNull View widget) {
+                            String url = finalUrl.substring(5,finalUrl.length()-1);
                             if(mChatcomponentClickListener != null){
                                 Bundle bundle = new Bundle();
                                 bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",finalUrl);
+                                bundle.putString("url",url);
                                 mChatcomponentClickListener.onChatComponentClick(widget,bundle);
                             }
                         }

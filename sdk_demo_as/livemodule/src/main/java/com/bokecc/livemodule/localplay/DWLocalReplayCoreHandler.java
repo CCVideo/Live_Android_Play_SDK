@@ -213,6 +213,7 @@ public class DWLocalReplayCoreHandler {
         if (dwLiveLocalReplay != null) {
             dwLiveLocalReplay.onDestroy();
         }
+        mTemplateInfo = null;
     }
 
     /******************************* 实现 DWLiveLocalReplayListener 定义的方法 ***************************************/

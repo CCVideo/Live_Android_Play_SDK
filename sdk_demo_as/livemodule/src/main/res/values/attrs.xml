@@ -79,5 +79,15 @@
             <enum name="right" value="4" />
         </attr>
     </declare-styleable>
-
+    <declare-styleable name="SubmitButton">
+        <attr name="buttonText" format="string" />
+        <attr name="buttonColor" format="color" />
+        <attr name="succeedColor" format="color" />
+        <attr name="failedColor" format="color" />
+        <attr name="buttonTextSize" format="dimension" />
+        <attr name="progressStyle" format="enum">
+            <enum name="loading" value="0" />
+            <enum name="progress" value="1" />
+        </attr>
+    </declare-styleable>
 </resources>

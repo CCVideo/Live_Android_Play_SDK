@@ -1,8 +1,8 @@
 package com.bokecc.livemodule.localplay.video;
 
 import android.content.Context;
-import android.graphics.*;
-import android.text.TextUtils;
+import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -11,9 +11,12 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
+import com.bokecc.livemodule.view.ResizeTextureView;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
@@ -25,7 +28,7 @@ public class LocalReplayVideoView extends RelativeLayout {
 
     View mRootView;
 
-    TextureView mTextureView;
+    ResizeTextureView mTextureView;
 
     TextView mVideoNoplayTip;
 
@@ -70,12 +73,21 @@ public class LocalReplayVideoView extends RelativeLayout {
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
         player = new DWReplayPlayer(getContext());
         player.setOnPreparedListener(preparedListener);
+        player.setOnVideoSizeChangedListener(videoSizeChangedListener);
         player.setOnInfoListener(infoListener);
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLocalReplayCoreHandler != null) {
             dwLocalReplayCoreHandler.setPlayer(player);
         }
     }
+    IMediaPlayer.OnVideoSizeChangedListener videoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
+        @Override
+        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            if (width != 0 && height != 0) {
+                mTextureView.setVideoSize(width, height);
+            }
+        }
+    };
 
     /**
      * 开始播放

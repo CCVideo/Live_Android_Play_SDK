@@ -1,7 +1,11 @@
 package com.bokecc.dwlivedemo.activity;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,6 +21,7 @@ import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
+import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -25,10 +30,12 @@ import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
 import com.bokecc.sdk.mobile.live.logging.ELog;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
+import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
 
 /**
  * 回放播放页（默认文档大屏，视频小屏，可手动切换）
@@ -87,7 +94,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        ELog.d(TAG,"onBackPressed()");
+        ELog.d(TAG, "onBackPressed()");
         if (!isPortrait()) {
             quitFullScreen();
             return;
@@ -96,6 +103,31 @@ public class ReplayPlayActivity extends BaseActivity {
             mExitPopupWindow.setConfirmExitRoomListener(confirmExitRoomListener);
             mExitPopupWindow.show(mRoot);
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 横屏隐藏状态栏
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+    }
+
+    @TargetApi(19)
+    private static int getSystemUiVisibility(boolean isFull) {
+        if (isFull) {
+            int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            return flags;
+        } else {
+            return View.SYSTEM_UI_FLAG_VISIBLE;
+        }
+
     }
 
     private void initViews() {
@@ -170,8 +202,24 @@ public class ReplayPlayActivity extends BaseActivity {
         mTagList.add(mChatTag);
         mChatTag.setVisibility(View.VISIBLE);
         mChatLayout = new ReplayChatComponent(this);
+        mChatLayout.setOnChatComponentClickListener(new OnChatComponentClickListener() {
+            @Override
+            public void onClickChatComponent(Bundle bundle) {
+                if (bundle == null) return;
+                String type = bundle.getString("type");
+                if (CONTENT_IMAGE_COMPONENT.equals(type)) {
+                    Intent intent = new Intent(ReplayPlayActivity.this, ImageDetailsActivity.class);
+                    intent.putExtra("imageUrl", bundle.getString("url"));
+                    startActivity(intent);
+                } else if (CONTENT_ULR_COMPONET.equals(type)) {
+                    Uri uri = Uri.parse(bundle.getString("url"));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+            }
+        });
         mLiveInfoList.add(mChatLayout);
-        if(mChatLayout != null){
+        if (mChatLayout != null) {
             mReplayRoomLayout.setSeekListener(mChatLayout);
         }
     }
@@ -208,7 +256,7 @@ public class ReplayPlayActivity extends BaseActivity {
         if (dwReplayCoreHandler == null) {
             return;
         }
-        ELog.d(TAG,"showFloatingDocLayout() hasPdfView:"+dwReplayCoreHandler.hasPdfView());
+        ELog.d(TAG, "showFloatingDocLayout() hasPdfView:" + dwReplayCoreHandler.hasPdfView());
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwReplayCoreHandler.hasPdfView()) {
             if (!mReplayFloatingView.isShowing()) {
@@ -308,7 +356,7 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
-                        lp.width =  ViewGroup.LayoutParams.MATCH_PARENT;
+                        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
                         lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
                         mDocLayout.setLayoutParams(lp);
                         mReplayFloatingView.addView(mDocLayout);
@@ -345,6 +393,7 @@ public class ReplayPlayActivity extends BaseActivity {
                 public void run() {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     mReplayMsgLayout.setVisibility(View.GONE);
+                    getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
                 }
             });
         }
@@ -365,6 +414,8 @@ public class ReplayPlayActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mReplayMsgLayout.setVisibility(View.VISIBLE);
         mReplayRoomLayout.quitFullScreen();
+
+        getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
     }
 
     //---------------------------------- 退出相关逻辑 --------------------------------------------/
@@ -377,12 +428,12 @@ public class ReplayPlayActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(mChatLayout != null){
+                    if (mChatLayout != null) {
                         mChatLayout.release();
                     }
-                   if(mChatLayout != null){
-                       mReplayRoomLayout.release();
-                   }
+                    if (mChatLayout != null) {
+                        mReplayRoomLayout.release();
+                    }
 
                     mExitPopupWindow.dismiss();
                     finish();
