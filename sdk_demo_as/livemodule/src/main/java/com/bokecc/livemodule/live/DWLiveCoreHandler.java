@@ -148,6 +148,7 @@ public class DWLiveCoreHandler {
     /******************************* 设置"播放"组件/控件相关 ***************************************/
 
     private LiveDocSizeChangeListener mDocSizeListener;
+
     public void setDocSizeChangeListener(LiveDocSizeChangeListener listener) {
         mDocSizeListener = listener;
     }
@@ -320,8 +321,8 @@ public class DWLiveCoreHandler {
     /**
      * 发送随堂测答题结果
      *
-     * @param practiceId  随堂测ID
-     * @param answerOptions  随堂测回答的结果信息
+     * @param practiceId    随堂测ID
+     * @param answerOptions 随堂测回答的结果信息
      */
     public void sendPracticeAnswer(String practiceId, ArrayList<String> answerOptions) {
         DWLive dwLive = DWLive.getInstance();
@@ -366,6 +367,13 @@ public class DWLiveCoreHandler {
     /******************************* 实现直播相关功能事件监听 ***************************************/
 
     private DWLiveListener dwLiveListener = new DWLiveListener() {
+
+        @Override
+        public void onHistoryQuestionAnswer(List<Question> questions, List<Answer> answers) {
+            if (dwLiveQAListener != null) {
+                dwLiveQAListener.onHistoryQuestionAnswer(questions, answers);
+            }
+        }
 
         /**
          * 提问
@@ -560,9 +568,9 @@ public class DWLiveCoreHandler {
          * @param docTotalPage 当前文档总共的页数
          */
         @Override
-        public void onPageChange(String docId, String docName, int width ,int height, int pageNum, int docTotalPage) {
-            Log.d("SocketRoomHandler", "onPageChange: width:"+width +"  height:"+height);
-           // mDocSizeListener.updateSize(width,height);
+        public void onPageChange(String docId, String docName, int width, int height, int pageNum, int docTotalPage) {
+            Log.d("SocketRoomHandler", "onPageChange: width:" + width + "  height:" + height);
+            // mDocSizeListener.updateSize(width,height);
         }
 
         /**
@@ -643,7 +651,9 @@ public class DWLiveCoreHandler {
          */
         @Override
         public void onInformation(String msg) {
-
+            if (dwLiveRoomListener!=null){
+                dwLiveRoomListener.onInformation(msg);
+            }
         }
 
         /**
@@ -660,7 +670,26 @@ public class DWLiveCoreHandler {
                     dwLiveFunctionListener.onException("网络错误：" + exception.getMessage());
                 } else if (exception.getErrorCode() == ErrorCode.PROCESS_FAIL) {
                     dwLiveFunctionListener.onException("过程失败：" + exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.DOC_PAGE_INFO_FAILED) {
+                    dwLiveFunctionListener.onException("文档加载失败");
+                } else if (exception.getErrorCode() == ErrorCode.LOGIN_FAILED) {//登陆失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_PLAY_URL_FAILED) {//获取播放地址失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_CHAT_FAILED) {//获取聊天数据失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_QUESTIONNAIRE_FAILED) {//获取问答数据失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.CONNECT_SERVICE_FAILED) {//连接soket服务器异常
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_HISTORY_FAILED) {//获取历史信息失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_HA_BEEN_PLAY_TIME_FAILED) {//获取已播放时间失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
+                } else if (exception.getErrorCode() == ErrorCode.GET_ANNOUNCEMENT_FAILED) {//获取公告失败
+                    dwLiveFunctionListener.onException(exception.getMessage());
                 }
+
             }
         }
 
@@ -675,14 +704,6 @@ public class DWLiveCoreHandler {
             if (dwLiveRoomListener != null && DWLive.getInstance().getRoomInfo() != null) {
                 dwLiveRoomListener.showRoomTitle(DWLive.getInstance().getRoomInfo().getName());
             }
-
-            /**
-             * TODO 可以尝试获取一下当前正在进行的随堂测，需要考虑用户重新登录及Home桌面的问题
-             * TODO（根据实际需求场景，自行实现）
-             */
-           // if(DWLive.getInstance() != null) {
-           //    DWLive.getInstance().getRealTimePractice();
-           // }
         }
 
         /**
@@ -808,6 +829,7 @@ public class DWLiveCoreHandler {
                 dwLiveFunctionListener.onStartLottery(lotteryId);
             }
         }
+
         /**
          * 抽奖结果
          *
@@ -1091,7 +1113,7 @@ public class DWLiveCoreHandler {
         @Override
         public void onEnterSpeak(boolean isVideoRtc, boolean needAdjust, String videoSize) {
             if (dwLiveRTCListener != null) {
-                dwLiveRTCListener.onEnterSpeak(isVideoRtc,needAdjust, videoSize);
+                dwLiveRTCListener.onEnterSpeak(isVideoRtc, needAdjust, videoSize);
             }
             if (dwLiveRTCStatusListener != null) {
                 dwLiveRTCStatusListener.onEnterRTC(isVideoRtc);

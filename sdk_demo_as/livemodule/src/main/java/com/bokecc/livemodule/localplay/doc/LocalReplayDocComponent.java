@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
-import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 /**
@@ -40,6 +39,13 @@ public class LocalReplayDocComponent extends LinearLayout {
         DWLocalReplayCoreHandler replayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (replayCoreHandler != null) {
             replayCoreHandler.setDocView(mDocView);
+        }
+    }
+
+    // 设置文档区域是否可滑动
+    public void setDocScrollable(boolean scrollable) {
+        if (mDocView != null) {
+            mDocView.setScrollable(scrollable);
         }
     }
 }

@@ -80,8 +80,8 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
         mRoot.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mReplayVideoView.start();
                 showFloatingDocLayout();
+                mReplayVideoView.start();
             }
         }, 1000);
     }
@@ -369,6 +369,14 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
         switch (v.getId()) {
             // 回放切换
             case R.id.replay_one:
+//                ReplayLoginInfo replayLoginInfoOne = new ReplayLoginInfo();
+//                replayLoginInfoOne.setRoomId("7A69CC542B18A9AB9C33DC5901307461");
+//                replayLoginInfoOne.setUserId("B27039502337407C");
+//                replayLoginInfoOne.setLiveId("C5E179F3DA38A94A");
+//                replayLoginInfoOne.setRecordId("DAF45492DF286EDA");
+//                replayLoginInfoOne.setViewerName("111");
+//                replayLoginInfoOne.setViewerToken("111");
+//                startLiveReplay(replayLoginInfoOne);
                 ReplayLoginInfo replayLoginInfoOne = new ReplayLoginInfo();
                 replayLoginInfoOne.setRoomId("F4F90F55B2BF615F9C33DC5901307461");
                 replayLoginInfoOne.setUserId("E038C54084076CA5");
@@ -379,7 +387,14 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
                 startLiveReplay(replayLoginInfoOne);
                 break;
             case R.id.replay_two:
-                startLocalReplay("BC638B0BBFD7BF01.ccr");
+                ReplayLoginInfo replayLoginInfoTwo = new ReplayLoginInfo();
+                replayLoginInfoTwo.setRoomId("F2A76C986EDCBFB89C33DC5901307461");
+                replayLoginInfoTwo.setUserId("5D2636511DBBCADD");
+                replayLoginInfoTwo.setLiveId("C10B87686023E6A6");
+                replayLoginInfoTwo.setRecordId("C10B87686023E6A6");
+                replayLoginInfoTwo.setViewerName("111");
+                replayLoginInfoTwo.setViewerToken("xuetiancn");
+                startLiveReplay(replayLoginInfoTwo);
                 break;
             case R.id.replay_three:
                 // 需要 "存储" 权限

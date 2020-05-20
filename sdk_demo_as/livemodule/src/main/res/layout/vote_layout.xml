@@ -289,7 +289,7 @@
 
                 <Button
                     android:id="@+id/btn_qs_submit"
-                    style="@style/pilotButtonTheme"
+                    style="@style/practiceButtonTheme"
                     android:layout_width="132dp"
                     android:layout_height="45dp"
                     android:enabled="false"

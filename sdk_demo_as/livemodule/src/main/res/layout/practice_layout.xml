@@ -83,7 +83,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_alignParentRight="true"
                         android:textSize="12sp"
-                        android:text="13:14"/>
+                        android:text="00:00"/>
 
                     <ImageView
                         android:layout_width="15dp"
@@ -92,7 +92,7 @@
                         android:layout_toLeftOf="@id/timer"
                         android:layout_marginRight="6dp"
                         android:layout_marginLeft="15dp"
-                        android:src="@mipmap/icon_time" />
+                        android:src="@drawable/icon_time" />
 
                 </RelativeLayout>
 
@@ -313,7 +313,49 @@
                     </RelativeLayout>
 
                 </LinearLayout>
+                <RadioGroup
+                    android:id="@+id/rg_qs_double"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginBottom="25dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
+                    <RelativeLayout
+                        android:id="@+id/rl_qs_double_select_0"
+                        style="@style/qs_single_select_layout_theme"
+                        android:layout_marginRight="40dp">
+
+                        <RadioButton
+                            android:id="@+id/rb_double_0"
+                            style="@style/qs_single_select_theme"
+                            android:drawableLeft="@drawable/qs_choose_right_sign"
+                            android:paddingLeft="8dp" />
+
+                        <ImageView
+                            android:id="@+id/iv_qs_double_select_sign_0"
+                            style="@style/qs_single_select_sign_theme" />
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/rl_qs_double_select_1"
+                        style="@style/qs_single_select_layout_theme">
+
+                        <RadioButton
+                            android:id="@+id/rb_double_1"
+                            style="@style/qs_single_select_theme"
+                            android:drawableLeft="@drawable/qs_choose_wrong_sign"
+                            android:paddingLeft="8dp" />
+
+                        <ImageView
+                            android:id="@+id/iv_qs_double_select_sign_1"
+                            style="@style/qs_single_select_sign_theme" />
+                    </RelativeLayout>
+
+                </RadioGroup>
                 <TextView
                     android:id="@+id/network_error"
                     android:layout_height="wrap_content"

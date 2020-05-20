@@ -1,5 +1,7 @@
 package com.bokecc.dwlivedemo.download;
 
+import android.util.Log;
+
 import com.bokecc.sdk.mobile.live.util.SupZipTool;
 
 import java.io.File;
@@ -13,6 +15,7 @@ public class UnZiper {
 
         /**
          * 解压失败
+         *
          * @param errorCode 错误码
          * @param message   错误内容
          */
@@ -39,9 +42,10 @@ public class UnZiper {
 
     /**
      * 构造函数
+     *
      * @param listener 监听器
-     * @param oriFile 解压原始文件
-     * @param dir 解压到的文件夹
+     * @param oriFile  解压原始文件
+     * @param dir      解压到的文件夹
      */
     public UnZiper(UnZipListener listener, File oriFile, String dir) {
         this.listener = listener;
@@ -60,9 +64,10 @@ public class UnZiper {
                 @Override
                 public void run() {
                     status = ZIP_ING;
-
                     // 调用解压方法
                     int resultCode = SupZipTool.decompressZipDec(oriFile.getAbsolutePath(), dir);
+                   // Log.e("dds_test", "file:" + oriFile.getAbsolutePath());
+                    //Log.e("dds_test", "result:" + resultCode);
 
                     if (resultCode != 0) {
                         status = ZIP_ERROR;
@@ -84,6 +89,7 @@ public class UnZiper {
 
     /**
      * 获取解压状态
+     *
      * @return
      */
     public int getStatus() {
@@ -92,6 +98,7 @@ public class UnZiper {
 
     /**
      * 设置解压状态
+     *
      * @param status
      * @return
      */

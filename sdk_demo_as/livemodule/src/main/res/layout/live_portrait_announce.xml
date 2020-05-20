@@ -30,7 +30,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:src="@mipmap/window_close" />
+            android:src="@drawable/window_close" />
 
     </RelativeLayout>
 

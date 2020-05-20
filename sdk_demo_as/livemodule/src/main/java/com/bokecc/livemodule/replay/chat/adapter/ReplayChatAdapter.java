@@ -32,12 +32,15 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular;
-import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular1;
 
 public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.ChatViewHolder> {
 
+
+    private final Pattern pattern;
 
     public interface OnChatComponentClickListener {
         void onChatComponentClick(View view, Bundle bundle);
@@ -69,6 +72,7 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
         } else {
             selfId = viewer.getId();
         }
+        pattern = Pattern.compile(regular, Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -184,20 +188,11 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
                 String url = null;
                 int start = -1;
                 int end = -1;
-                if (msg.contains(regular)){
-                    int i = msg.indexOf(regular);
-                    if (msg.contains(regular1)){
-                        int j = msg.indexOf(regular1);
-                        if (i<j){
-                            start = i;
-                            end=j+1;
-                            url = msg.substring(start,end);
-                            String substring = msg.substring(start + 5, end - 1);
-                            msg = msg.replace(url,substring);
-                            start-=1;
-                            end-=6;
-                        }
-                    }
+                Matcher matcher = pattern.matcher(msg);
+                if (matcher.find()) {
+                    start = matcher.start();
+                    end = matcher.end();
+                    url = matcher.group();
                 }
 
                 SpannableString ss = new SpannableString(msg);
@@ -210,11 +205,10 @@ public class ReplayChatAdapter extends RecyclerView.Adapter<ReplayChatAdapter.Ch
                     ss.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(@NonNull View widget) {
-                            String url = finalUrl.substring(5,finalUrl.length()-1);
                             if(mChatcomponentClickListener != null){
                                 Bundle bundle = new Bundle();
                                 bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",url);
+                                bundle.putString("url",finalUrl);
                                 mChatcomponentClickListener.onChatComponentClick(widget,bundle);
                             }
                         }

@@ -59,7 +59,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
     MoreFunctionLayout mMoreFunctionLayout;
 
     @Override
-    protected void onCreate( Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         // 隐藏ActionBar
         hideActionBar();
         // 屏幕常亮
@@ -171,10 +171,10 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
         if (requestCode == 100) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission Allow
-                Toast.makeText(LivePlayClassicActivity.this, "Permission Allow", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(LivePlayClassicActivity.this, "Permission Allow", Toast.LENGTH_SHORT).show();
             } else {
                 // Permission Denied
-                Toast.makeText(LivePlayClassicActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(LivePlayClassicActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -188,8 +188,9 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
         // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
         @Override
-        public void switchVideoDoc(final boolean videoMain) {
+        public boolean switchVideoDoc(final boolean videoMain) {
             // TODO 不建议在此页面布局类型下做切换操作，如需要,请自行添加完善逻辑
+            return false;
         }
 
         // 退出直播间
@@ -237,7 +238,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
         @Override
         public void onClickDocScaleType(int scaleType) {
-            
+
         }
     };
 

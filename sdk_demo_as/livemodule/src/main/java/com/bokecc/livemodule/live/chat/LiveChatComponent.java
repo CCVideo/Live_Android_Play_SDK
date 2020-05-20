@@ -1,6 +1,7 @@
 package com.bokecc.livemodule.live.chat;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ import com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
+import com.bokecc.livemodule.live.chat.window.BanChatPopup;
 import com.bokecc.livemodule.utils.ChatImageUtils;
 import com.bokecc.livemodule.view.BaseRelativeLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
@@ -81,7 +83,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     //软键盘的高度
     private int softKeyHeight;
     private boolean showEmojiAction = false;
-
+    private BanChatPopup banChatPopup;
     public void setOnChatComponentClickListener(OnChatComponentClickListener listener) {
         mChatComponentClickListener = listener;
     }
@@ -407,7 +409,12 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
                     if (barrageLayout != null) {
                         // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕 && 聊天状态为显示
                         if (!ChatImageUtils.isImgChatMessage(historyChats.get(i).getMessage()) && "0".equals(historyChats.get(i).getStatus())) {
-                            barrageLayout.addNewInfo(historyChats.get(i).getMessage());
+                            //判断横竖屏
+                            if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                barrageLayout.addNewInfo(historyChats.get(i).getMessage());
+                            } else if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                //竖屏不需要添加
+                            }
                         }
                     }
                     addChatEntity(getChatEntity(historyChats.get(i)));
@@ -489,12 +496,30 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
      * @param mode 禁言类型 1：个人禁言  2：全员禁言
      */
     @Override
-    public void onBanChat(int mode) {
-        if (mode == 1) {
-            Log.i(TAG, "个人被禁言");
-        } else if (mode == 2) {
-            Log.i(TAG, "全员被禁言");
-        }
+    public void onBanChat(final int mode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (banChatPopup ==null){
+                    banChatPopup = new BanChatPopup(getContext());
+                }
+                if (banChatPopup.isShowing()){
+                    banChatPopup.onDestroy();
+                }
+                if (mode == 1) {
+                    banChatPopup.banChat("个人被禁言");
+                } else if (mode == 2) {
+                    banChatPopup.banChat("全员被禁言");
+                }
+                banChatPopup.show(rootView);
+            }
+        });
+
+    }
+    private View rootView;
+
+    public void setPopView(View rootView) {
+        this.rootView = rootView;
     }
 
     /**
@@ -503,12 +528,25 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
      * @param mode 禁言类型 1：个人禁言  2：全员禁言
      */
     @Override
-    public void onUnBanChat(int mode) {
-        if (mode == 1) {
-            Log.i(TAG, "解除个人禁言");
-        } else if (mode == 2) {
-            Log.i(TAG, "解除全员被禁言");
-        }
+    public void onUnBanChat(final int mode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (banChatPopup ==null){
+                    banChatPopup = new BanChatPopup(getContext());
+                }
+                if (banChatPopup.isShowing()){
+                    banChatPopup.onDestroy();
+                }
+                if (mode == 1) {
+                    banChatPopup.banChat("解除个人禁言");
+                } else if (mode == 2) {
+                    banChatPopup.banChat("解除全员被禁言");
+                }
+                banChatPopup.show(rootView);
+            }
+        });
+
     }
 
     /**

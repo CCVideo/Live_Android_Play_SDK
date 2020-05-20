@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ public class PracticeStatisAdapter extends RecyclerView.Adapter<PracticeStatisAd
     private LayoutInflater mInflater;
 
     private int practiceNumber;
+    private int type;
 
     public PracticeStatisAdapter(Context context) {
         practiceStatisices = new ArrayList<>();
@@ -41,8 +43,9 @@ public class PracticeStatisAdapter extends RecyclerView.Adapter<PracticeStatisAd
     /**
      * 添加数据
      */
-    public void add(ArrayList<PracticeStatisInfo.OptionStatis> practiceStatisices) {
+    public void add(ArrayList<PracticeStatisInfo.OptionStatis> practiceStatisices,int type) {
         this.practiceStatisices = practiceStatisices;
+        this.type=type;
         notifyDataSetChanged();
     }
 
@@ -69,12 +72,26 @@ public class PracticeStatisAdapter extends RecyclerView.Adapter<PracticeStatisAd
             holder.mRightProgressBar.setVisibility(View.GONE);
             holder.mWrongProgressBar.setProgress(optionSingle.getCount());
         }
-
-        holder.mSummaryOrder.setText(orders[optionSingle.getIndex()]);
+        if (type==0){
+            holder.mSummaryOrder.setText(orders2[optionSingle.getIndex()]);
+        }else{
+            holder.mSummaryOrder.setText(orders[optionSingle.getIndex()]);
+        }
 
         String userCount = optionSingle.getCount() + "人 ";
-
-        String percent = "(" + optionSingle.getPercent() + ")";
+        String percentText = "";
+        if (optionSingle.getPercent().contains(".")){
+            String[] split = optionSingle.getPercent().split("\\.");
+            if (split.length>=2&&split[1].contains("0")){
+                String replace = split[1].replace("0", "");
+                percentText = split[0]+replace;
+            }else{
+                percentText = optionSingle.getPercent();
+            }
+        }else{
+            percentText = optionSingle.getPercent();
+        }
+        String percent = "(" + percentText + ")";
 
         String msg = userCount + percent;
 
@@ -94,7 +111,7 @@ public class PracticeStatisAdapter extends RecyclerView.Adapter<PracticeStatisAd
     }
 
     String[] orders = new String[]{"A：", "B：", "C：", "D：", "E：", "F："};
-
+    String[] orders2 = new String[]{"√：","×："};
     @Override
     public int getItemCount() {
         return practiceStatisices == null ? 0 : practiceStatisices.size();

@@ -16,8 +16,10 @@ import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivedemo.scan.qr_codescan.MipcaActivityCapture;
+import com.bokecc.dwlivedemo.utils.StatusBarUtil;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
@@ -44,10 +46,14 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
     LoginPopupWindow loginPopupWindow;   // 登录Loading控件
     private View mRoot;
-
+    private long currentTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        hideActionBar();
+        // 全屏
+//        requestFullScreenFeature();
+        // 沉浸式
+        StatusBarUtil.transparencyBar(this);
+        StatusBarUtil.setLightStatusBar(this, true, false);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_replay_login);
         initViews();
@@ -76,7 +82,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         lllLoginReplayRoomid.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_roomid_hint)).addOnTextChangeListener(myTextWatcher);
         lllLoginReplayLiveid.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_liveid_hint)).addOnTextChangeListener(myTextWatcher);
         lllLoginReplayRecordid.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_recordid_hint)).addOnTextChangeListener(myTextWatcher);
-        lllLoginReplayName.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_name_hint)).addOnTextChangeListener(myTextWatcher);
+        lllLoginReplayName.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_name_hint)).addOnTextChangeListener(myTextWatcherLength);
         lllLoginReplayName.maxEditTextLength = MAX_NAME;
         lllLoginReplayPassword.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_s_password_hint)).addOnTextChangeListener(myTextWatcher)
                 .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -87,7 +93,11 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doLiveLogin();
+                //防止频繁点击
+                if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
+                    doLiveLogin();
+                    currentTime = System.currentTimeMillis();
+                }
             }
         });
     }
@@ -121,10 +131,10 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         replayLoginInfo.setRecordId(lllLoginReplayRecordid.getText().trim());
         replayLoginInfo.setViewerName(lllLoginReplayName.getText().trim());
         replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText().trim());
-        replayLoginInfo.setViewerToken(lllLoginReplayPassword.getText().trim());
 //        replayLoginInfo.setViewerToken("XjbetHY9Wn84uEkUpNauVq");
         // 设置登录参数
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
+
 
             @Override
             public void onException(final DWLiveException exception) {
@@ -133,13 +143,13 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
             }
 
             @Override
-            public void onLogin(TemplateInfo templateInfo) {
+            public void onLogin(TemplateInfo templateInfo, Marquee marquee) {
                 dismissPopupWindow();
                 writeSharePreference();
                 toastOnUiThread("登录成功");
                 Bundle bundle = new Bundle();
-//                bundle.putSerializable("marquee", marquee);
-                go(ReplayPlayActivity.class,bundle); // 回放默认Demo页
+                bundle.putSerializable("marquee", marquee);
+                go(ReplayPlayActivity.class, bundle); // 回放默认Demo页
                 // go(ReplayPlayDocActivity.class);  // 回放'文档大屏/视频小屏'的Demo页
                 dismissPopupWindow();
             }
@@ -267,7 +277,27 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
             btnLoginLive.setTextColor(isLoginEnabled ? Color.parseColor("#ffffff") : Color.parseColor("#f7d8c8"));
         }
     };
+    private TextWatcher myTextWatcherLength = new TextWatcher() {
 
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.length()>20){
+                toastOnUiThread(getResources().getString(R.string.username_max_length));
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            boolean isLoginEnabled = isNewLoginButtonEnabled(lllLoginReplayUid, lllLoginReplayRoomid, lllLoginReplayLiveid, lllLoginReplayName);
+            btnLoginLive.setEnabled(isLoginEnabled);
+            btnLoginLive.setTextColor(isLoginEnabled ? Color.parseColor("#ffffff") : Color.parseColor("#f7d8c8"));
+        }
+    };
 
     // 检测登录按钮是否应该可用
     public static boolean isNewLoginButtonEnabled(LoginLineLayout... views) {
@@ -291,7 +321,11 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
         for (String p : params) {
             String[] en = p.split("=");
-            map.put(en[0], en[1]);
+            if (en.length < 2) {
+                map.put(en[0], "");
+            } else {
+                map.put(en[0], en[1]);
+            }
         }
         return map;
     }

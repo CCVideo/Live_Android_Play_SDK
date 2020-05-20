@@ -22,7 +22,7 @@
     <item android:state_enabled="false">
         <shape android:shape="rectangle">
             <!--<solid android:color="#CCff6633" />-->
-            <gradient android:angle="180" android:endColor="#ff5723" android:startColor="#ff9049" />
+            <gradient android:angle="180" android:endColor="#ff9049" android:startColor="#FF9c7a" />
             <corners android:radius="24dp" />
         </shape>
     </item>

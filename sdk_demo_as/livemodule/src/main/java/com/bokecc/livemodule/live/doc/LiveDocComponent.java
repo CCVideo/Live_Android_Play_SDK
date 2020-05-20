@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
+import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 /**
@@ -14,14 +15,9 @@ import com.bokecc.sdk.mobile.live.widget.DocView;
  */
 public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeListener {
 
-    private final int SCALE_CENTER_INSIDE = 0;
-    private final int SCALE_FIT_XY = 1;
-    private final int SCALE_CROP_CENTER = 2;
-    private int mCurrentScaleType = SCALE_CENTER_INSIDE;
 
     private Context mContext;
     private DocView mDocView;
-
 
     public LiveDocComponent(Context context) {
         super(context);
@@ -39,7 +35,9 @@ public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeL
         mDocView = new DocView(mContext);
         // 设置true：响应文档内容上下滑动，不支持悬浮窗拖动  设置false：支持悬浮窗拖动，不响应文档内容上下滑动
         mDocView.setScrollable(false);
-        mDocView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        // params.gravity = Gravity.CENTER;
+        mDocView.setLayoutParams(params);
         addView(mDocView);
 
         mDocView.changeBackgroundColor("#ffffff");
@@ -58,16 +56,18 @@ public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeL
         }
     }
 
-//    public void setScaleType(int type) {
-//        mCurrentScaleType = type;
-//        if (SCALE_CENTER_INSIDE == mCurrentScaleType) {
-//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
-//        } else if (SCALE_FIT_XY == mCurrentScaleType) {
-//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
-//        } else if (SCALE_CROP_CENTER == mCurrentScaleType) {
-//            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
-//        }
-//    }
+    // 设置文档的拉伸模式
+    public void setScaleType(int type) {
+        // 如果不是自适应宽度不会起作用
+        if (!mDocView.isDocFitWidth()) return;
+        if (DocView.ScaleType.CENTER_INSIDE.ordinal() == type) {
+            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
+        } else if (DocView.ScaleType.FIT_XY.ordinal() == type) {
+            DWLive.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
+        } else if (DocView.ScaleType.CROP_CENTER.ordinal() == type) {
+            DWLive.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
+        }
+    }
 
     public void updateSize(int srcWidth, int srcHeight) {
 

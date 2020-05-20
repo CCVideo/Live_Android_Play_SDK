@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/com.bokecc.dwlivemoduledemo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -19,7 +20,7 @@
             <ImageView
                 android:id="@+id/iv_back"
                 style="@style/baseTitleImageTheme"
-                android:src="@mipmap/nav_ic_back_nor" />
+                android:src="@drawable/nav_ic_back_nor" />
 
             <RelativeLayout
                 android:id="@+id/rl_na_title"
@@ -42,7 +43,7 @@
                 style="@style/baseTitleImageTheme"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:src="@mipmap/nav_ic_code" />
+                android:src="@drawable/nav_ic_code" />
 
         </RelativeLayout>
 
@@ -52,7 +53,7 @@
         android:id="@+id/fl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_scrollFlags="enterAlways" >
+        app:layout_scrollFlags="enterAlways">
 
         <LinearLayout
             android:id="@+id/ll_login_live_root"

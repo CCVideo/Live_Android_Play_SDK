@@ -19,18 +19,18 @@ public class TasksManagerDBOpenHelper extends SQLiteOpenHelper {
                 + String.format(
                 "("
                         + "%s INTEGER PRIMARY KEY, " // id, download id
-                        + "%s VARCHAR, " // name
                         + "%s VARCHAR, " // url
                         + "%s VARCHAR, " // path
                         + "%s INTEGER, " // taskStatus
-                        + "%s INTEGER " // taskStatus
+                        + "%s INTEGER, " // PROGRESS
+                        + "%s INTEGER " // total
                         + ")"
-                , TasksManagerModel.ID
-                , TasksManagerModel.NAME
-                , TasksManagerModel.URL
-                , TasksManagerModel.PATH
-                , TasksManagerModel.TASK_STATUS
-                , TasksManagerModel.TOTAL
+                , DownLoadBean.ID
+                , DownLoadBean.URL
+                , DownLoadBean.PATH
+                , DownLoadBean.TASK_STATUS
+                , DownLoadBean.PROGRESS
+                , DownLoadBean.TOTAL
         ));
     }
 

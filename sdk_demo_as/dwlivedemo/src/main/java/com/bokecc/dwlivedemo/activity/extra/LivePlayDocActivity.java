@@ -165,13 +165,13 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
 
         // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
         @Override
-        public void switchVideoDoc(final boolean videoMain) {
+        public boolean switchVideoDoc(final boolean videoMain) {
             DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
             if (dwLiveCoreHandler == null) {
-                return;
+                return false;
             }
             // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
-            if (dwLiveCoreHandler.hasPdfView()) {
+            if (dwLiveCoreHandler.hasPdfView()&&mLiveFloatingView!=null&&mLiveFloatingView.isShowing()) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -188,7 +188,9 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
                         }
                     }
                 });
+                return true;
             }
+            return false;
         }
 
         // 退出直播间

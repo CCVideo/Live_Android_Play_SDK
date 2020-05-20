@@ -21,7 +21,7 @@
                     android:layout_width="250dp"
                     android:layout_height="126dp"
                     android:layout_centerInParent="true"
-                    android:src="@mipmap/prize_cup" />
+                    android:src="@drawable/prize_cup" />
 
                 <TextView
                     android:id="@+id/self_prize"

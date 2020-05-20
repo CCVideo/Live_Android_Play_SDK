@@ -4,17 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
+import com.bokecc.dwlivedemo.BuildConfig;
 import com.bokecc.dwlivedemo.R;
-import com.bokecc.dwlivedemo.activity.extra.ReplayMixPlayActivity;
 import com.bokecc.dwlivedemo.base.BaseActivity;
-import com.bokecc.sdk.mobile.live.logging.ELog;
-import com.tbruyelle.rxpermissions2.Permission;
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.bokecc.dwlivedemo.utils.Permissions;
+import com.bokecc.dwlivedemo.utils.StatusBarUtil;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 
 /**
@@ -22,19 +20,19 @@ import io.reactivex.functions.Consumer;
  */
 public class PilotActivity extends BaseActivity {
     private static final String TAG = "PilotActivity";
-    private RxPermissions rxPermissions;
-    private int grantNum = 0;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        requestFullScreenFeature();
-
+        // 全屏
+//        requestFullScreenFeature();
+        // 沉浸式
+        StatusBarUtil.transparencyBar(this);
+        StatusBarUtil.setLightStatusBar(this, true, false);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_pilot);
-        rxPermissions = new RxPermissions(this);
+        ((TextView) (findViewById(R.id.about_version_code))).setText(getString(R.string.pilot_version, BuildConfig.VERSION_NAME));
 
         /**************************************************************************
          *
@@ -56,7 +54,7 @@ public class PilotActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PilotActivity.this, LiveLoginActivity.class);
-                checkoutPermission(intent);
+                checkoutLivePermission(intent);
             }
         });
 
@@ -79,27 +77,38 @@ public class PilotActivity extends BaseActivity {
         });
     }
 
-    private void checkoutPermission(final Intent intent){
-        grantNum = 0;
+    private void checkoutPermission(final Intent intent) {
+        Permissions.request(this, new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                new Permissions.Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) {
+                        if (integer == PERMISSION_GRANTED) {
+                            startActivity(intent);
+                        }
 
-        Observable<Permission> permissionObservable = rxPermissions.requestEach(Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        );
-
-        Disposable subscribe = permissionObservable.subscribe(new Consumer<Permission>() {
-            @Override
-            public void accept(Permission permission) {
-                if (permission.granted) {
-                    ELog.i(TAG, "permission granted:" + permission.name);
-                    grantNum++;
-                    if (grantNum == 3) {
-                        ELog.i(TAG, "all permission is granted:");
-                        startActivity(intent);
                     }
-                }
-            }
-        });
+                });
+
+
+    }
+    private void checkoutLivePermission(final Intent intent) {
+        Permissions.request(this, new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_PHONE_STATE},
+                new Permissions.Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) {
+                        if (integer == PERMISSION_GRANTED) {
+                            startActivity(intent);
+                        }
+
+                    }
+                });
+
+
     }
 
 }

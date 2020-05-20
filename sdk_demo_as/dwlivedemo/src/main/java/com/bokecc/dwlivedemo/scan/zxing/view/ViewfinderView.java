@@ -184,7 +184,7 @@ public final class ViewfinderView extends View {
             lineRect.top = slideTop;  
             lineRect.bottom = slideTop + 8;
 
-            canvas.drawBitmap(((BitmapDrawable)(getResources().getDrawable(R.mipmap.qrcode_scan_line))).getBitmap(), null, lineRect, paint);
+            canvas.drawBitmap(((BitmapDrawable)(getResources().getDrawable(R.drawable.qrcode_scan_line))).getBitmap(), null, lineRect, paint);
 			
             paint.setColor(Color.WHITE);    
             paint.setTextSize(TEXT_SIZE * density);    

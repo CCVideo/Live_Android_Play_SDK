@@ -21,7 +21,7 @@
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_alignParentLeft="true"
                 android:paddingRight="5dp"
-                android:src="@mipmap/title_back" />
+                android:src="@drawable/title_back" />
 
             <TextView
                 android:id="@+id/tv_portrait_live_title"
@@ -66,7 +66,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:src="@mipmap/video_full_screen" />
+            android:src="@drawable/video_full_screen" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -132,6 +132,7 @@
         android:orientation="vertical"
         android:id="@+id/id_error_layout"
         android:gravity="center"
+        android:background="@color/viewfinder_mask"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView

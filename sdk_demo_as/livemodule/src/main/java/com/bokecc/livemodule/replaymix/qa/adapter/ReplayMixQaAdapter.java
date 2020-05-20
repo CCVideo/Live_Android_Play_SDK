@@ -80,6 +80,7 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
     }
 
     private boolean isOnlyShowSelf = false;
+
     public void setOnlyShowSelf(boolean isOnlyShowSelf) {
         if (isOnlyShowSelf) {
             mQaInfoMapCurrent = mQaInfoMapSelf;
@@ -118,7 +119,9 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
         notifyDataSetChanged();
     }
 
-    /** 收到客户端发布的questionId，将问题展示出来 */
+    /**
+     * 收到客户端发布的questionId，将问题展示出来
+     */
     public void showQuestion(String questionId) {
 
         // 如果当前 QaInfoMapAll 没有存储此id，不做任何处理
@@ -133,11 +136,11 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
             mPublishedIdList.add(questionId);
         }
 
-        for (Map.Entry<String, QaInfo> entry: mQaInfoMapAll.entrySet()) {
+        for (Map.Entry<String, QaInfo> entry : mQaInfoMapAll.entrySet()) {
             if (entry.getValue().getAnswers().size() > 0) {
                 QaInfo qaInfo = entry.getValue();
                 QaInfo newQaInfo = new QaInfo(qaInfo.getQuestion());
-                newQaInfo.setAnswers((ArrayList<Answer>)qaInfo.getAnswers().clone()); //防止浅拷贝
+                newQaInfo.setAnswers((ArrayList<Answer>) qaInfo.getAnswers().clone()); //防止浅拷贝
                 mQaInfoMapNormal.put(entry.getKey(), newQaInfo);
             } else if (entry.getValue().getQuestion().getQuestionUserId().equals(currentUserId)) {
                 Question mQuestion = entry.getValue().getQuestion();
@@ -177,12 +180,12 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
             } else {
                 mQaInfoMapNormal.clear();
 
-                for (Map.Entry<String, QaInfo> entry: mQaInfoMapAll.entrySet()) {
+                for (Map.Entry<String, QaInfo> entry : mQaInfoMapAll.entrySet()) {
                     if (entry.getValue().getAnswers().size() > 0) {
 
                         QaInfo qaInfo = entry.getValue();
                         QaInfo newQaInfo = new QaInfo(qaInfo.getQuestion());
-                        newQaInfo.setAnswers((ArrayList<Answer>)qaInfo.getAnswers().clone()); //防止浅拷贝
+                        newQaInfo.setAnswers((ArrayList<Answer>) qaInfo.getAnswers().clone()); //防止浅拷贝
 
                         mQaInfoMapNormal.put(entry.getKey(), newQaInfo);
                     } else if (entry.getValue().getQuestion().getQuestionUserId().equals(currentUserId)) {
@@ -225,7 +228,7 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
             int sendTime = Integer.valueOf(question.getTime());
             if (sendTime > 0) {
                 if (liveInfo != null) {
-                    SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = simpleDateFormat.parse(liveInfo.getLiveStartTime());
                     Date dateForShow = new Date(date.getTime() + sendTime * 1000);
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
@@ -244,7 +247,7 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
         holder.answerContainer.removeAllViews();
 
         if (answers != null && answers.size() > 0) {
-            for (Answer answer: answers) {
+            for (Answer answer : answers) {
                 String msg = answer.getAnswerUserName() + ": " + answer.getContent();
                 SpannableString ss = new SpannableString(msg);
                 ss.setSpan(new ForegroundColorSpan(Color.parseColor("#12ad1a")),
@@ -286,7 +289,7 @@ public class ReplayMixQaAdapter extends RecyclerView.Adapter<ReplayMixQaAdapter.
         TextView questionTime;
         TextView questionContent;
         LinearLayout answerContainer;
-        LinearLayout qaSingleLayout;
+        View qaSingleLayout;
         View qaSeparateLine;
 
         public ChatViewHolder(View itemView) {

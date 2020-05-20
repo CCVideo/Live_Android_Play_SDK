@@ -32,11 +32,7 @@ public class VoteHandler {
 
     /** 结束投票 */
     public void stopVote() {
-        if (isVoteResultShow) {
-            return;
-        } else {
-            mVotePopup.dismiss();
-        }
+
     }
 
     /** 展示投票结果统计 */

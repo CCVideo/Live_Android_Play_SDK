@@ -25,7 +25,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/video_rtc" />
+                android:src="@drawable/video_rtc" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/audio_rtc" />
+                android:src="@drawable/audio_rtc" />
 
             <TextView
                 android:layout_width="wrap_content"

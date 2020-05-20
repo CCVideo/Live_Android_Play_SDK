@@ -1,6 +1,7 @@
 package com.bokecc.livemodule.live.function.practice.view;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -8,7 +9,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -18,23 +18,22 @@ import android.widget.Toast;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.utils.PopupAnimUtil;
-import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.livemodule.view.BasePopupWindow;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
 import com.bokecc.sdk.mobile.live.util.NetworkUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 横屏随堂测答题界面
  */
 public class PracticeLandPopup extends BasePopupWindow {
+    private RadioGroup doubleGroup;
+    private RadioButton double0;
+    private RadioButton double1;
 
+    private ImageView doubleIv0;
+    private ImageView doubleIv1;
     public PracticeLandPopup(Context context) {
         super(context);
     }
@@ -47,6 +46,7 @@ public class PracticeLandPopup extends BasePopupWindow {
     private TextView chooseTypeDesc;
 
     private TextView timerText;
+
 
     private RelativeLayout rl0;
     private RelativeLayout rl1;
@@ -125,6 +125,7 @@ public class PracticeLandPopup extends BasePopupWindow {
         chooseTypeDesc = findViewById(R.id.choose_type_desc);
         timerText = findViewById(R.id.timer);
 
+
         radioGroup = findViewById(R.id.rg_qs_multi);
         radio0 = findViewById(R.id.rb_multi_0);
         radio1 = findViewById(R.id.rb_multi_1);
@@ -187,6 +188,8 @@ public class PracticeLandPopup extends BasePopupWindow {
         cbs.add(checkBox3);
         cbs.add(checkBox4);
         cbs.add(checkBox5);
+        doubleIv0 = findViewById(R.id.iv_qs_double_select_sign_0);
+        doubleIv1 = findViewById(R.id.iv_qs_double_select_sign_1);
 
         radio0.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,14 +304,41 @@ public class PracticeLandPopup extends BasePopupWindow {
         mivs.add(cbIv3);
         mivs.add(cbIv4);
         mivs.add(cbIv5);
+        doubleGroup = findViewById(R.id.rg_qs_double);
+        double0 = findViewById(R.id.rb_double_0);
+        double1 = findViewById(R.id.rb_double_1);
 
+        double0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initRadioButtonAndImageView();
+                selectOption = 0;
+                double0.setChecked(true);
+                doubleIv0.setVisibility(View.VISIBLE);
+                submit.setEnabled(true);
+            }
+        });
+
+        double1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initRadioButtonAndImageView();
+                selectOption = 1;
+                double1.setChecked(true);
+                doubleIv1.setVisibility(View.VISIBLE);
+                submit.setEnabled(true);
+            }
+        });
+
+        doubleIv0 = findViewById(R.id.iv_qs_double_select_sign_0);
+        doubleIv1 = findViewById(R.id.iv_qs_double_select_sign_1);
         submit = findViewById(R.id.btn_qs_submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!NetworkUtils.isNetworkAvailable(mContext)) {
-                    Toast.makeText(mContext, "网络异常，请重试", Toast.LENGTH_LONG).show();
                     return;
+                } else {
                 }
                 submit.setEnabled(false);
                 dismiss();
@@ -332,6 +362,10 @@ public class PracticeLandPopup extends BasePopupWindow {
                     }
                 } else if (voteType == 2) {
                     // 判断是否作答
+                    if (selectOptions.size() < 1) {
+                        Toast.makeText(mContext, "请先选择答案", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     ArrayList<String> ids = new ArrayList<>();
                     ArrayList<Integer> indexs = new ArrayList<>();
                     for (int i = 0; i < practiceInfo.getOptions().size(); i++) {
@@ -397,6 +431,11 @@ public class PracticeLandPopup extends BasePopupWindow {
         for (ImageView view : ivs) {
             view.setVisibility(View.GONE);
         }
+        doubleIv0.setVisibility(View.GONE);
+        doubleIv1.setVisibility(View.GONE);
+
+        double0.setChecked(false);
+        double1.setChecked(false);
     }
 
     /**
@@ -428,67 +467,35 @@ public class PracticeLandPopup extends BasePopupWindow {
     }
 
 
-    int voteCount;
-    int voteType; // 0为判断，1为单选，2为多选
-
-    Timer timer ;
-    TimerTask timerTask;
-
+    private int voteCount;
+    private int voteType; // 0为判断，1为单选，2为多选
     public void startPractice(final PracticeInfo practiceInfo) {
         this.practiceInfo = practiceInfo;
         this.voteCount = practiceInfo.getOptions().size();
         this.voteType = practiceInfo.getType();
         this.submit.setEnabled(false);
         showSelectLayout();
-
-        timer = new Timer();
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    final long now = System.currentTimeMillis();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    final Date date = sdf.parse(practiceInfo.getPublishTime());
-                    if (timerText != null) {
-                        timerText.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                timerText.setText(TimeUtil.getFormatTime(now - date.getTime()));
-                            }
-                        });
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        timer.schedule(timerTask, 0, 1000);
-
-        this.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if(timerTask != null) {
-                    timerTask.cancel();
-                }
-                if (timer != null) {
-                    timer.cancel();
-                }
-            }
-        });
     }
 
     private void showSelectLayout() {
 
         selectLayout.setVisibility(View.VISIBLE);
 
-        if (voteType == 0 || voteType == 1) {
+        if (voteType ==0){
+            chooseTypeDesc.setText("判断题");
+            selectOption = -1;
+            initRadioButtonAndImageView();
+            radioGroup.setVisibility(View.GONE);
+            checkboxGroup.setVisibility(View.GONE);
+            doubleGroup.setVisibility(View.VISIBLE);
+        }else if (voteType == 1) {
             chooseTypeDesc.setText("单选题");
             // 单选
             selectOption = -1;
             initRadioButtonAndImageView();
             radioGroup.setVisibility(View.VISIBLE);
             checkboxGroup.setVisibility(View.GONE);
+            doubleGroup.setVisibility(View.GONE);
             for (int i = 0; i < rls.size(); i++) {
                 RelativeLayout rl = rls.get(i);
                 if (i < voteCount) {
@@ -504,6 +511,7 @@ public class PracticeLandPopup extends BasePopupWindow {
             initCheckBoxButtonAndImageView();
             radioGroup.setVisibility(View.GONE);
             checkboxGroup.setVisibility(View.VISIBLE);
+            doubleGroup.setVisibility(View.GONE);
             for (int i = 0; i < mrls.size(); i++) {
                 RelativeLayout mrl = mrls.get(i);
                 if (i < voteCount) {
@@ -512,6 +520,18 @@ public class PracticeLandPopup extends BasePopupWindow {
                     mrl.setVisibility(View.GONE);
                 }
             }
+        }
+    }
+
+    public void setText(final String formatTime) {
+        if (timerText != null&&!TextUtils.isEmpty(formatTime)) {
+            timerText.post(new Runnable() {
+                @Override
+                public void run() {
+                    timerText.setText(formatTime);
+
+                }
+            });
         }
     }
 }

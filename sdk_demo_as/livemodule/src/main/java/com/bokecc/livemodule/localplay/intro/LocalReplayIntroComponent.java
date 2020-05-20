@@ -2,17 +2,17 @@ package com.bokecc.livemodule.localplay.intro;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.localplay.DWLocalDWReplayIntroListener;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
-import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
-import com.bokecc.livemodule.replaymix.DWReplayMixIntroListener;
-import com.bokecc.livemodule.view.MixedTextView;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 
 /**
@@ -24,7 +24,7 @@ public class LocalReplayIntroComponent extends LinearLayout implements DWLocalDW
 
     TextView mTitle;
 
-    LinearLayout mContent;
+    WebView webView;
 
     public LocalReplayIntroComponent(Context context) {
         super(context);
@@ -42,8 +42,16 @@ public class LocalReplayIntroComponent extends LinearLayout implements DWLocalDW
     public void initIntroView() {
         LayoutInflater.from(mContext).inflate(R.layout.portrait_intro_layout, this, true);
         mTitle = (TextView) findViewById(R.id.tv_intro_title);
-        mContent = (LinearLayout) findViewById(R.id.content_layer);
+        webView = findViewById(R.id.intro_webview);
         DWLocalReplayCoreHandler.getInstance().setLocalIntroListener(this);
+        webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+// 设置支持Javascript
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setTextSize(WebSettings.TextSize.NORMAL);
+//设置背景颜色
+        webView.setBackgroundColor(0);
     }
 
 
@@ -57,9 +65,13 @@ public class LocalReplayIntroComponent extends LinearLayout implements DWLocalDW
             mTitle.post(new Runnable() {
                 @Override
                 public void run() {
-                    mTitle.setText(info.getName());
-                    mContent.removeAllViews();
-                    mContent.addView(new MixedTextView(mContext, info.getDesc()));
+                    if (!TextUtils.isEmpty(info.getName()))
+                        mTitle.setText(info.getName());
+                    if (!TextUtils.isEmpty(info.getDesc())){
+                        webView.loadDataWithBaseURL(null, "<html><head><meta name='viewport' content=width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0><style type='text/css' >img{height: auto;max-width: 100%;max-height: 100%;}</style></head><body>"+ info.getDesc()+"</body></html>","text/html","utf-8", null);
+                    }else {
+                        webView.loadDataWithBaseURL(null, "<html><head><meta name='viewport' content=width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0><style type='text/css' >img{height: auto;max-width: 100%;max-height: 100%;}</style></head><body><p>暂无简介</p></body></html>","text/html","utf-8", null);
+                    }
                 }
             });
         }

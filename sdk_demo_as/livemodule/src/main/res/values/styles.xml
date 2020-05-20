@@ -137,7 +137,7 @@
 
     <style name="userCountTextViewTheme">
         <item name="android:drawablePadding">2dp</item>
-        <item name="android:drawableLeft">@mipmap/portrait_people</item>
+        <item name="android:drawableLeft">@drawable/portrait_people</item>
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:shadowColor">#80666666</item>
@@ -184,12 +184,12 @@
 
     <!--问卷单选按钮-->
     <style name="QuestionnaireRadio" parent="@android:style/Widget.CompoundButton.RadioButton">
-        <item name="android:button">@drawable/questionnaire_radio</item>
+        <item name="android:background">@drawable/questionnaire_radio</item>
     </style>
 
     <!--问卷多选按钮-->
     <style name="QuestionnaireCheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/questionnaire_checkbox</item>
+        <item name="android:background">@drawable/questionnaire_checkbox</item>
     </style>
 
     <!-- 随堂测选项按钮 -->

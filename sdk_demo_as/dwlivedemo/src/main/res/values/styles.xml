@@ -1,13 +1,5 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <!--导航的按钮样式 parent="@style/Widget.AppCompat.Button.Borderless"-->
     <style name="pilotButtonTheme" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:layout_centerHorizontal">true</item>
@@ -51,10 +43,9 @@
     </style>
 
 
-
     <style name="userCountTextViewTheme">
         <item name="android:drawablePadding">2dp</item>
-        <item name="android:drawableLeft">@mipmap/portrait_people</item>
+        <item name="android:drawableLeft">@drawable/portrait_people</item>
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:shadowColor">#80666666</item>
@@ -66,11 +57,9 @@
     </style>
 
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
-
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
 </resources>

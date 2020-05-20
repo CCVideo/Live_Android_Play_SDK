@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--顶部布局-->
     <RelativeLayout
         android:id="@+id/rl_portrait_live_top_layout"
         android:layout_width="match_parent"
@@ -16,20 +17,21 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true">
 
+            <!--返回按钮-->
             <ImageView
                 android:id="@+id/iv_portrait_live_close"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_alignParentLeft="true"
                 android:paddingRight="5dp"
-                android:src="@mipmap/title_back" />
+                android:src="@drawable/title_back" />
 
+            <!--标题-->
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_portrait_live_title"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_toRightOf="@id/iv_portrait_live_close"
                 android:paddingLeft="0dp"
-                android:text="直播间标题" />
+                android:visibility="visible" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -38,36 +40,28 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
+                <!--横屏房间人数-->
                 <TextView
                     android:id="@+id/tv_portrait_live_user_count_top"
                     style="@style/userCountTextViewTheme"
-                    android:layout_marginRight="12dp"
+                    android:layout_marginEnd="12dp"
                     android:gravity="center"
                     android:text="0"
                     android:visibility="gone" />
-<!--                <TextView-->
-<!--                    android:id="@+id/id_center_inside"-->
-<!--                    android:visibility="visible"-->
-<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
-<!--                    android:paddingRight="5dp"-->
-<!--                    android:text="centerInside" />-->
-<!--                <TextView-->
-<!--                    android:visibility="visible"-->
-<!--                    android:id="@+id/id_fit_xy"-->
-<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
-<!--                    android:paddingRight="5dp"-->
-<!--                    android:text="fit_xy" />-->
-<!--                <TextView-->
-<!--                    android:visibility="visible"-->
-<!--                    android:id="@+id/id_crop_center"-->
-<!--                    style="@style/phoneLiveLandscapeTitleViewTheme"-->
-<!--                    android:paddingRight="5dp"-->
-<!--                    android:text="crop_center" />-->
 
+                <!--文档拉伸类型-->
+                <Spinner
+                    android:id="@+id/spr_scale_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/spinner_scale_type"
+                    android:gravity="center" />
+
+                <!--切换文档-->
                 <TextView
                     android:id="@+id/video_doc_switch"
                     style="@style/phoneLiveLandscapeTitleViewTheme"
-                    android:paddingRight="5dp"
+                    android:paddingEnd="5dp"
                     android:text="切换文档" />
 
             </LinearLayout>
@@ -76,6 +70,7 @@
 
     </RelativeLayout>
 
+    <!--下方布局-->
     <RelativeLayout
         android:id="@+id/rl_portrait_live_bottom_layout"
         android:layout_width="match_parent"
@@ -83,19 +78,22 @@
         android:layout_alignParentBottom="true"
         android:visibility="visible">
 
+        <!--下方布局按钮-->
         <RelativeLayout
             android:id="@+id/portrait_live_bottom"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@drawable/living_bottom_bg">
 
+
+            <!--房间人数-->
             <TextView
                 android:id="@+id/tv_portrait_live_user_count_bottom"
                 style="@style/userCountTextViewTheme"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
+                android:layout_marginStart="20dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginLeft="20dp"
                 android:text="0" />
 
             <!-- 视频全屏 -->
@@ -103,10 +101,11 @@
                 android:id="@+id/iv_portrait_live_full"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="10dp"
-                android:src="@mipmap/video_full_screen" />
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/video_full_screen"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -116,116 +115,112 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:orientation="vertical"
             android:visibility="gone">
 
             <!--下面聊天区 android:layout_marginBottom="0dp" 解决显示问题 具体原因不详-->
-<!--            <FrameLayout-->
-<!--                android:id="@+id/id_private_chat_msg_mask"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginBottom="0dp"-->
-<!--                android:alpha="0.5"-->
-<!--                >-->
-                <RelativeLayout
-                    android:background="#88000000"
-                    android:id="@+id/id_push_chat_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:visibility="visible">
-                    <Button
-                        android:id="@+id/id_push_chat_send"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="58dp"
-                        android:layout_height="40dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginBottom="3dp"
-                        android:layout_marginEnd="11dp"
-                        android:layout_marginTop="3dp"
-                        android:alpha="1"
-                        android:background="@drawable/push_send_bg"
-                        android:text="@string/send_chat"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp" />
+            <!--            <FrameLayout-->
+            <!--                android:id="@+id/id_private_chat_msg_mask"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="50dp"-->
+            <!--                android:layout_marginBottom="0dp"-->
+            <!--                android:alpha="0.5"-->
+            <!--                >-->
+            <RelativeLayout
+                android:id="@+id/id_push_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:background="#88000000"
+                android:visibility="visible">
 
-                    <LinearLayout
+                <Button
+                    android:id="@+id/id_push_chat_send"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="58dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginBottom="3dp"
+                    android:alpha="1"
+                    android:background="@drawable/push_send_bg"
+                    android:text="@string/send_chat"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/id_push_chat_send">
+
+                    <ImageView
+                        android:id="@+id/iv_barrage_control"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/barrage_on" />
+
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/id_push_chat_send">
+                        android:layout_height="40dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="3dp"
+                        android:background="@drawable/push_input_bg"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true">
 
                         <ImageView
-                            android:id="@+id/iv_barrage_control"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:layout_marginTop="5dp"
-                            android:src="@mipmap/barrage_on" />
+                            android:id="@+id/id_push_chat_emoji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="9dp"
+                            android:layout_marginEnd="9dp"
+                            android:layout_marginBottom="9dp"
+                            android:clickable="true"
+                            android:src="@drawable/push_chat_emoji_normal" />
 
-                        <RelativeLayout
+                        <EditText
+                            android:id="@+id/id_push_chat_input"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            android:layout_marginBottom="3dp"
-                            android:layout_marginEnd="12dp"
-                            android:layout_marginTop="3dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_toStartOf="@id/id_push_chat_emoji"
                             android:background="@drawable/push_input_bg"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true">
-
-                            <ImageView
-                                android:id="@+id/id_push_chat_emoji"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_marginBottom="9dp"
-                                android:layout_marginEnd="9dp"
-                                android:layout_marginTop="9dp"
-                                android:clickable="true"
-                                android:src="@drawable/push_chat_emoji_normal" />
-
-                            <EditText
-                                android:id="@+id/id_push_chat_input"
-                                android:layout_width="match_parent"
-                                android:layout_height="40dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_toStartOf="@id/id_push_chat_emoji"
-                                android:background="@drawable/push_input_bg"
-                                android:hint="@string/chat_input_hint"
-                                android:imeOptions="flagNoExtractUi"
-                                android:textColorHint="#666666"
-                                android:textSize="14sp" />
-                        </RelativeLayout>
-                    </LinearLayout>
-                </RelativeLayout>
-<!--            </FrameLayout>-->
+                            android:hint="@string/chat_input_hint"
+                            android:imeOptions="flagNoExtractUi"
+                            android:textColorHint="#666666"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+            <!--            </FrameLayout>-->
         </LinearLayout>
 
+        <!--表情列表-->
         <GridView
-            android:layout_alignParentBottom="true"
             android:id="@+id/id_push_emoji_grid"
             android:layout_width="match_parent"
             android:layout_height="207dp"
+            android:layout_alignParentBottom="true"
             android:alpha="1"
             android:background="#f2efed"
             android:numColumns="7"
-            android:paddingEnd="10dp"
             android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:visibility="gone" />
 
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/estimateStartTime"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
-        android:text="直播"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

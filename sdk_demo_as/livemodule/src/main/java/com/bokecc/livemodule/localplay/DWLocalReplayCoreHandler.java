@@ -1,23 +1,21 @@
 package com.bokecc.livemodule.localplay;
 
-import android.view.Surface;
-
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplayListener;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
+import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLiveInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayPageInfo;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
-
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * 离线回放相关逻辑核心处理机制
@@ -41,7 +39,7 @@ public class DWLocalReplayCoreHandler {
     }
 
 
-    /******************************* 各类功能模块监听相关 ***************************************/
+    //******************************* 各类功能模块监听相关 ***************************************/
     private DWLocalDWReplayChatListener localDWReplayChatListener;
 
     /**
@@ -106,6 +104,14 @@ public class DWLocalReplayCoreHandler {
         return mTemplateInfo != null && "1".equals(mTemplateInfo.getPdfView());
     }
 
+    public ReplayLiveInfo getReplayLiveInfo() {
+        DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        if (dwLiveReplay != null) {
+            return dwLiveReplay.getReplayLiveInfo();
+        }
+        return null;
+    }
+
     /**
      * 回放是否有聊天组件
      *
@@ -124,7 +130,7 @@ public class DWLocalReplayCoreHandler {
         return mTemplateInfo != null && "1".equals(mTemplateInfo.getQaView());
     }
 
-    /******************************* 设置"播放"组件/控件相关 ***************************************/
+    //******************************* 设置"播放"组件/控件相关 ***************************************/
 
     private DWReplayPlayer player;
     //播放内容地址
@@ -183,7 +189,7 @@ public class DWLocalReplayCoreHandler {
     }
 
 
-    /******************************* 视频播放相关 ***************************************/
+    //******************************* 视频播放相关 ***************************************/
 
     /**
      * 开始播放
@@ -216,8 +222,7 @@ public class DWLocalReplayCoreHandler {
         mTemplateInfo = null;
     }
 
-    /******************************* 实现 DWLiveLocalReplayListener 定义的方法 ***************************************/
-
+    //******************************* 实现 DWLiveLocalReplayListener 定义的方法 ***************************************/
     private DWLiveLocalReplayListener dwLiveLocalReplayListener = new DWLiveLocalReplayListener() {
 
         @Override
@@ -290,6 +295,7 @@ public class DWLocalReplayCoreHandler {
 
     /**
      * 播放进度
+     *
      * @param percent
      */
     public void updateBufferPercent(int percent) {
@@ -297,7 +303,6 @@ public class DWLocalReplayCoreHandler {
             localReplayRoomListener.updateBufferPercent(percent);
         }
     }
-
 
 
     public interface LocalTemplateUpdateListener {

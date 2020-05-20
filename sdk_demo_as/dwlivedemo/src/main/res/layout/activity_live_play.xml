@@ -4,44 +4,93 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--上边显示-->
     <RelativeLayout
         android:id="@+id/rl_pc_live_top_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@android:color/black">
 
+        <!--文档和视频-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/video_root">
 
+            <!--包裹文档和视频布局-->
             <RelativeLayout
                 android:id="@+id/rl_video_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+                android:layout_height="match_parent"
+                android:gravity="center">
                 <!-- 视频组件 -->
                 <com.bokecc.livemodule.live.video.LiveVideoView
                     android:id="@+id/live_video_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+                <!--- 连麦视频组件 -->
+                <com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout
+                    android:id="@+id/live_rtc_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+
+            <!--直播状态显示-->
+            <RelativeLayout
+                android:id="@+id/no_stream_root"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/live_nostart_bg"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/iv_no_stream"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/live_nostart_img" />
+
+                <TextView
+                    android:id="@+id/tv_no_stream"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/iv_no_stream"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="20dp"
+                    android:text="直播未开始"
+                    android:textColor="@color/reply_button_disable"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/id_count_down_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_no_stream"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/reply_button_disable"
+                    android:textSize="13sp" />
 
             </RelativeLayout>
 
-            <!--- 连麦视频组件 -->
-            <com.bokecc.livemodule.live.morefunction.rtc.RTCVideoLayout
-                android:id="@+id/live_rtc_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"/>
-
         </RelativeLayout>
-
+        <!--跑马灯-->
+        <com.bokecc.sdk.mobile.live.widget.MarqueeView
+            android:id="@+id/marquee_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:visibility="gone" />
         <!-- 弹幕组件 -->
         <com.bokecc.livemodule.live.chat.barrage.BarrageLayout
             android:id="@+id/live_barrage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
+            android:layout_height="match_parent" />
+        <!--房间其他控制-->
         <com.bokecc.livemodule.live.room.LiveRoomLayout
             android:id="@+id/live_room_layout"
             android:layout_width="match_parent"
@@ -55,16 +104,16 @@
         android:layout_height="0dp"
         android:layout_weight="2">
 
+        <!--中间的tab-->
         <include layout="@layout/live_pc_portrait_msg_layout" />
 
+        <!--下方的功能-->
         <com.bokecc.livemodule.live.morefunction.MoreFunctionLayout
             android:id="@+id/more_function_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
-    <FrameLayout
-        android:id="@+id/layout_emotion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+
+
 </LinearLayout>

@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_qa_single_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ffffff"
-    android:orientation="horizontal">
+    android:background="#ffffff">
+
+    <View
+        android:id="@+id/divide"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#e8e8e8" />
 
     <com.bokecc.livemodule.view.HeadView
         android:id="@+id/user_head_view"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@id/divide"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="11dp"
-        android:layout_marginRight="9dp"
-        android:src="@mipmap/head_view_student" />
+        android:layout_marginEnd="9dp"
+        android:src="@drawable/head_view_student" />
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/divide"
         android:layout_marginTop="9dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="10dp"
-        android:layout_weight="1"
+        android:layout_toEndOf="@id/user_head_view"
         android:orientation="vertical">
 
         <FrameLayout
@@ -67,11 +74,10 @@
             android:id="@+id/ll_answer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:orientation="vertical">
 
         </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

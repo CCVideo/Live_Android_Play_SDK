@@ -58,7 +58,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             showToast(msg);
         }
     }
-
     // 进行吐司提示
     private void showToast(String msg) {
         if (TextUtils.isEmpty(msg)) {

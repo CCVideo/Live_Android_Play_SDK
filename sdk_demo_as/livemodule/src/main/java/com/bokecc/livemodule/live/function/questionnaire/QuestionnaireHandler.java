@@ -1,6 +1,7 @@
 package com.bokecc.livemodule.live.function.questionnaire;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.PopupWindow;
 
@@ -27,28 +28,28 @@ public class QuestionnaireHandler {
         mExeternalQuestionnairePopup = new ExeternalQuestionnairePopup(context);
 
         mQuestionnaireStopPopup = new QuestionnaireStopPopup(context);
-        mQuestionnaireStopPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if (mQuestionnairePopup != null) {
-                    mQuestionnairePopup.dismiss();
-                }
-            }
-        });
         mQuestionnaireStatisPopup = new QuestionnaireStatisPopup(context);
     }
 
 
     /** 开始问卷答题 */
     public void startQuestionnaire(View rootView, final QuestionnaireInfo info) {
+        if (mQuestionnaireStopPopup!=null&&mQuestionnaireStopPopup.isShowing())
+            mQuestionnaireStopPopup.dismiss();
+        if (mQuestionnaireStatisPopup!=null&&mQuestionnaireStatisPopup.isShowing()){
+            mQuestionnaireStatisPopup.dismiss();
+        }
         mQuestionnairePopup.setQuestionnaireInfo(info);
-        mQuestionnairePopup.show(rootView);
+        if (!mQuestionnairePopup.isShowing()){
+            mQuestionnairePopup.show(rootView);
+        }
     }
 
     /** 停止问卷答题 */
     public void stopQuestionnaire(View rootView) {
         if (mQuestionnairePopup != null && mQuestionnairePopup.isShowing()) {
             if (!mQuestionnairePopup.hasSubmitedQuestionnaire()) {
+                mQuestionnairePopup.dismiss();
                 mQuestionnaireStopPopup.show(rootView);
             }
         }

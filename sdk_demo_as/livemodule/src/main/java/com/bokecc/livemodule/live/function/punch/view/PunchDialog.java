@@ -13,7 +13,6 @@ import com.bokecc.livemodule.utils.PopupAnimUtil;
 import com.bokecc.livemodule.view.BasePopupWindow;
 import com.bokecc.sdk.mobile.live.BaseCallback;
 import com.bokecc.sdk.mobile.live.DWLive;
-import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.PunchCommitRespone;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -130,7 +129,7 @@ public class PunchDialog extends BasePopupWindow {
         @Override
         public void run() {
             countDownText.setText(time + "s");
-            ELog.i("Sivin", "time:" + time);
+            //ELog.i("Sivin", "time:" + time);
             if (time < 0) {
                 dismiss();
                 return;

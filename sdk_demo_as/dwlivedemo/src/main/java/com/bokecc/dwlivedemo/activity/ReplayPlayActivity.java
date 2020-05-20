@@ -11,6 +11,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -22,6 +24,7 @@ import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
+import com.bokecc.livemodule.live.chat.util.DensityUtil;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -29,13 +32,20 @@ import com.bokecc.livemodule.replay.intro.ReplayIntroComponent;
 import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
+import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.OnMarqueeImgFailListener;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
+import com.bokecc.sdk.mobile.live.widget.MarqueeView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
+
+import static android.view.View.VISIBLE;
 
 /**
  * 回放播放页（默认文档大屏，视频小屏，可手动切换）
@@ -52,13 +62,14 @@ public class ReplayPlayActivity extends BaseActivity {
 
     // 悬浮弹窗（用于展示文档和视频）
     FloatingPopupWindow mReplayFloatingView;
-
+    // 回放房间组件
     ReplayRoomLayout mReplayRoomLayout;
+    // 跑马灯组件
+    MarqueeView mMarqueeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 隐藏状态栏
-        hideActionBar();
+        requestFullScreenFeature();
         // 屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
@@ -178,8 +189,80 @@ public class ReplayPlayActivity extends BaseActivity {
         }
         // 直播间简介
         initIntroLayout();
-        //设置跑马灯
-        //mReplayVideoView.setMarquee(this,(Marquee) getIntent().getSerializableExtra("marquee"));
+
+        if (DWLiveReplay.getInstance()!=null&&DWLiveReplay.getInstance().getRoomInfo()!=null){
+            if (DWLiveReplay.getInstance().getRoomInfo().getOpenMarquee()==1){
+                //设置跑马灯
+                mMarqueeView = findViewById(R.id.marquee_view);
+                mMarqueeView.setVisibility(VISIBLE);
+                setMarquee((Marquee) getIntent().getSerializableExtra("marquee"));
+            }
+        }
+    }
+
+    public void setMarquee(final Marquee marquee) {
+        final ViewGroup parent = (ViewGroup) mMarqueeView.getParent();
+        if (parent.getWidth()!=0&&parent.getHeight()!=0){
+            if (marquee != null && marquee.getAction() != null) {
+                if (marquee.getType().equals("text")) {
+                    mMarqueeView.setTextContent(marquee.getText().getContent());
+                    mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
+                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(this,marquee.getText().getFont_size()));
+                    mMarqueeView.setType(1);
+                } else {
+                    mMarqueeView.setMarqueeImage(this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
+                    mMarqueeView.setType(2);
+                }
+                mMarqueeView.setMarquee(marquee,parent.getHeight(),parent.getWidth());
+                mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
+                    @Override
+                    public void onLoadMarqueeImgFail() {
+                        //跑马灯加载失败
+                        toastOnUiThread("跑马灯加载失败");
+                    }
+                });
+                mMarqueeView.start();
+            }
+        }else{
+            parent.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                        @Override
+                        public void onGlobalLayout() {
+                            if (Build.VERSION.SDK_INT >= 16) {
+                                parent.getViewTreeObserver()
+                                        .removeOnGlobalLayoutListener(this);
+                            }
+                            else {
+                                parent.getViewTreeObserver()
+                                        .removeGlobalOnLayoutListener(this);
+                            }
+                            int width = parent.getWidth();// 获取宽度
+                            int height = parent.getHeight();// 获取高度
+                            if (marquee != null && marquee.getAction() != null) {
+                                if (marquee.getType().equals("text")) {
+                                    mMarqueeView.setTextContent(marquee.getText().getContent());
+                                    mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
+                                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(ReplayPlayActivity.this,marquee.getText().getFont_size()));
+                                    mMarqueeView.setType(1);
+                                } else {
+                                    mMarqueeView.setMarqueeImage(ReplayPlayActivity.this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
+                                    mMarqueeView.setType(2);
+                                }
+                                mMarqueeView.setMarquee(marquee,height,width);
+                                mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
+                                    @Override
+                                    public void onLoadMarqueeImgFail() {
+                                        //跑马灯加载失败
+                                        toastOnUiThread("跑马灯加载失败");
+                                    }
+                                });
+                                mMarqueeView.start();
+                            }
+                        }
+                    });
+        }
+
     }
 
     /********************************* 重要组件相关 ***************************************/
@@ -200,7 +283,7 @@ public class ReplayPlayActivity extends BaseActivity {
     private void initChatLayout() {
         mIdList.add(R.id.live_portrait_info_chat);
         mTagList.add(mChatTag);
-        mChatTag.setVisibility(View.VISIBLE);
+        mChatTag.setVisibility(VISIBLE);
         mChatLayout = new ReplayChatComponent(this);
         mChatLayout.setOnChatComponentClickListener(new OnChatComponentClickListener() {
             @Override
@@ -228,7 +311,7 @@ public class ReplayPlayActivity extends BaseActivity {
     private void initQaLayout() {
         mIdList.add(R.id.live_portrait_info_qa);
         mTagList.add(mQaTag);
-        mQaTag.setVisibility(View.VISIBLE);
+        mQaTag.setVisibility(VISIBLE);
         mQaLayout = new ReplayQAComponent(this);
         mLiveInfoList.add(mQaLayout);
     }
@@ -238,7 +321,7 @@ public class ReplayPlayActivity extends BaseActivity {
         ELog.d(TAG, "initIntroLayout");
         mIdList.add(R.id.live_portrait_info_intro);
         mTagList.add(mIntroTag);
-        mIntroTag.setVisibility(View.VISIBLE);
+        mIntroTag.setVisibility(VISIBLE);
         mIntroComponent = new ReplayIntroComponent(this);
         mLiveInfoList.add(mIntroComponent);
     }
@@ -351,6 +434,7 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayVideoContainer.addView(mDocLayout);
                         isVideoMain = false;
                         mReplayRoomLayout.setVideoDocSwitchText("切换视频");
+                        mDocLayout.setDocScrollable(true);//webview可切换
                     } else {
                         // 缓存视频的切换前的画面
                         mReplayVideoContainer.removeAllViews();
@@ -363,6 +447,7 @@ public class ReplayPlayActivity extends BaseActivity {
                         mReplayVideoContainer.addView(mReplayVideoView);
                         isVideoMain = true;
                         mReplayRoomLayout.setVideoDocSwitchText("切换文档");
+                        mDocLayout.setDocScrollable(false);//webview不可切换
                     }
                 }
             });
@@ -412,7 +497,7 @@ public class ReplayPlayActivity extends BaseActivity {
     // 退出全屏
     private void quitFullScreen() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        mReplayMsgLayout.setVisibility(View.VISIBLE);
+        mReplayMsgLayout.setVisibility(VISIBLE);
         mReplayRoomLayout.quitFullScreen();
 
         getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));

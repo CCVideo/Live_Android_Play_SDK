@@ -59,7 +59,7 @@ public class PracticeSubmitResultPopup extends BasePopupWindow {
 
     // 展示答题结果
     public void showPracticeResult(PracticeSubmitResultInfo info) {
-        mSubmitResultEmoji.setImageResource(info.getAnswerResult() == 1 ? R.mipmap.practice_right : R.mipmap.practice_wrong);
+        mSubmitResultEmoji.setImageResource(info.getAnswerResult() == 1 ? R.drawable.practice_right : R.drawable.practice_wrong);
         mSubmitResultDesc.setText(info.getAnswerResult() == 1 ? "恭喜，答对啦！" : "哎呀，答错了，下次继续努力！");
     }
 

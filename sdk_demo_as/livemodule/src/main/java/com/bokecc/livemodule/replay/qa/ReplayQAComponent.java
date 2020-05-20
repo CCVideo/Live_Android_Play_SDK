@@ -31,7 +31,6 @@ public class ReplayQAComponent extends RelativeLayout implements DWReplayQAListe
 
     private Context mContext;
     private RecyclerView mQaList;
-    private RelativeLayout mInputLayout;
     private ReplayQaAdapter mQaAdapter;
 
     private LinkedHashMap<String, QaInfo> mQaInfoMap;
@@ -52,7 +51,7 @@ public class ReplayQAComponent extends RelativeLayout implements DWReplayQAListe
     private void initViews() {
         LayoutInflater.from(mContext).inflate(R.layout.live_portrait_qa_layout, this, true);
         mQaList = findViewById(R.id.rv_qa_container);
-        mInputLayout = findViewById(R.id.rl_qa_input_layout);
+        RelativeLayout mInputLayout = findViewById(R.id.rl_qa_input_layout);
         mQaInfoLength = 0;
         mInputLayout.setVisibility(View.GONE);
         initQaLayout();
@@ -76,22 +75,22 @@ public class ReplayQAComponent extends RelativeLayout implements DWReplayQAListe
     }
 
     public void addReplayQAInfos(LinkedHashMap<String, QaInfo> replayQaInfos) {
-        mQaAdapter.addReplayQuestoinAnswer(replayQaInfos);
+        mQaAdapter.addReplayQuestionAnswer(replayQaInfos);
     }
 
-    public void addQuestion(Question question) {
-        mQaAdapter.addQuestion(question);
-    }
+//    public void addQuestion(Question question) {
+//        mQaAdapter.addQuestion(question);
+//    }
 
-    public void addAnswer(Answer answer) {
-        mQaAdapter.addAnswer(answer);
-    }
+//    public void addAnswer(Answer answer) {
+//        mQaAdapter.addAnswer(answer);
+//    }
 
     @Override
     public void onQuestionAnswer(final TreeSet<ReplayQAMsg> qaMsgs) {
         LinkedHashMap<String, QaInfo> qaInfoMap = new LinkedHashMap<>();
 
-        for (ReplayQAMsg qaMsg: qaMsgs) {
+        for (ReplayQAMsg qaMsg : qaMsgs) {
 
             ReplayQuestionMsg questionMsg = qaMsg.getReplayQuestionMsg();
             Question question = new Question();
@@ -119,7 +118,7 @@ public class ReplayQAComponent extends RelativeLayout implements DWReplayQAListe
 
             // 回答过
             QaInfo qaInfo = new QaInfo(question);
-            for (ReplayAnswerMsg answerMsg:answerMsgs) {
+            for (ReplayAnswerMsg answerMsg : answerMsgs) {
                 Answer answer = new Answer();
                 answer.setUserAvatar(answerMsg.getUserAvatar())
                         .setContent(answerMsg.getContent())

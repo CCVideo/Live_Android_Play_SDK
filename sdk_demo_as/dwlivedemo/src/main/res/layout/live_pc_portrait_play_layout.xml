@@ -22,7 +22,7 @@
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_alignParentLeft="true"
                 android:paddingRight="5dp"
-                android:src="@mipmap/title_back" />
+                android:src="@drawable/title_back" />
 
             <TextView
                 android:id="@+id/tv_portrait_live_title"
@@ -78,7 +78,7 @@
             android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/video_full_screen" />
+            android:src="@drawable/video_full_screen" />
 
     </RelativeLayout>
 

@@ -11,7 +11,7 @@
 
     <!-- 聊天 -->
     <string name="send_chat">发送</string>
-    <string name="chat_input_hint">我也说两句吧～</string>
+    <string name="chat_input_hint">在这里和老师互动哦</string>
     <string name="private_chat_list_tip">私聊列表</string>
 
     <!-- 问答 -->
@@ -28,4 +28,20 @@
     <string name="pref_speakerphone_dlg">Speakerphone.</string>
     <string name="pref_speakerphone_default">auto</string>
     <string name="btn_send">发送</string>
+    <string name="no_introduction">暂无简介</string>
+
+
+    <!--倒计时-->
+
+    <string name="string_utils_count_down_day_hour_minute_second">%1$d天 %2$d小时%3$d分钟%4$d秒</string>
+    <string name="string_utils_count_down_hour_minute_second">0天%1$d小时%2$d分钟%3$d秒</string>
+    <string name="string_utils_count_down_minute_second">0天00小时%1$d分钟%2$d秒</string>
+    <string name="string_utils_count_down_second">0天00小时00分钟%d秒</string>
+
+
+    <string-array name="spinner_scale_type">
+        <item>保持横竖比</item>
+        <item>拉伸全屏</item>
+        <item>裁剪</item>
+    </string-array>
 </resources>

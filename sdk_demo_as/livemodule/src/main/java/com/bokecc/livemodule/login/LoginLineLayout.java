@@ -46,7 +46,7 @@ public class LoginLineLayout extends LinearLayout implements View.OnClickListene
 
         imageView = new ImageView(context);
         imageView.setPadding(15, 0, 15, 0);
-        imageView.setImageDrawable(getResources().getDrawable(R.mipmap.login_line_close));
+        imageView.setImageDrawable(getResources().getDrawable(R.drawable.login_line_close));
         imageView.setTag("delete");
         imageView.setVisibility(View.INVISIBLE);
         ll.addView(imageView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);

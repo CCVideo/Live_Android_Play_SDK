@@ -31,6 +31,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 直播公聊适配器
@@ -44,10 +46,10 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
     private String selfId;
     private onChatComponentClickListener mChatCompontentClickListener;
     private onItemClickListener onItemClickListener;
-    public static final String regular = "[uri_";
-    public static final String regular1 = "]";
+    public static final String regular = "((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
     public static final String CONTENT_IMAGE_COMPONENT = "content_image";
     public static final String CONTENT_ULR_COMPONET = "content_url";
+    private final Pattern pattern;
 
     public interface onChatComponentClickListener {
         void onChatComponentClick(View view, Bundle bundle);
@@ -76,6 +78,7 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
         } else {
             selfId = viewer.getId();
         }
+        pattern = Pattern.compile(regular, Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -245,20 +248,11 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                 String url = null;
                 int start = -1;
                 int end = -1;
-                if (msg.contains(regular)){
-                    int i = msg.indexOf(regular);
-                    if (msg.contains(regular1)){
-                        int j = msg.indexOf(regular1);
-                        if (i<j){
-                            start = i;
-                            end=j+1;
-                            url = msg.substring(start,end);
-                            String substring = msg.substring(start + 5, end - 1);
-                            msg = msg.replace(url,substring);
-                            start-=1;
-                            end-=6;
-                        }
-                    }
+                Matcher matcher = pattern.matcher(msg);
+                if (matcher.find()) {
+                    start = matcher.start();
+                    end = matcher.end();
+                    url = matcher.group();
                 }
 
                 holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
@@ -275,11 +269,9 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                         public void onClick(@NonNull View widget) {
 
                             if(mChatCompontentClickListener != null){
-                                //截取字符串
-                                String url = finalUrl.substring(5,finalUrl.length()-1);
                                 Bundle bundle = new Bundle();
                                 bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",url);
+                                bundle.putString("url",finalUrl);
                                 mChatCompontentClickListener.onChatComponentClick(widget,bundle);
                             }
                         }

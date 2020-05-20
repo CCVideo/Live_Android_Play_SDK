@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bokecc.livemodule.R;
 import com.bumptech.glide.Glide;
 
 import java.util.regex.Matcher;
@@ -124,18 +125,18 @@ public class MixedTextView extends LinearLayout {
     private void appendTextView(String content) {
         // 判断内容是否为空
         if (content == null || content.isEmpty()) {
-            return;
+            content=getResources().getString(R.string.no_introduction);
         }
 
         // 如果内容仅仅是回车,不进行显示
         if (content.length() == 1 && content.charAt(0) == '\n') {
-            return;
+            content=getResources().getString(R.string.no_introduction);
         }
 
         // 逻辑： <br /> 长度为6 加一个回车字符是7
         if (content.startsWith("<br>") || content.startsWith("<br />")) {
             if (content.length() <= 7) {
-                return;
+                content=getResources().getString(R.string.no_introduction);
             }
         }
 

@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 
@@ -22,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * 回放聊天控件
@@ -178,11 +175,14 @@ public class ReplayMixChatComponent extends RelativeLayout implements DWReplayMi
                                     clearChatEntities();
                                 }
                             });
-                            for (ChatEntity entity : mChatEntities) {
-                                if (!TextUtils.isEmpty(entity.getTime()) && time >= Integer.valueOf(entity.getTime())) {
-                                    temp_chatEntities.add(entity);
+                            if (mChatEntities!=null&&mChatEntities.size()>0){
+                                for (ChatEntity entity : mChatEntities) {
+                                    if (!TextUtils.isEmpty(entity.getTime()) && time >= Integer.valueOf(entity.getTime())) {
+                                        temp_chatEntities.add(entity);
+                                    }
                                 }
                             }
+
                             lastChatTime = time;
                             if (mChatList != null && temp_chatEntities.size() > 0) {
                                 mChatList.post(new Runnable() {

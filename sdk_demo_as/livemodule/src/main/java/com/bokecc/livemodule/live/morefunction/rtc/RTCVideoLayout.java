@@ -3,11 +3,10 @@ package com.bokecc.livemodule.live.morefunction.rtc;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
@@ -67,6 +66,7 @@ public class RTCVideoLayout extends BaseLinearLayout {
             mVideoSizes[0] = 1600;
             mVideoSizes[1] = 1000;
         }
+        requestLayout();
     }
 
     @Override
@@ -104,8 +104,8 @@ public class RTCVideoLayout extends BaseLinearLayout {
                     }
                 }
                 // 由于rtc是走的通话音频，所以需要做处理
-                mAudioManager = AppRTCAudioManager.create(mContext, null);
-                mAudioManager.init();
+                mAudioManager = AppRTCAudioManager.create(mContext);
+                mAudioManager.start(null);
             }
         });
     }
@@ -116,7 +116,7 @@ public class RTCVideoLayout extends BaseLinearLayout {
             public void run() {
                 setVisibility(GONE);
                 if (mAudioManager != null) {
-                    mAudioManager.close();
+                    mAudioManager.stop();
                 }
             }
         });
@@ -129,12 +129,23 @@ public class RTCVideoLayout extends BaseLinearLayout {
                 setVisibility(GONE);
                 toastOnUiThread(e.getLocalizedMessage());
                 if (mAudioManager != null) {
-                    mAudioManager.close();
+                    mAudioManager.stop();
                 }
             }
         });
     }
 
+    public void destroy() {
+        if (mAudioManager != null) {
+            mAudioManager.stop();
+        }
+        if (mRemoteRender != null) {
+            mRemoteRender.release();
+        }
+        if (mLocalRender != null) {
+            mLocalRender.release();
+        }
+    }
     //***************************************** 工具方法 *****************************************
 //
 //    // 连麦远端视频组件等比缩放

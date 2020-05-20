@@ -62,7 +62,7 @@ public class VoteSummaryAdapter extends RecyclerView.Adapter<VoteSummaryAdapter.
 
         String userCount = voteSingle.getCount() + "人 ";
 
-        String percent = "(" + voteSingle.getPercent() + "%)";
+        String percent = "(" + Math.round(Float.parseFloat(voteSingle.getPercent())) + "%)";
 
         String msg = userCount + percent;
 

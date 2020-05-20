@@ -3,17 +3,18 @@ package com.bokecc.dwlivedemo.download;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
 
 import com.bokecc.dwlivedemo.DWApplication;
-import com.liulishuo.filedownloader.util.FileDownloadUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bokecc.dwlivedemo.download.DownLoadBean.PROGRESS;
+import static com.bokecc.dwlivedemo.download.DownLoadBean.TOTAL;
+
 public class TasksManagerDBController {
 
-    public final static String TABLE_NAME = "tasksmanger";
+    public final static String TABLE_NAME = "download";
 
     private final SQLiteDatabase db;
 
@@ -22,21 +23,21 @@ public class TasksManagerDBController {
         db = openHelper.getWritableDatabase();
     }
 
-    public List<TasksManagerModel> getAllTasks() {
+    public List<DownLoadBean> getAllTasks() {
         final Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        final List<TasksManagerModel> list = new ArrayList<>();
+        final List<DownLoadBean> list = new ArrayList<>();
         try {
             if (!c.moveToLast()) {
                 return list;
             }
             do {
-                TasksManagerModel model = new TasksManagerModel();
-                model.setId(c.getInt(c.getColumnIndex(TasksManagerModel.ID)));
-                model.setName(c.getString(c.getColumnIndex(TasksManagerModel.NAME)));
-                model.setUrl(c.getString(c.getColumnIndex(TasksManagerModel.URL)));
-                model.setPath(c.getString(c.getColumnIndex(TasksManagerModel.PATH)));
-                model.setTaskStatus(c.getInt(c.getColumnIndex(TasksManagerModel.TASK_STATUS)));
-                model.setTotal(c.getLong(c.getColumnIndex(TasksManagerModel.TOTAL)));
+                DownLoadBean model = new DownLoadBean();
+                model.setId(c.getInt(c.getColumnIndex(DownLoadBean.ID)));
+                model.setUrl(c.getString(c.getColumnIndex(DownLoadBean.URL)));
+                model.setPath(c.getString(c.getColumnIndex(DownLoadBean.PATH)));
+                model.setTaskStatus(c.getInt(c.getColumnIndex(DownLoadBean.TASK_STATUS)));
+                model.setTotal(c.getLong(c.getColumnIndex(TOTAL)));
+                model.setProgress(c.getLong(c.getColumnIndex(PROGRESS)));
                 list.add(model);
             } while (c.moveToPrevious());
         } finally {
@@ -47,50 +48,76 @@ public class TasksManagerDBController {
         return list;
     }
 
-    public TasksManagerModel addTask(String name, final String url, final String path,TasksManager.Status status) {
-        if (TextUtils.isEmpty(url) || TextUtils.isEmpty(path)) {
-            status.setVal(TasksManager.CODE_URL_ERROR);
-            return null;
+    /**
+     *
+     * @param downLoadBean
+     * @return 0是成功  -1是参数为null   -2是重复  -3是添加数据库失败
+     */
+    public int addTask(DownLoadBean downLoadBean) {
+        if (downLoadBean==null) {
+            return -1;
         }
-        // 必须用FileDownloadUtils.generateId去关联TasksManagerModel和FileDownloader
-        final int id = FileDownloadUtils.generateId(url, path + "/" + name);
-        TasksManagerModel model = TasksManager.getImpl().getById(id);
-        if (model != null) { //任务已存在
-            status.setVal(TasksManager.CODE_TASK_ALREADY_EXIST);
-            return null;
+        //先查询是否有相同的
+        try{
+            DownLoadBean downLoadBeanByUrl = getDownLoadBeanByUrl(downLoadBean.getUrl());
+            if (downLoadBeanByUrl!=null){
+                return -2;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        model = new TasksManagerModel();
-        model.setId(id);
-        model.setName(name);
-        model.setUrl(url);
-        model.setPath(path + "/" + name);
-        model.setTaskStatus(TasksManagerModel.INIT_STATUS);
-        final boolean succeed = db.insert(TABLE_NAME, null, model.toContentValues()) != -1;
-        if(!succeed){
-            status.setVal(TasksManager.INSERT_DATA_BASE_ERROR);
-        }
-        return succeed ? model : null;
+
+        boolean succeed = db.insert(TABLE_NAME, null, downLoadBean.toContentValues()) != -1;
+        return succeed?0:-3;
     }
 
+    private DownLoadBean getDownLoadBeanByUrl(String url){
+        Cursor cursor = db.rawQuery("select * from "+TABLE_NAME+" where url=?", new String[]{url});
+        DownLoadBean downLoadBean = null;
+        try {
+            do {
+                if (!cursor.moveToLast()) {
+                    return downLoadBean;
+                }
+                downLoadBean = new DownLoadBean();
+                downLoadBean.setId(cursor.getInt(cursor.getColumnIndex(DownLoadBean.ID)));
+                downLoadBean.setUrl(cursor.getString(cursor.getColumnIndex(DownLoadBean.URL)));
+                downLoadBean.setPath(cursor.getString(cursor.getColumnIndex(DownLoadBean.PATH)));
+                downLoadBean.setTaskStatus(cursor.getInt(cursor.getColumnIndex(DownLoadBean.TASK_STATUS)));
+                downLoadBean.setTotal(cursor.getLong(cursor.getColumnIndex(TOTAL)));
+                downLoadBean.setProgress(cursor.getLong(cursor.getColumnIndex(PROGRESS)));
+            } while (cursor.moveToPrevious());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return downLoadBean;
+    }
 
-    public int updateTaskModelStatus(int taskId, int status) {
-        ContentValues values = new ContentValues();
-        values.put(TasksManagerModel.TASK_STATUS, status);
-        int ret = db.update(TABLE_NAME, values, "id=?", new String[]{taskId + ""});
+    public int update(DownLoadBean downLoadBean) {
+        ContentValues values = downLoadBean.toContentValues();
+        int ret = db.update(TABLE_NAME, values, "url=?", new String[]{downLoadBean.getUrl() + ""});
         return ret;
     }
 
-    public int updateTaskModelTotal(int taskId, long total) {
-        ContentValues values = new ContentValues();
-        values.put(TasksManagerModel.TOTAL, total);
-        int ret = db.update(TABLE_NAME, values, "id=?", new String[]{taskId + ""});
-        return ret;
-    }
+    public int removeTask(String url){
 
-    public int removeTask(int taskId){
-
-       int ret = db.delete(TABLE_NAME,"id=?", new String[]{taskId + ""});
+       int ret = db.delete(TABLE_NAME,"url=?", new String[]{url + ""});
 
        return ret;
+    }
+    public void onDestroy(){
+        if (db!=null){
+            db.close();
+        }
+    }
+
+    public int updateTaskModelProgress(String url, long process, long total) {
+        ContentValues cv = new ContentValues();
+        cv.put(PROGRESS, process);
+        cv.put(TOTAL, total);
+        int ret = db.update(TABLE_NAME, cv, "url=?", new String[]{url});
+        return ret;
     }
 }

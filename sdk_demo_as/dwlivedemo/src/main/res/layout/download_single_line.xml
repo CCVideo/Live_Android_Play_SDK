@@ -38,7 +38,7 @@
             android:id="@+id/id_download_icon"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="10dp"
-            android:src="@mipmap/download_wait"
+            android:src="@drawable/download_wait"
             android:layout_width="15dp"
             android:layout_height="15dp" />
 

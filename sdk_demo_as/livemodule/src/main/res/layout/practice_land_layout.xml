@@ -18,6 +18,7 @@
             android:layout_alignParentBottom="true"
             android:background="#ffffff">
 
+            <!--关闭按钮-->
             <ImageView
                 android:id="@+id/qs_close"
                 android:layout_width="wrap_content"
@@ -31,33 +32,36 @@
                 android:id="@+id/qs_select_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/qs_line"
-                android:orientation="horizontal"
                 android:layout_margin="5dp"
+                android:orientation="horizontal"
                 android:visibility="visible">
-                
+
+                <!--title-->
                 <ImageView
                     android:layout_width="58dp"
                     android:layout_height="20dp"
-                    android:src="@mipmap/practice_logo"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10dp"/>
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/practice_logo" />
 
+                <!--答题类型描述-->
                 <TextView
                     android:id="@+id/choose_type_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="15dp"
                     android:textColor="#FF79808B"
                     android:textSize="17sp" />
 
+                <!--多选题-->
                 <RadioGroup
                     android:id="@+id/rg_qs_multi"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
@@ -153,12 +157,14 @@
 
                 </RadioGroup>
 
+                <!--单选题-->
                 <LinearLayout
                     android:id="@+id/ll_qs_checkboxs"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
@@ -255,34 +261,83 @@
 
                 </LinearLayout>
 
+                <!--判断题-->
+                <RadioGroup
+                    android:id="@+id/rg_qs_double"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginBottom="25dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <RelativeLayout
+                        android:id="@+id/rl_qs_double_select_0"
+                        style="@style/qs_single_select_layout_theme"
+                        android:layout_marginRight="40dp">
+
+                        <RadioButton
+                            android:id="@+id/rb_double_0"
+                            style="@style/qs_single_select_theme"
+                            android:drawableLeft="@drawable/qs_choose_right_sign"
+                            android:paddingLeft="8dp" />
+
+                        <ImageView
+                            android:id="@+id/iv_qs_double_select_sign_0"
+                            style="@style/qs_single_select_sign_theme" />
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/rl_qs_double_select_1"
+                        style="@style/qs_single_select_layout_theme">
+
+                        <RadioButton
+                            android:id="@+id/rb_double_1"
+                            style="@style/qs_single_select_theme"
+                            android:drawableLeft="@drawable/qs_choose_wrong_sign"
+                            android:paddingLeft="8dp" />
+
+                        <ImageView
+                            android:id="@+id/iv_qs_double_select_sign_1"
+                            style="@style/qs_single_select_sign_theme" />
+                    </RelativeLayout>
+
+                </RadioGroup>
+
+                <!--小闹钟图标-->
                 <ImageView
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
-                    android:src="@mipmap/icon_time" />
+                    android:src="@drawable/icon_time" />
 
+                <!--计时时间-->
                 <TextView
                     android:id="@+id/timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="#FFFF643D"
                     android:layout_marginLeft="6dp"
-                    android:textSize="12sp"
-                    android:text="13:14"/>
+                    android:text="00:00"
+                    android:textColor="#FFFF643D"
+                    android:textSize="12sp" />
 
+                <!--提交按钮-->
                 <Button
                     android:id="@+id/btn_qs_submit"
                     style="@style/practiceButtonTheme"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginLeft="10dp"
                     android:layout_width="70dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_gravity="center_vertical|right"
                     android:layout_height="30dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:enabled="false"
-                    android:text="提交" />
+                    android:text="提交"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
 
         </RelativeLayout>

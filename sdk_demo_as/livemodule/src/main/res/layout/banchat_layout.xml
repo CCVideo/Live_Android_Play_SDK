@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/id_popup_window_outside_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#51000000">
+
+        <RelativeLayout
+            android:layout_centerInParent="true"
+            android:id="@id/id_popup_window_anim_view"
+            android:background="@drawable/rollcall_bg"
+            android:layout_width="240dp"
+            android:layout_height="125dp">
+
+
+            <TextView
+                android:id="@+id/tv_banchat_content"
+                android:text="解除全体禁言"
+                android:layout_above="@+id/btn_banchat_ok"
+                android:layout_marginBottom="20dp"
+                android:textSize="15sp"
+                android:textColor="#000000"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:maxWidth="180dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btn_banchat_ok"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="25dp"
+                android:layout_width="90dp"
+                android:layout_height="30dp"
+                android:textSize="13sp"
+                android:text="好的"
+                style="@style/pilotButtonTheme" />
+
+        </RelativeLayout>
+
+
+
+</RelativeLayout>

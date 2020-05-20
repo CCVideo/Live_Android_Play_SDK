@@ -3,10 +3,15 @@ package com.bokecc.livemodule.replay.room;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,8 +31,6 @@ import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import tv.danmaku.ijk.media.player.IjkTimedText;
 
 /**
  * 回放直播间信息组件
@@ -85,6 +88,20 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     TimerTask timerTask;
 
     private ReplayVideoView mVideoView;
+    //针对隐藏标题栏和聊天布局的延迟
+    @SuppressLint("HandlerLeak")
+    public Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case DELAY_HIDE_WHAT://3s延迟隐藏
+                    hide();
+                    break;
+            }
+        }
+    };
+    private final int DELAY_HIDE_WHAT = 1;
 
     public void setVideoView(ReplayVideoView videoView) {
         mVideoView = videoView;
@@ -149,7 +166,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
         // 设置直播间标题
         if (DWLiveReplay.getInstance().getRoomInfo() != null) {
-            mTitle.setText(DWLiveReplay.getInstance().getRoomInfo().getName());
+            if (DWLiveReplay.getInstance().getRoomInfo().getBaseRecordInfo() != null && !TextUtils.isEmpty(DWLiveReplay.getInstance().getRoomInfo().getBaseRecordInfo().getTitle()))
+                mTitle.setText(DWLiveReplay.getInstance().getRoomInfo().getBaseRecordInfo().getTitle());
         }
 
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
@@ -212,6 +230,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 start = seekBar.getProgress();
+                handler.removeMessages(DELAY_HIDE_WHAT);
             }
 
             @Override
@@ -228,6 +247,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 if (mChatListener != null && seekBar.getProgress() - start < 0) {
                     mChatListener.onBackSeek(seekBar.getProgress());
                 }
+                handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
             }
         });
 
@@ -239,6 +259,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 doRetry(true);
             }
         });
+        handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
     }
 
     public void doRetry(boolean updateStream) {
@@ -248,7 +269,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         DWReplayCoreHandler instance = DWReplayCoreHandler.getInstance();
         if (instance != null) {
             int progress = mPlaySeekBar.getProgress();
-            instance.retryReplay(progress,updateStream);
+            instance.retryReplay(progress, updateStream);
         }
     }
 
@@ -427,7 +448,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 mTopLayout.setVisibility(INVISIBLE);
                 mBottomLayout.setVisibility(INVISIBLE);
                 mTipsLayout.setVisibility(VISIBLE);
-                mTipsView.setText("视频加载失败");
+                mTipsView.setText("播放失败");
                 mTryBtn.setText("点击重试");
                 stopTimerTask();
             }
@@ -534,73 +555,107 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         @Override
         public void onClick(View v) {
             if (!controllerShouldResponseFinger) return;
-            if (mTopLayout.isShown()) {
-                ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", mBottomLayout.getHeight());
-                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", -1 * mTopLayout.getHeight());
-                AnimatorSet animatorSet = new AnimatorSet();
-                animatorSet.play(top_y).with(bottom_y);
-
-                //播放动画的持续时间
-                animatorSet.setDuration(500);
-                animatorSet.start();
-
-                animatorSet.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        mBottomLayout.setVisibility(GONE);
-                        mTopLayout.setVisibility(GONE);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-                    }
-                });
-            } else {
-                mTopLayout.setVisibility(VISIBLE);
-                mBottomLayout.setVisibility(VISIBLE);
-                ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", 0);
-                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", 0);
-                AnimatorSet animatorSet = new AnimatorSet();
-                animatorSet.play(top_y).with(bottom_y);
-                //播放动画的持续时间
-                animatorSet.setDuration(500);
-                animatorSet.start();
-                animatorSet.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-
-                    }
-                });
-            }
+            handler.removeMessages(DELAY_HIDE_WHAT);
+            toggleTopAndButtom();
         }
     };
 
+    private void hide() {
+        mTopLayout.clearAnimation();
+        mBottomLayout.clearAnimation();
+        ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", mBottomLayout.getHeight());
+        ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", -1 * mTopLayout.getHeight());
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(top_y).with(bottom_y);
+
+        //播放动画的持续时间
+        animatorSet.setDuration(500);
+        animatorSet.start();
+
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                mBottomLayout.setVisibility(GONE);
+                mTopLayout.setVisibility(GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+            }
+        });
+    }
+
+    private void show() {
+        mTopLayout.clearAnimation();
+        mBottomLayout.clearAnimation();
+        mTopLayout.setVisibility(VISIBLE);
+        mBottomLayout.setVisibility(VISIBLE);
+        ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", 0);
+        ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", 0);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(top_y).with(bottom_y);
+        //播放动画的持续时间
+        animatorSet.setDuration(500);
+        animatorSet.start();
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+
+            }
+        });
+        handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
+    }
+
+    private void toggleTopAndButtom() {
+        if (mTopLayout.isShown()) {
+            hide();
+        } else {
+            show();
+        }
+    }
+
     public interface SeekListener {
         void onBackSeek(long progress);
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_UP:
+                performClick();
+                return false;
+
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

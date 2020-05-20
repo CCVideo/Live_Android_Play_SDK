@@ -40,8 +40,8 @@ public class ResizeTextureView extends TextureView {
             heightMeasureSpec = widthMeasureSpec - heightMeasureSpec;
             widthMeasureSpec = widthMeasureSpec - heightMeasureSpec;
         }
-        int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
-        int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
+        int width = getDefaultSize(widthMeasureSpec, widthMeasureSpec);
+        int height = getDefaultSize(heightMeasureSpec, heightMeasureSpec);
         if (mVideoWidth > 0 && mVideoHeight > 0) {
             int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
             int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);

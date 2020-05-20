@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent"
+        android:background="#000000">
 
         <SurfaceView
             android:id="@+id/preview_view"
@@ -20,10 +21,10 @@
 
         <include
             android:id="@+id/include1"
+            layout="@layout/activity_scan_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            layout="@layout/activity_scan_title" />
+            android:layout_alignParentTop="true" />
 
     </RelativeLayout>
 

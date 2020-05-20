@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@mipmap/questionnaire_radio" android:state_checked="false" />
-    <item android:drawable="@mipmap/questionnaire_radio_selected" android:state_checked="true" />
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/questionnaire_radio_normal" android:state_checked="false" tools:ignore="ResourceCycle" />
+    <item android:drawable="@drawable/questionnaire_radio_selected" android:state_checked="true" />
 </selector>

@@ -25,15 +25,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular;
-import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.regular1;
 
 /**
  * 弹幕布局类
  *
  * @author liufh
- *
  */
-public class BarrageLayout extends RelativeLayout{
+public class BarrageLayout extends RelativeLayout {
 
     private List<String> infos = new ArrayList<String>(); // 存储收到的弹幕信息
 
@@ -55,6 +53,7 @@ public class BarrageLayout extends RelativeLayout{
 
     private int maxBrragePerShow = 8;
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -77,6 +76,7 @@ public class BarrageLayout extends RelativeLayout{
     };
 
     private int offset = 100;
+
     private void insertBrrageView(int size) {
 
         if (width > height) {
@@ -89,22 +89,10 @@ public class BarrageLayout extends RelativeLayout{
         int i = 0;
         while (iterator.hasNext()) {
             String info = iterator.next();
-            //判断是否是连接 并且要去掉
-            if (info.contains(regular)){
-                int x = info.indexOf(regular);
-                if (info.contains(regular1)){
-                    int y = info.indexOf(regular1);
-                    if (x<y){
-                        String url = info.substring(x, y+1);
-                        String substring = info.substring(x + 5, y);
-                        info = info.replace(url,substring);
-                    }
-                }
-            }
 //			addBarrageView(height * i / maxBrragePerShow, duration, info + "");
             addBarrageView((height - offset) * i / maxBrragePerShow + offset, duration, info + "");
             iterator.remove();
-            if (i == size-1) {
+            if (i == size - 1) {
                 break;
             }
             i++;
@@ -159,15 +147,16 @@ public class BarrageLayout extends RelativeLayout{
         vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                BarrageLayout.this.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 height = BarrageLayout.this.getHeight();
                 width = BarrageLayout.this.getWidth();
+                BarrageLayout.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
 
     /**
      * 添加新信息
+     *
      * @param info
      */
     public void addNewInfo(String info) {
@@ -191,7 +180,9 @@ public class BarrageLayout extends RelativeLayout{
 
         timerTask = new TimerTask() {
             @Override
-            public void run() { handler.sendEmptyMessage(0); }
+            public void run() {
+                handler.sendEmptyMessage(0);
+            }
         };
 
         timer.schedule(timerTask, 0, barrageInterval);
@@ -213,6 +204,7 @@ public class BarrageLayout extends RelativeLayout{
 
     /**
      * 设置屏幕刷新弹幕的间隔，最小2s
+     *
      * @param interval 毫秒
      */
     public void setInterval(long interval) {
@@ -223,6 +215,7 @@ public class BarrageLayout extends RelativeLayout{
 
     /**
      * 设置弹幕在屏幕的动画时间
+     *
      * @param duration
      */
     public void setBarrageDuration(long duration) {
@@ -231,6 +224,7 @@ public class BarrageLayout extends RelativeLayout{
 
     /**
      * 设置每次获取的最大的弹幕个数
+     *
      * @param maxBarragePerShow
      */
     public void setMaxBarragePerShow(int maxBarragePerShow) {

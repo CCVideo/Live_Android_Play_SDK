@@ -32,18 +32,8 @@
             android:textSize="@dimen/pc_live_intro_title" />
     </LinearLayout>
 
-    <ScrollView
+    <WebView
+        android:id="@+id/intro_webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/content_layer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/live_infos_intro_tv_bg"
-            android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" />
-
-    </ScrollView>
+        android:layout_height="match_parent"/>
 </LinearLayout>

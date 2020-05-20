@@ -7,13 +7,31 @@ package com.bokecc.dwlivedemo.download;
 public interface DownloadItemClickListener {
     /**
      * 任务下载并解压完成，点击回调
-     * @param taskId 任务id
+     * @param path 文件路径
      */
-    void onFinishTaskClick(int taskId);
+    void onFinishTaskClick(String path);
 
     /**
      * 长按列表，监听回调
-     * @param taskId 任务id
+     * @param url 下载地址
      */
-    void onItemLongClick(int taskId);
+    void onItemLongClick(DownLoadBean url);
+
+    /**
+     * 开始下载
+     * @param downLoadBean
+     */
+    void onDownload(DownLoadBean downLoadBean);
+
+    /**
+     * 暂停下载
+     * @param downLoadBean
+     */
+    void onPause(DownLoadBean downLoadBean);
+
+    /**
+     * 重新下载
+     * @param downLoadBean
+     */
+    void reDownLoad(DownLoadBean downLoadBean);
 }

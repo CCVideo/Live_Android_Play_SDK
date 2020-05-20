@@ -24,12 +24,14 @@
             android:id="@+id/option_radio"
             style="@style/QuestionnaireRadio"
             android:layout_marginLeft="2dp"
+            android:button="@null"
             android:layout_width="20dp"
             android:layout_height="20dp" />
 
         <CheckBox
             android:id="@+id/option_checkbox"
             style="@style/QuestionnaireCheckBox"
+            android:button="@null"
             android:layout_width="20dp"
             android:layout_height="20dp" />
 
@@ -38,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="14dp"
+            android:clickable="true"
             android:textColor="#666666"
             android:textSize="12dp" />
 
@@ -45,6 +48,7 @@
             android:id="@+id/option_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="14dp"

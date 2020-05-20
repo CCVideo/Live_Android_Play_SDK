@@ -1,28 +1,29 @@
 package com.bokecc.livemodule.replay.video;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.bean.MarqueeAction;
+import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
-import com.bokecc.livemodule.view.MarqueeView;
 import com.bokecc.livemodule.view.ResizeTextureView;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
+import com.bokecc.sdk.mobile.live.DWLiveEngine;
+import com.bokecc.sdk.mobile.live.replay.ChangeLineCallback;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -36,11 +37,9 @@ public class ReplayVideoView extends RelativeLayout {
     private TextView mVideoNoPlayTip;
     private ProgressBar mVideoProgressBar;
     private DWReplayPlayer player;
-
+    private Handler handler = new Handler();
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
-    private Activity mActivity;
-    private MarqueeView mMarqueeView;
 
     public ReplayVideoView(Context context) {
         super(context);
@@ -83,6 +82,12 @@ public class ReplayVideoView extends RelativeLayout {
         player.setOnCompletionListener(completionListener);
         player.setOnVideoSizeChangedListener(videoSizeChangedListener);
         player.setBufferTimeout(20);
+        player.setOnSeekCompleteListener(new IMediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(IMediaPlayer mp) {
+
+            }
+        });
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
             dwReplayCoreHandler.setPlayer(player);
@@ -251,38 +256,5 @@ public class ReplayVideoView extends RelativeLayout {
         }
     };
 
-    public void setMarquee(Activity activity, Marquee marquee) {
-//        if (marquee!=null&&marquee.getAction()!=null) {
-//            this.mActivity = activity;
-//            mMarqueeView = findViewById(R.id.marquee_view);
-//            mMarqueeView.setVisibility(VISIBLE);
-//            List<MarqueeAction> marqueeActions = new ArrayList<>();
-//            for (int x = 0; x < marquee.getAction().size(); x++) {
-//                com.bokecc.sdk.mobile.live.pojo.MarqueeAction marqueeAction1 = marquee.getAction().get(x);
-//                MarqueeAction marqueeAction = new MarqueeAction();
-//                marqueeAction.setIndex(x);
-//                marqueeAction.setDuration(marqueeAction1.getDuration());
-//                marqueeAction.setStartXpos((float) marqueeAction1.getStart().getXpos());
-//                marqueeAction.setStartYpos((float) marqueeAction1.getStart().getYpos());
-//                marqueeAction.setStartAlpha((float) marqueeAction1.getStart().getAlpha());
-//                marqueeAction.setEndXpos((float) marqueeAction1.getEnd().getXpos());
-//                marqueeAction.setEndYpos((float) marqueeAction1.getEnd().getYpos());
-//                marqueeAction.setEndAlpha((float) marqueeAction1.getEnd().getAlpha());
-//                marqueeActions.add(marqueeAction);
-//            }
-//            mMarqueeView.setLoop(marquee.getLoop());
-//            mMarqueeView.setMarqueeActions(marqueeActions);
-//            if (marquee.getType().equals("text")) {
-//                mMarqueeView.setTextContent(marquee.getText().getContent());
-//                mMarqueeView.setTextColor(marquee.getText().getColor());
-//                mMarqueeView.setTextFontSize(marquee.getText().getFont_size());
-//                mMarqueeView.setType(1);
-//            } else {
-//                mMarqueeView.setMarqueeImage(mActivity, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
-//                mMarqueeView.setType(2);
-//            }
-//
-//            mMarqueeView.start();
-//        }
-    }
+
 }

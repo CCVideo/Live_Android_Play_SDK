@@ -2,13 +2,11 @@ package com.bokecc.livemodule.localplay.qa.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,26 +15,26 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.qa.module.QaInfo;
-import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
-import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
 import com.bokecc.sdk.mobile.live.pojo.Question;
+import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLiveInfo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * 回放问答适配器
  */
-public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdapter.ChatViewHolder> {
-
+public class LocalReplayQaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final static String TAG = "LocalReplayQaAdapter";
+    private final static int TYPE_QUESTION = 0;
+    private final static int TYPE_ANSWER = 1;
 
     private Context mContext;
 
@@ -50,7 +48,12 @@ public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdap
     private LayoutInflater mInflater;
 
     // 获取到直播间信息
-    private LiveInfo liveInfo;
+    private ReplayLiveInfo liveInfo;
+
+    private SimpleDateFormat simpleDateFormat;
+    private SimpleDateFormat sdf;
+    private Calendar cal = Calendar.getInstance();
+    private SpannableStringBuilder ss = new SpannableStringBuilder();
 
     public LocalReplayQaAdapter(Context context) {
         mQaInfoMapAll = new LinkedHashMap<>();
@@ -60,11 +63,14 @@ public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdap
         mQaInfoMapCurrent = mQaInfoMapNormal;
         mContext = context;
         mInflater = LayoutInflater.from(context);
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf = new SimpleDateFormat("HH:mm");
+
 
         // 获取直播间信息，用于计算问答时间
-        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
+        DWLocalReplayCoreHandler dwLiveCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
-            liveInfo = DWLiveCoreHandler.getInstance().getLiveInfo();
+            liveInfo = dwLiveCoreHandler.getReplayLiveInfo();
         }
     }
 
@@ -79,205 +85,157 @@ public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdap
         }
     }
 
-    private boolean isOnlyShowSelf = false;
-    public void setOnlyShowSelf(boolean isOnlyShowSelf) {
-        if (isOnlyShowSelf) {
-            mQaInfoMapCurrent = mQaInfoMapSelf;
-        } else {
-            mQaInfoMapCurrent = mQaInfoMapNormal;
+    @Override
+    public int getItemViewType(int position) {
+        int currentPosition = -1;
+        for (String qId : mPublishedIdList) {
+            QaInfo info = mQaInfoMapCurrent.get(qId);
+            if (info != null) {
+                currentPosition = currentPosition + 1;
+                if (currentPosition == position) {
+                    return TYPE_QUESTION;
+                }
+                ArrayList<Answer> answers = info.getAnswers();
+                if (answers != null && answers.size() > 0) {
+                    int size = answers.size();
+                    for (int i = 0; i < size; i++) {
+                        currentPosition = currentPosition + 1;
+                        if (position == currentPosition) {
+                            return TYPE_ANSWER;
+                        }
+                    }
+                }
+            }
         }
-
-        notifyDataSetChanged();
+        return super.getItemViewType(position);
     }
+
 
     // 用于回放的问答添加
-    public void addReplayQuestoinAnswer(LinkedHashMap<String, QaInfo> mQaInfoMap) {
+    public void addReplayQuestionAnswer(LinkedHashMap<String, QaInfo> mQaInfoMap) {
         this.mQaInfoMapCurrent = mQaInfoMap;
+        mPublishedIdList = new ArrayList<>(mQaInfoMapCurrent.keySet());
         notifyDataSetChanged();
     }
 
-    public void addQuestion(Question question) {
-        if (mQaInfoMapAll.containsKey(question.getId())) {
-            return;
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView;
+        if (viewType == TYPE_QUESTION) {
+            itemView = mInflater.inflate(R.layout.live_pc_qa_single_line, parent, false);
+            return new LocalReplayQaAdapter.ChatViewHolder(itemView);
         } else {
-            mQaInfoMapAll.put(question.getId(), new QaInfo(question));
-
-            if (question.getQuestionUserId().equals(DWLive.getInstance().getViewer().getId())) {
-                // 本人发布的问题，进行展示
-                mQaInfoMapNormal.put(question.getId(), new QaInfo(question));
-                mQaInfoMapSelf.put(question.getId(), new QaInfo(question));
-            } else if (question.getIsPublish() == 1) {
-                // 如果接收到问题的已经发布了，也展示出来
-                if (!mPublishedIdList.contains(question.getId())) {
-                    mPublishedIdList.add(question.getId());
-                }
-                mQaInfoMapNormal.put(question.getId(), new QaInfo(question));
-            }
+            itemView = mInflater.inflate(R.layout.live_pc_qa_answer, parent, false);
+            return new LocalReplayQaAdapter.SubViewHolder(itemView);
         }
-
-        notifyDataSetChanged();
-    }
-
-    /** 收到客户端发布的questionId，将问题展示出来 */
-    public void showQuestion(String questionId) {
-
-        // 如果当前 QaInfoMapAll 没有存储此id，不做任何处理
-        if (!mQaInfoMapAll.containsKey(questionId)) {
-            return;
-        }
-
-        String currentUserId = DWLive.getInstance().getViewer().getId();
-        mQaInfoMapNormal.clear();
-
-        if (!mPublishedIdList.contains(questionId)) {
-            mPublishedIdList.add(questionId);
-        }
-
-        for (Map.Entry<String, QaInfo> entry: mQaInfoMapAll.entrySet()) {
-            if (entry.getValue().getAnswers().size() > 0) {
-                QaInfo qaInfo = entry.getValue();
-                QaInfo newQaInfo = new QaInfo(qaInfo.getQuestion());
-                newQaInfo.setAnswers((ArrayList<Answer>)qaInfo.getAnswers().clone()); //防止浅拷贝
-                mQaInfoMapNormal.put(entry.getKey(), newQaInfo);
-            } else if (entry.getValue().getQuestion().getQuestionUserId().equals(currentUserId)) {
-                Question mQuestion = entry.getValue().getQuestion();
-                mQaInfoMapNormal.put(mQuestion.getId(), new QaInfo(mQuestion));
-            } else if (entry.getValue().getAnswers().size() == 0 && mPublishedIdList.contains(entry.getValue().getQuestion().getId())) {
-                QaInfo qaInfo = entry.getValue();
-                QaInfo newQaInfo = new QaInfo(qaInfo.getQuestion());
-                mQaInfoMapNormal.put(entry.getKey(), newQaInfo);
-            }
-        }
-
-        notifyDataSetChanged();
-    }
-
-    public void addAnswer(Answer answer) {
-        if (mQaInfoMapAll.containsKey(answer.getQuestionId())) {
-
-            // 检测要答案是否已经存在，如果已经存在了，就不执行添加了操作
-            ArrayList<Answer> answers = mQaInfoMapAll.get(answer.getQuestionId()).getAnswers();
-            if (answers.size() > 0) {
-                for (Answer mapAnswer : answers) {
-                    if (mapAnswer.equals(answer)) {
-                        Log.e(TAG, "now map has contain this answer, not to add");
-                        return;
-                    }
-                }
-            }
-
-            String currentUserId = DWLive.getInstance().getViewer().getId();
-
-            mQaInfoMapAll.get(answer.getQuestionId()).addAnswer(answer);
-
-            Question question = mQaInfoMapAll.get(answer.getQuestionId()).getQuestion();
-
-            if (mQaInfoMapNormal.containsKey(question.getId())) {
-                mQaInfoMapNormal.get(question.getId()).addAnswer(answer);
-            } else {
-                mQaInfoMapNormal.clear();
-
-                for (Map.Entry<String, QaInfo> entry: mQaInfoMapAll.entrySet()) {
-                    if (entry.getValue().getAnswers().size() > 0) {
-
-                        QaInfo qaInfo = entry.getValue();
-                        QaInfo newQaInfo = new QaInfo(qaInfo.getQuestion());
-                        newQaInfo.setAnswers((ArrayList<Answer>)qaInfo.getAnswers().clone()); //防止浅拷贝
-
-                        mQaInfoMapNormal.put(entry.getKey(), newQaInfo);
-                    } else if (entry.getValue().getQuestion().getQuestionUserId().equals(currentUserId)) {
-                        Question mQuestion = entry.getValue().getQuestion();
-                        mQaInfoMapNormal.put(mQuestion.getId(), new QaInfo(mQuestion));
-                    }
-                }
-            }
-
-            if (question.getQuestionUserId().equals(currentUserId)) {
-                mQaInfoMapSelf.get(answer.getQuestionId()).addAnswer(answer);
-            }
-
-            notifyDataSetChanged();
-        }
-    }
-
-    public LinkedHashMap<String, QaInfo> getQaInfos() {
-        return mQaInfoMapCurrent;
     }
 
     @Override
-    public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.live_pc_qa_single_line, parent, false);
-        return new ChatViewHolder(itemView);
-    }
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        int itemViewType = holder.getItemViewType();
 
-    @Override
-    public void onBindViewHolder(ChatViewHolder holder, int position) {
-        ArrayList<String> list = new ArrayList<>(mQaInfoMapCurrent.keySet());
-        QaInfo info = mQaInfoMapCurrent.get(list.get(position));
-
-        Question question = info.getQuestion();
-        ArrayList<Answer> answers = info.getAnswers();
-
-        holder.questionName.setText(question.getQuestionUserName());
-
-        // 计算问答时间
-        try {
-            int sendTime = Integer.valueOf(question.getTime());
-            if (sendTime > 0) {
-                if (liveInfo != null) {
-                    SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = simpleDateFormat.parse(liveInfo.getLiveStartTime());
-                    Date dateForShow = new Date(date.getTime() + sendTime * 1000);
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                    holder.questionTime.setText(sdf.format(dateForShow));
+        // 问题列表
+        if (itemViewType == TYPE_QUESTION) {
+            int[] ints = translateToDoubleIndex(position);
+            QaInfo info = mQaInfoMapCurrent.get(mPublishedIdList.get(ints[0]));
+            if (info != null) {
+                Question question = info.getQuestion();
+                // 设置提问者名称
+                ((LocalReplayQaAdapter.ChatViewHolder) holder).questionName.setText(question.getQuestionUserName());
+                // 计算问答时间
+                try {
+                    int sendTime = Integer.valueOf(question.getTime());
+                    if (sendTime > 0) {
+                        if (liveInfo != null) {
+                            Date date = simpleDateFormat.parse(liveInfo.getStartTime());
+                            cal.setTime(date);
+                            cal.add(Calendar.SECOND, sendTime);
+                            date = cal.getTime();
+                            ((LocalReplayQaAdapter.ChatViewHolder) holder).questionTime.setText(sdf.format(date));
+                        }
+                    } else {
+                        ((LocalReplayQaAdapter.ChatViewHolder) holder).questionTime.setText(sdf.format(new Date()));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-            } else {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                holder.questionTime.setText(simpleDateFormat.format(new Date()));
+                // 设置问题内容
+                ((LocalReplayQaAdapter.ChatViewHolder) holder).questionContent.setText(question.getContent());
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
+
         }
 
-        holder.questionContent.setText(question.getContent());
-
-        holder.answerContainer.removeAllViews();
-
-        if (answers != null && answers.size() > 0) {
-            for (Answer answer: answers) {
+        // 回答列表
+        else if (itemViewType == TYPE_ANSWER) {
+            int[] ints = translateToDoubleIndex(position);
+            QaInfo info = mQaInfoMapCurrent.get(mPublishedIdList.get(ints[0]));
+            if (info != null) {
+                Answer answer = info.getAnswers().get(ints[1]);
                 String msg = answer.getAnswerUserName() + ": " + answer.getContent();
-                SpannableString ss = new SpannableString(msg);
+                ss.clear();
+                ss.append(msg);
                 ss.setSpan(new ForegroundColorSpan(Color.parseColor("#12ad1a")),
                         0, answer.getAnswerUserName().length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ss.setSpan(new ForegroundColorSpan(Color.parseColor("#1E1F21")),
                         answer.getAnswerUserName().length() + 1, msg.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ((LocalReplayQaAdapter.SubViewHolder) holder).answerText.setText(ss);
 
-                TextView textView = new TextView(mContext);
-                textView.setText(ss);
-                textView.setLineSpacing(0, 1.1f);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mContext.getResources().getDimension(R.dimen.pc_live_qa_answer));
-                textView.setGravity(Gravity.CENTER_VERTICAL);
-                holder.answerContainer.addView(textView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
-        } else {
-            holder.qaSeparateLine.setVisibility(View.GONE);
+
         }
 
-        if (isOnlyShowSelf) {
-            if (question.getQuestionUserId().equals(DWLive.getInstance().getViewer().getId())) {
-                holder.qaSingleLayout.setVisibility(View.VISIBLE);
-            } else {
-                holder.qaSingleLayout.setVisibility(View.GONE);
-            }
-        } else {
-            holder.qaSingleLayout.setVisibility(View.VISIBLE);
-        }
     }
+
+    private int mSize = 0;
 
     @Override
     public int getItemCount() {
-        return mQaInfoMapCurrent == null ? 0 : mQaInfoMapCurrent.size();
+        if (mSize == 0) {
+            int totalSize = 0;
+
+            for (int i = 0; i < mPublishedIdList.size(); i++) {
+                QaInfo qaInfo = mQaInfoMapCurrent.get(mPublishedIdList.get(i));
+                int size = 0;
+                if (qaInfo != null) {
+                    ArrayList<Answer> answers = qaInfo.getAnswers();
+                    size = answers.size();
+                    totalSize += (size + 1);
+                }
+            }
+            mSize = totalSize;
+        }
+        return mSize;
     }
+
+    private int[] translateToDoubleIndex(int adapterPosition) {
+        final int[] result = new int[]{-1, -1};
+        final int groupCount = mPublishedIdList.size();
+        int adaptPositionCursor = 0;
+        for (int groupCursor = 0; groupCursor < groupCount; groupCursor++) {
+            if (adaptPositionCursor == adapterPosition) {
+                result[0] = groupCursor;
+                break;
+            }
+            QaInfo qaInfo = mQaInfoMapCurrent.get(mPublishedIdList.get(groupCursor));
+            if (qaInfo != null) {
+                ArrayList<Answer> answers = qaInfo.getAnswers();
+                int childCount = answers.size();
+                final int offset = adapterPosition - adaptPositionCursor;
+                if (childCount >= offset) {
+                    result[0] = groupCursor;
+                    result[1] = offset - 1;
+                    break;
+                }
+                adaptPositionCursor += childCount;
+
+            }
+            adaptPositionCursor++;
+        }
+        return result;
+    }
+
 
     final class ChatViewHolder extends RecyclerView.ViewHolder {
 
@@ -286,7 +244,7 @@ public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdap
         TextView questionTime;
         TextView questionContent;
         LinearLayout answerContainer;
-        LinearLayout qaSingleLayout;
+        View qaSingleLayout;
         View qaSeparateLine;
 
         public ChatViewHolder(View itemView) {
@@ -298,6 +256,16 @@ public class LocalReplayQaAdapter extends RecyclerView.Adapter<LocalReplayQaAdap
             answerContainer = itemView.findViewById(R.id.ll_answer);
             qaSingleLayout = itemView.findViewById(R.id.ll_qa_single_layout);
             qaSeparateLine = itemView.findViewById(R.id.qa_separate_line);
+        }
+    }
+
+    final class SubViewHolder extends RecyclerView.ViewHolder {
+
+        TextView answerText;
+
+        public SubViewHolder(@NonNull View itemView) {
+            super(itemView);
+            answerText = itemView.findViewById(R.id.qa_answer);
         }
     }
 }

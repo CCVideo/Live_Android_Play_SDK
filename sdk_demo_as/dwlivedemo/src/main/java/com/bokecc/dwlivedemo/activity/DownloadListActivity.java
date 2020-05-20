@@ -5,40 +5,48 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bokecc.dwlivedemo.DWApplication;
 import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
+import com.bokecc.dwlivedemo.download.DownLoadBean;
+import com.bokecc.dwlivedemo.download.DownLoadManager;
+import com.bokecc.dwlivedemo.download.DownLoadStatus;
+import com.bokecc.dwlivedemo.download.DownLoadTaskListener;
 import com.bokecc.dwlivedemo.download.DownloadItemClickListener;
 import com.bokecc.dwlivedemo.download.DownloadListAdapter;
-import com.bokecc.dwlivedemo.download.DownloadView;
-import com.bokecc.dwlivedemo.download.TasksManager;
-import com.bokecc.dwlivedemo.download.TasksManagerModel;
+import com.bokecc.dwlivedemo.download.FileUtil;
 import com.bokecc.dwlivedemo.popup.DownloadInfoDeletePopup;
 import com.bokecc.dwlivedemo.popup.DownloadUrlInputDialog;
 import com.bokecc.dwlivedemo.scan.qr_codescan.MipcaActivityCapture;
-import com.liulishuo.filedownloader.FileDownloader;
-import com.liulishuo.filedownloader.util.FileDownloadLog;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
  * 离线回放下载列表页
  */
-public class DownloadListActivity extends BaseActivity implements View.OnClickListener, DownloadView {
+public class DownloadListActivity extends BaseActivity implements View.OnClickListener, DownLoadTaskListener {
 
     public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload/";
+
+
+//    public static String DOWNLOAD_DIR ;
 
     /**
      * activity里最底层的父布局容器，用于弹出PopupWindow使用
@@ -80,6 +88,8 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
      * 跳转二维码扫面界面请求码
      */
     private final int qrRequestCode = 111;
+    private DownLoadManager downloadManager;
+    private int checkCallPhonePermission;
 
 
     @Override
@@ -87,12 +97,7 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         hideActionBar();
         setContentView(R.layout.activity_down_load_list);
-
-        FileDownloadLog.NEED_LOG = true;
-        FileDownloader.setup(this);
-        //注册TaskManager
-        TasksManager.getImpl().onCreate(new WeakReference<DownloadView>(this));
-
+//        DOWNLOAD_DIR = DWApplication.getContext().getExternalFilesDir(null).getPath() + "/CCDownload/";
         //初始化控件
         mRoot = getWindow().getDecorView().findViewById(android.R.id.content);
         mDownloadListView = findViewById(R.id.id_download_list);
@@ -104,33 +109,31 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         mDeletePopup = new DownloadInfoDeletePopup(this);
         mDeletePopup.setOutsideCancel(true);
         mDeletePopup.setBackPressedCancel(true);
-
-        //初始化下载列表
-        initDownloadList();
-
+        //文件下载管理器
+        downloadManager = new DownLoadManager();
+        downloadManager.setDownLoadTaskListener(this);
         //检测权限
-        int checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+        checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (checkCallPhonePermission == PackageManager.PERMISSION_GRANTED){
+            //初始化下载列表
+            initDownloadList();
+        }else{
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
         }
-
     }
 
     @Override
-    public void postNotifyDataChanged() {
-        if (adapter != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            });
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (checkCallPhonePermission == PackageManager.PERMISSION_GRANTED){
+            //初始化下载列表
+            initDownloadList();
+        }else{
+            toastOnUiThread("请开启文件存储权限");
         }
     }
-
-
+    private long crrentTime = 0;
     private void initDownloadList() {
         mDownloadListView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DownloadListAdapter(this);
@@ -139,23 +142,67 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
 
         adapter.setItemClickListener(new DownloadItemClickListener() {
             @Override
-            public void onFinishTaskClick(int taskId) {
-                TasksManagerModel task = TasksManager.getImpl().getById(taskId);
+            public void onFinishTaskClick(String path) {
+                if (System.currentTimeMillis() - crrentTime<2000){
+                    toastOnUiThread("点击太频繁了");
+                    return;
+                }
+                crrentTime = System.currentTimeMillis();
                 Intent intent = new Intent(DownloadListActivity.this, LocalReplayPlayActivity.class);
-                intent.putExtra("fileName", task.getName());
+                intent.putExtra("fileName", FileUtil.getUnzipFileName(path));
                 startActivity(intent);
             }
 
             @Override
-            public void onItemLongClick(final int taskId) {
+            public void onItemLongClick(final DownLoadBean downLoadBean) {
                 mDeletePopup.setListener(new DownloadInfoDeletePopup.ConfirmListener() {
                     @Override
                     public void onConfirmClick() {
-                        TasksManager.getImpl().removeTask(taskId);
-                        adapter.notifyDataSetChanged();
+                        List<DownLoadBean> list = new ArrayList<>();
+                        List<DownLoadBean> dates = adapter.getDates();
+                        list.addAll(dates);
+                        Iterator<DownLoadBean> iterator = dates.iterator();
+                        while (iterator.hasNext()){
+                            DownLoadBean next = iterator.next();
+                            if (next.getUrl().equals(downLoadBean.getUrl())){
+                                list.remove(next);
+                                break;
+                            }
+                        }
+                        adapter.setDates(list);
+                        downloadManager.delete(downLoadBean);
                     }
                 });
                 mDeletePopup.show(mRoot);
+            }
+
+            @Override
+            public void onDownload(DownLoadBean downLoadBean) {
+                downloadManager.reStart(downLoadBean);
+            }
+
+            @Override
+            public void onPause(DownLoadBean downLoadBean) {
+                downLoadBean.setTaskStatus(DownLoadStatus.DOWNLOAD_PAUSE);
+                downloadManager.pause(downLoadBean);
+            }
+
+            @Override
+            public void reDownLoad(DownLoadBean downLoadBean) {
+                //重新下载
+                downLoadBean.setTaskStatus(DownLoadStatus.DOWNLOAD_WAIT);
+                downloadManager.reDownload(downLoadBean);
+                //刷新界面
+                List<DownLoadBean> dates = adapter.getDates();
+                List<DownLoadBean> list = new ArrayList<>();
+                list.addAll(dates);
+                for (DownLoadBean downLoadBean1:list ){
+                    if (downLoadBean1.getUrl().equals(downLoadBean.getUrl())){
+                        downLoadBean.setTaskStatus(DownLoadStatus.DOWNLOAD_WAIT);
+                        break;
+                    }
+                }
+                adapter.setDates(list);
             }
         });
 
@@ -163,10 +210,16 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void onUrlAdd(String url) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                int ret = TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
-                handleAddTaskRet(ret);
+                DownLoadBean downLoadBean = new DownLoadBean();
+                downLoadBean.setProgress(0);
+                downLoadBean.setTotal(0);
+                downLoadBean.setPath(DOWNLOAD_DIR+"/"+fileName);
+                downLoadBean.setUrl(url);
+                //开始下载
+                downloadManager.start(downLoadBean);
             }
         });
+        downloadManager.getAllLocalDate();
     }
 
 
@@ -175,10 +228,12 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         int id = v.getId();
         switch (id) {
             case R.id.id_code_add:
-                codeScanAddress();
+                if (checkCallPhonePermission == PackageManager.PERMISSION_GRANTED)
+                    codeScanAddress();
                 break;
             case R.id.id_new_add:
-                addNewAddress();
+                if (checkCallPhonePermission == PackageManager.PERMISSION_GRANTED)
+                    addNewAddress();
                 break;
         }
     }
@@ -224,9 +279,12 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
                     String url = result.trim();
                     if (url.startsWith("http") && url.endsWith("ccr")) {
                         String fileName = url.substring(url.lastIndexOf("/") + 1);
-                        int ret = TasksManager.getImpl().addTask(fileName, url, DOWNLOAD_DIR);
-                        handleAddTaskRet(ret);
-
+                        DownLoadBean downLoadBean = new DownLoadBean();
+                        downLoadBean.setProgress(0);
+                        downLoadBean.setTotal(0);
+                        downLoadBean.setPath(DOWNLOAD_DIR+"/"+fileName);
+                        downLoadBean.setUrl(url);
+                        downloadManager.start(downLoadBean);
                     } else {
                         Toast.makeText(getApplicationContext(), "扫描失败，请扫描正确的播放二维码", Toast.LENGTH_SHORT).show();
                     }
@@ -236,31 +294,110 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
     }
 
 
-    public void handleAddTaskRet(int ret) {
-        switch (ret) {
-            case TasksManager.CODE_OK:
-                postNotifyDataChanged();
-                break;
-            case TasksManager.CODE_TASK_ALREADY_EXIST:
-                toastOnUiThread("任务已存在");
-                break;
-            case TasksManager.CODE_URL_ERROR:
-                toastOnUiThread("任务Url错误");
-                break;
-            case TasksManager.INSERT_DATA_BASE_ERROR:
-                toastOnUiThread("数据库发生错误");
-                break;
-        }
+    @Override
+    public void getAllDateResult(List<DownLoadBean> date) {
+        adapter.setDates(date);
     }
 
+    @Override
+    public void error(int status, String url) {
+        //错误回调
+        int type = 0;
+        switch (status){
+            case 1://获取所有数据失败
+
+                break;
+            case 2://删除失败
+                toastOnUiThread("删除失败");
+                break;
+
+            case 3://下载失败
+                toastOnUiThread("下载失败");
+                type  = DownLoadStatus.DOWNLOAD_ERROR;
+                update(url,type);
+                break;
+
+            case 4://暂停失败
+                toastOnUiThread("暂停失败");
+                break;
+
+            case 5://解压失败
+                toastOnUiThread("解压失败");
+                type  = DownLoadStatus.ZIP_ERROR;
+                update(url,type);
+                break;
+            case 6://更新本地数据库失败
+                toastOnUiThread("更新本地数据库失败");
+                break;
+            case 12://重复下载
+                toastOnUiThread("重复下载");
+                break;
+        }
+
+    }
+    public void update(String url,int type){
+        //更新adapter
+        List<DownLoadBean> dates = adapter.getDates();
+        List<DownLoadBean> list = new ArrayList<>();
+        list.addAll(dates);
+        for (DownLoadBean downLoadBean1:list ){
+            if (downLoadBean1.getUrl().equals(url)){
+                downLoadBean1.setTaskStatus(type);
+                break;
+            }
+        }
+        adapter.setDates(list);
+    }
+    @Override
+    public void onProcess(DownLoadBean downLoadBean) {
+        //进度改变回调
+        List<DownLoadBean> dates = adapter.getDates();
+        List<DownLoadBean> list = new ArrayList<>();
+        list.addAll(dates);
+        for (DownLoadBean downLoadBean1:list ){
+            if (downLoadBean1.getUrl().equals(downLoadBean.getUrl())){
+                downLoadBean1.setTotal(downLoadBean.getTotal());
+                downLoadBean1.setTaskStatus(downLoadBean.getTaskStatus());
+                downLoadBean1.setPath(downLoadBean.getPath());
+                downLoadBean1.setProgress(downLoadBean.getProgress());
+                downLoadBean1.setId(downLoadBean.getId());
+                break;
+            }
+        }
+        adapter.setDates(list);
+    }
+
+    @Override
+    public void statusChange(int downLoadStatus, DownLoadBean downLoadBean1) {
+        //状态改变回调
+        List<DownLoadBean> dates = adapter.getDates();
+        List<DownLoadBean> list = new ArrayList<>();
+        list.addAll(dates);
+        for (int i = 0;i<list.size();i++){
+            DownLoadBean downLoadBean = list.get(i);
+            if (downLoadBean.getUrl().equals(downLoadBean1.getUrl())){
+                downLoadBean.setTaskStatus(downLoadStatus);
+                break;
+            }
+        }
+        adapter.setDates(list);
+    }
+
+    @Override
+    public void addDateSuccess(DownLoadBean downLoadBean) {
+        //刷新界面
+        List<DownLoadBean> dates = adapter.getDates();
+        List<DownLoadBean> list = new ArrayList<>();
+        list.addAll(dates);
+        list.add(downLoadBean);
+        adapter.setDates(list);
+    }
 
     @Override
     protected void onDestroy() {
-        TasksManager.getImpl().onDestroy();
-        adapter = null;
-        FileDownloader.getImpl().pauseAll();
         super.onDestroy();
+        //销毁下载的框架
+        if (downloadManager!=null)
+            downloadManager.destroy();
     }
-
-
 }

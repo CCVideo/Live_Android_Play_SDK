@@ -7,11 +7,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -77,16 +79,13 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
     private String mCurPrivateUserId = "";
     // 定义当前支持的最大的可输入的文字数量
     private short maxInput = 300;
-    // 软键盘是否显示
-    private boolean isSoftInput = false;
-    // emoji是否需要显示 emoji是否显示
-    private boolean isEmoji = false, isEmojiShow = false;
+    // emoji是否显示
+    private boolean isEmojiShow = false;
     // 聊天id与信息映射表
     private Map<String, ChatEntity> mChaIdMap;
 
     //软键盘的高度
     private int softKeyHeight;
-    private boolean showEmojiAction = false;
 
 
     public LivePrivateChatLayout(Context context) {
@@ -181,18 +180,16 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mEmoji.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //如果当前软键盘处于显示状态
-                if (isSoftInput) {
-                    showEmojiAction = true;
-                    //1显示表情键盘
+                if (isEmojiShow){
+                    hideEmoji();
+                    boolean b = mImm.showSoftInput(mInput, 0);
+                    if (!b){
+                        //如果没有打开软键盘 需要将输入框移动到底部
+                        mPrivateChatInputLayout.setTranslationY(0);
+                    }
+                }else{
                     showEmoji();
-                    //2隐藏软键盘
                     mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-                }else if(isEmojiShow){  //表情键盘显示，软键盘没有显示，则直接显示软键盘
-                    mImm.showSoftInput(mInput, 0);
-                }else{ //软键盘和表情键盘都没有显示
-                    //显示表情键盘
-                    showEmoji();
                 }
             }
         });
@@ -211,7 +208,6 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
                 }
                 DWLive.getInstance().sendPrivateChatMsg(mTo.getUserId(), msg);
                 clearChatInput();
-                onKeyboardHeightChanged(0,getContext().getResources().getConfiguration().orientation);
             }
         });
     }
@@ -224,6 +220,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
     public void hideKeyboard() {
         hideEmoji();
         mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
+        mPrivateChatInputLayout.setTranslationY(0);
     }
 
     /**
@@ -236,6 +233,12 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
             mEmojiGrid.setLayoutParams(lp);
         }
         mEmojiGrid.setVisibility(View.VISIBLE);
+        TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+        mShowAction.setRepeatMode(Animation.REVERSE);
+        mShowAction.setDuration(100);
+        mEmojiGrid.startAnimation(mShowAction);
         mEmoji.setImageResource(R.drawable.push_chat_emoji);
         isEmojiShow = true;
         final float[] transY = new float[1];
@@ -270,8 +273,6 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
         mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
         isEmojiShow = false;
         mEmojiGrid.setVisibility(View.GONE);
-
-
     }
 
     public void initPrivateChatView() {
@@ -327,9 +328,7 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
                 }
             }
         });
-
-        onSoftInputChange();
-
+        mSoftKeyBoardState = new SoftKeyBoardState(this, false);
         mPrivateChats = new ArrayList<>(); // 初始化私聊数据集合
         mPrivateChatUserList.setLayoutManager(new LinearLayoutManager(mContext));
         mPrivateUserAdapter = new PrivateUserAdapter(mContext);
@@ -384,26 +383,6 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
             }
         }
     }
-
-    private void onSoftInputChange() {
-        mSoftKeyBoardState = new SoftKeyBoardState(this, false);
-        mSoftKeyBoardState.setOnSoftKeyBoardStateChangeListener(new SoftKeyBoardState.OnSoftKeyBoardStateChangeListener() {
-            @Override
-            public void onChange(boolean isShow) {
-                isSoftInput = isShow;
-                if (!isSoftInput) { // 软键盘隐藏
-                    if (isEmoji) {
-                        mEmojiGrid.setVisibility(View.VISIBLE);// 避免闪烁
-                        isEmojiShow = true; // 修改emoji显示标记
-                        isEmoji = false; // 重置
-                    }
-                } else {
-                    hideEmoji();
-                }
-            }
-        });
-    }
-
 
     // 私聊对象
     private ChatUser mTo;
@@ -534,22 +513,13 @@ public class LivePrivateChatLayout extends BaseRelativeLayout {
      */
     public void onKeyboardHeightChanged(int height, int orientation) {
         if (height > 10) {
-            isSoftInput = true;
             softKeyHeight = height;
             mPrivateChatInputLayout.setTranslationY(-softKeyHeight);
-            mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
-            isEmojiShow = false;
         } else {
-            if(!showEmojiAction){
+            if(!isEmojiShow){
                 mPrivateChatInputLayout.setTranslationY(0);
-                hideEmoji();
             }
-            isSoftInput = false;
-
         }
-        //结束动作指令
-        showEmojiAction = false;
-
     }
 
 

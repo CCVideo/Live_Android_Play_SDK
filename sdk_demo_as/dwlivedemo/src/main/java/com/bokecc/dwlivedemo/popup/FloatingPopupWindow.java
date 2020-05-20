@@ -1,10 +1,12 @@
 package com.bokecc.dwlivedemo.popup;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
@@ -13,12 +15,12 @@ import com.bokecc.dwlivedemo.R;
 /**
  * 悬浮弹出框（支持拖动）
  */
-public class FloatingPopupWindow {
+public class FloatingPopupWindow implements View.OnClickListener {
     // 弹窗宽度
     public static final int POPUP_WINDOW_WIDTH = 300;
 
     // 弹窗高度
-    public static final int POPUP_WINDOW_HEIGHT = 225;
+    public static final int POPUP_WINDOW_HEIGHT = 224;
 
     private Context mContext;
 
@@ -31,6 +33,9 @@ public class FloatingPopupWindow {
     private boolean IsDouble = false;
     private float lastX;
     private float lastY;
+
+    // 删除按钮
+    private ImageView mDismissView;
 
     public FloatingPopupWindow(Context context) {
         mContext = context;
@@ -49,9 +54,10 @@ public class FloatingPopupWindow {
                             lastX = event.getRawX();
                             lastY = event.getRawY();
                         }
+                        mPopContentView.performClick();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (event.getPointerCount() > 1) {
+                        if (event.getPointerCount() > 2) {
                             IsDouble = true;
                         }
                         if (!IsDouble) {
@@ -59,13 +65,19 @@ public class FloatingPopupWindow {
                             lastX = event.getRawX();
                             int deltaY = (int) (event.getRawY() - lastY);
                             lastY = event.getRawY();
-                            mPopupWindow.update(deltaX + (int) lastX - (POPUP_WINDOW_WIDTH / 2), deltaY + (int) lastY - (POPUP_WINDOW_HEIGHT / 2), -1, -1, true);
+                            mPopupWindow.update(deltaX + (int) lastX - (POPUP_WINDOW_WIDTH / 2), deltaY + (int) lastY - (POPUP_WINDOW_HEIGHT / 2), -1, -1);
+
+
                         }
                         break;
                 }
                 return true;
             }
         });
+
+        mDismissView = new ImageView(context);
+        mDismissView.setImageResource(R.drawable.live_screen_close);
+        mDismissView.setOnClickListener(this);
     }
 
     /**
@@ -86,6 +98,7 @@ public class FloatingPopupWindow {
             mFloatingLayout.addView(view);
         }
     }
+
 
     /**
      * 获取当前正展示的View
@@ -124,4 +137,12 @@ public class FloatingPopupWindow {
         }
     }
 
+    private int dp2px(Context context, float dpValue) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, context.getResources().getDisplayMetrics());
+    }
+
+    @Override
+    public void onClick(View v) {
+        dismiss();
+    }
 }

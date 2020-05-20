@@ -71,6 +71,8 @@
                 android:hint="@string/chat_input_hint"
                 android:imeOptions="flagNoExtractUi"
                 android:textColorHint="#666666"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:textSize="14sp" />
 
             <ImageView

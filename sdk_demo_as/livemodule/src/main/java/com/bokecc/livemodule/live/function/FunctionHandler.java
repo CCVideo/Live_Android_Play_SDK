@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -128,7 +129,7 @@ public class FunctionHandler implements DWLiveFunctionListener {
             }
         });
     }
-
+    private boolean isNeedShowVote = false;
     /**
      * 开始投票
      *
@@ -137,6 +138,7 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onVoteStart(final int voteCount, final int VoteType) {
+        isNeedShowVote = true;
         if (rootView == null) {
             return;
         }
@@ -174,12 +176,16 @@ public class FunctionHandler implements DWLiveFunctionListener {
         if (rootView == null) {
             return;
         }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                voteHandler.showVoteResult(rootView, jsonObject);
-            }
-        });
+        if (isNeedShowVote){
+            isNeedShowVote = !isNeedShowVote;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    voteHandler.showVoteResult(rootView, jsonObject);
+                }
+            });
+        }
+
     }
 
     /**
@@ -361,7 +367,6 @@ public class FunctionHandler implements DWLiveFunctionListener {
             }
         });
     }
-
     /**
      * 收到随堂测提交结果
      *

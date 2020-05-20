@@ -2,15 +2,16 @@ package com.bokecc.dwlivedemo.activity;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -20,13 +21,13 @@ import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.LoginPopupWindow;
 import com.bokecc.dwlivedemo.scan.qr_codescan.MipcaActivityCapture;
+import com.bokecc.dwlivedemo.utils.StatusBarUtil;
 import com.bokecc.livemodule.login.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLiveLoginListener;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.LoginInfo;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.PublishInfo;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
@@ -56,7 +57,12 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        hideActionBar();
+        // 全屏
+//        requestFullScreenFeature();
+        // 沉浸式
+        StatusBarUtil.transparencyBar(this);
+        StatusBarUtil.setLightStatusBar(this, true, false);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_login);
         initViews();
@@ -70,7 +76,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         parseUriIntent();
 
     }
-
+    private static final String PERMISSION_WINDOW = "permission_window";
 
     private void parseUriIntent() {
         Intent intent = getIntent();
@@ -119,7 +125,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
         lllLoginLiveUid.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_uid_hint)).addOnTextChangeListener(myTextWatcher);
         lllLoginLiveRoomid.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_roomid_hint)).addOnTextChangeListener(myTextWatcher);
-        lllLoginLiveName.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_name_hint)).addOnTextChangeListener(myTextWatcher);
+        lllLoginLiveName.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_name_hint)).addOnTextChangeListener(myTextWatcherLength);
         lllLoginLiveName.maxEditTextLength = MAX_NAME;
         lllLoginLivePassword.setHint(getResources().getString(com.bokecc.livemodule.R.string.login_s_password_hint)).addOnTextChangeListener(myTextWatcher)
                 .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -128,7 +134,12 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doLiveLogin();
+                //防止频繁点击
+                if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
+                    doLiveLogin();
+                    currentTime = System.currentTimeMillis();
+                }
+
             }
         });
 
@@ -145,7 +156,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             }
         });
     }
-
+    private long currentTime = 0;
 
     /**
      * 隐藏弹窗
@@ -198,13 +209,13 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
                 writeSharePreference();
                 dismissPopupWindow();
                 Bundle bundle = new Bundle();
-//                bundle.putSerializable("marquee", viewer.getMarquee());
-                go(LivePlayActivity.class,bundle); // 直播默认Demo页
+                bundle.putSerializable("marquee", viewer.getMarquee());
+                go(LivePlayActivity.class, bundle); // 直播默认Demo页
             }
 
             @Override
             public void onException(final DWLiveException e) {
-                toastOnUiThread("登录失败" + e.getLocalizedMessage());
+                toastOnUiThread(e.getLocalizedMessage());
                 dismissPopupWindow();
             }
 
@@ -338,7 +349,27 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             btnLoginLive.setTextColor(isLoginEnabled ? Color.parseColor("#ffffff") : Color.parseColor("#f7d8c8"));
         }
     };
+    private TextWatcher myTextWatcherLength = new TextWatcher() {
 
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (charSequence.length()>20){
+                toastOnUiThread(getResources().getString(R.string.username_max_length));
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            boolean isLoginEnabled = isNewLoginButtonEnabled(lllLoginLiveName, lllLoginLiveRoomid, lllLoginLiveUid);
+            btnLoginLive.setEnabled(isLoginEnabled);
+            btnLoginLive.setTextColor(isLoginEnabled ? Color.parseColor("#ffffff") : Color.parseColor("#f7d8c8"));
+        }
+    };
     // 检测登录按钮是否应该可用
     public static boolean isNewLoginButtonEnabled(LoginLineLayout... views) {
         for (int i = 0; i < views.length; i++) {
@@ -361,9 +392,9 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         }
         for (String p : params) {
             String[] en = p.split("=");
-            if(en.length<2){
-                map.put(en[0],"");
-            }else{
+            if (en.length < 2) {
+                map.put(en[0], "");
+            } else {
                 map.put(en[0], en[1]);
             }
 

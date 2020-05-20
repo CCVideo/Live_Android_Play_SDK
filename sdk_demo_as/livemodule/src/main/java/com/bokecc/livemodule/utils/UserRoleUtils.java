@@ -16,18 +16,18 @@ public class UserRoleUtils {
     public static int getUserRoleAvatar(String userRole) {
         // 主讲（publisher）、助教（teacher）、主持人（host）、学生或观众（student）、其他没有角色（unknow）
         if ("publisher".equalsIgnoreCase(userRole)) {
-            return R.mipmap.head_view_publisher;
+            return R.drawable.head_view_publisher;
         }
         if ("teacher".equalsIgnoreCase(userRole)) {
-            return R.mipmap.head_view_teacher;
+            return R.drawable.head_view_teacher;
         }
         if ("host".equalsIgnoreCase(userRole)) {
-            return R.mipmap.head_view_host;
+            return R.drawable.head_view_host;
         }
         if ("student".equalsIgnoreCase(userRole)) {
-            return R.mipmap.head_view_student;
+            return R.drawable.head_view_student;
         }
-        return R.mipmap.head_view_student;
+        return R.drawable.head_view_student;
     }
 
     /**

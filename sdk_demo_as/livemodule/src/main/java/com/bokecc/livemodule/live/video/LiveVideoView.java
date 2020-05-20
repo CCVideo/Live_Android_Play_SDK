@@ -15,22 +15,19 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.bean.MarqueeAction;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveVideoListener;
-import com.bokecc.livemodule.view.MarqueeView;
 import com.bokecc.livemodule.view.ResizeTextureView;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.logging.ELog;
-import com.bokecc.sdk.mobile.live.pojo.Marquee;
+import com.bokecc.sdk.mobile.live.widget.MarqueeView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -73,6 +70,10 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     private OnPreparedCallback preparedCallback;
     /**
+     * 直播视频开启关闭回调
+     */
+    private OnStreamCallback onStreamCallback;
+    /**
      * 跑马灯view
      */
     private MarqueeView mMarqueeView;
@@ -85,40 +86,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     private View mVideoNoplayTip;
     private Activity mActivity;
 
-    public void setMarquee(Activity activity,Marquee marquee) {
-//        if (marquee!=null&&marquee.getAction()!=null){
-//            this.mActivity=activity;
-//            mMarqueeView = findViewById(R.id.marquee_view);
-//            mMarqueeView.setVisibility(VISIBLE);
-//            List<MarqueeAction> marqueeActions = new ArrayList<>();
-//            for (int x = 0;x<marquee.getAction().size();x++){
-//                com.bokecc.sdk.mobile.live.pojo.MarqueeAction marqueeAction1 = marquee.getAction().get(x);
-//                MarqueeAction marqueeAction = new MarqueeAction();
-//                marqueeAction.setIndex(x);
-//                marqueeAction.setDuration(marqueeAction1.getDuration());
-//                marqueeAction.setStartXpos((float) marqueeAction1.getStart().getXpos());
-//                marqueeAction.setStartYpos((float) marqueeAction1.getStart().getYpos());
-//                marqueeAction.setStartAlpha((float) marqueeAction1.getStart().getAlpha());
-//                marqueeAction.setEndXpos((float) marqueeAction1.getEnd().getXpos());
-//                marqueeAction.setEndYpos((float) marqueeAction1.getEnd().getYpos());
-//                marqueeAction.setEndAlpha((float) marqueeAction1.getEnd().getAlpha());
-//                marqueeActions.add(marqueeAction);
-//            }
-//            mMarqueeView.setLoop(marquee.getLoop());
-//            mMarqueeView.setMarqueeActions(marqueeActions);
-//            if (marquee.getType().equals("text")){
-//                mMarqueeView.setTextContent(marquee.getText().getContent());
-//                mMarqueeView.setTextColor(marquee.getText().getColor());
-//                mMarqueeView.setTextFontSize(marquee.getText().getFont_size());
-//                mMarqueeView.setType(1);
-//            }else{
-//                mMarqueeView.setMarqueeImage(mActivity,marquee.getImage().getImage_url(),marquee.getImage().getWidth(),marquee.getImage().getHeight());
-//            }
-//
-//            mMarqueeView.start();
-//        }
-    }
-
     /**
      * 直播视频通知接口
      */
@@ -130,7 +97,21 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
          */
         void onPrepared(LiveVideoView videoView);
     }
+    /**
+     * 直播视频通知接口
+     */
+    public interface OnStreamCallback {
+        /**
+         * 流停止了
+         *
+         */
+        void onStreamEnd(boolean isNormal);
 
+        /**
+         * 流开始了
+         */
+        void onStreamStart();
+    }
     public LiveVideoView(Context context) {
         super(context);
         initViews(context);
@@ -175,6 +156,8 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         player.setOnPreparedListener(onPreparedListener);
         player.setOnInfoListener(onInfoListener);
         player.setOnVideoSizeChangedListener(onVideoSizeChangedListener);
+        player.setOnErrorListener(onErrorListener);
+
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setPlayer(player);
@@ -197,6 +180,14 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     public void setPreparedCallback(OnPreparedCallback preparedCallback) {
         this.preparedCallback = preparedCallback;
     }
+    /**
+     * 设置视频流开始和关闭回调
+     *
+     * @param onStreamCallback
+     */
+    public void setOnStreamCallback(OnStreamCallback onStreamCallback) {
+        this.onStreamCallback = onStreamCallback;
+    }
 
     /**
      * 视频播放控件进入连麦模式
@@ -208,7 +199,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         if (isVideoRtc) {
             player.pause();
             player.stop();
-            setVisibility(INVISIBLE);
+            setVisibility(GONE);
         } else {
             // 如果是音频连麦，只需将播放器的音频关闭掉
             player.setVolume(0f, 0f);
@@ -356,8 +347,8 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     if (null != mSurface) {
                         player.setSurface(mSurface);
                     }
-                    ELog.i("sdk_bokecc","onPrepared...");
-                    mVideoProgressBar.setVisibility(VISIBLE);
+                    ELog.i(TAG,"LiveVideoView onPrepared...");
+//                    mVideoProgressBar.setVisibility(VISIBLE);
                     //显示跑马灯
 
                     // 通知直播视频已经准备就绪
@@ -375,13 +366,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             switch (what) {
                 // 缓冲开始
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
+                    ELog.i(TAG,"LiveVideoView oninfo...MEDIA_INFO_BUFFERING_START");
                     mVideoProgressBar.setVisibility(VISIBLE);
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
-                    mVideoProgressBar.setVisibility(GONE);
-                    break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+                    ELog.i(TAG,"LiveVideoView oninfo...MEDIA_INFO_VIDEO_RENDERING_START");
                     mVideoProgressBar.setVisibility(GONE);
                     break;
                 default:
@@ -407,7 +398,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             }
         }
     };
-
+    IMediaPlayer.OnErrorListener onErrorListener = new IMediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
+            Toast.makeText(mContext,"播放失败",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    };
 
     // 判断当前屏幕朝向是否为竖屏
     private boolean isPortrait() {
@@ -464,7 +461,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     //------------------------------------- SDK 回调相关 ---------------------------------------
     // 由 DWLiveListener(DWLiveCoreHandler) --> DWLiveVideoListener(LiveVideoView)
     @Override
-    public void onStreamEnd(boolean isNormal) {
+    public void onStreamEnd(final boolean isNormal) {
         mRootView.post(new Runnable() {
             @Override
             public void run() {
@@ -472,9 +469,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 player.stop();
                 player.reset();
                 mVideoProgressBar.setVisibility(View.GONE);
+                if (onStreamCallback!=null){
+                    onStreamCallback.onStreamEnd(isNormal);
+                }
             }
         });
     }
+
 
     /**
      * 播放状态
@@ -490,6 +491,9 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     case PLAYING:
                         // 直播正在播放
                         mVideoProgressBar.setVisibility(VISIBLE);
+                        if (onStreamCallback!=null){
+                            onStreamCallback.onStreamStart();
+                        }
                         break;
                     case PREPARING:
                         // 直播未开始

@@ -6,14 +6,13 @@ import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
-import android.widget.TextView;
 
 /**
  * 弹幕组件
- * @author cc视频
  *
+ * @author cc视频
  */
-public class BarrageView extends TextView {
+public class BarrageView extends android.support.v7.widget.AppCompatTextView {
 
     private boolean isFinish = false;
 
@@ -42,10 +41,12 @@ public class BarrageView extends TextView {
         anim.setFillAfter(true);
         anim.setAnimationListener(new AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {}
+            public void onAnimationStart(Animation animation) {
+            }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {

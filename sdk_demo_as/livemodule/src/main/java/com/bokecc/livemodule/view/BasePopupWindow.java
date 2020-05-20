@@ -21,13 +21,13 @@ public abstract class BasePopupWindow implements View.OnClickListener {
     View mOutsideView;
     View mAnimView;
 
-    private PopupWindow mPopupWindow;
+    protected PopupWindow mPopupWindow;
     private boolean isOutsideCancel = false;
     private boolean isDismissing = false; // 正在dismiss
     private boolean isKeyBackCancel = false;
 
     private OnPopupDismissListener mOnPopupDismissListener;
-    private View mPopContentView;
+    protected View mPopContentView;
 
     /**
      * @param context 上下文

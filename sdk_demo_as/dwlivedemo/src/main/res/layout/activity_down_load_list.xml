@@ -40,7 +40,7 @@
                 android:layout_centerVertical="true"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:src="@mipmap/nav_ic_code_white" />
+                android:src="@drawable/nav_ic_code_white" />
 
             <TextView
                 android:id="@+id/id_new_add"

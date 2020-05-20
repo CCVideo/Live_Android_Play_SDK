@@ -262,7 +262,7 @@ public class DWReplayMixCoreHandler {
             DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
             if (dwLiveReplay != null && surface != null) {
                 dwLiveReplay.start(null);
-                ijkMediaPlayer.updateSurface(surface);
+                //ijkMediaPlayer.updateSurface(surface);
             }
         } else if (mCurrentPlayType == PlayType.LOCAL) {
             final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
@@ -368,6 +368,11 @@ public class DWReplayMixCoreHandler {
             if (dwReplayMixIntroListener != null) {
                 dwReplayMixIntroListener.updateRoomInfo(DWLiveReplay.getInstance().getRoomInfo());
             }
+        }
+
+        @Override
+        public void numberOfReceivedLines(int lines) {
+
         }
     };
 

@@ -8,6 +8,7 @@ import com.bokecc.livemodule.replay.doc.ReplayDocSizeChangeListener;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
+import com.bokecc.sdk.mobile.live.replay.ChangeLineCallback;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
@@ -240,6 +241,17 @@ public class DWReplayCoreHandler {
     }
 
     /**
+     * 切换线路 对应的是{@link com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener numberOfReceivedLines 如果是2 传递0或者1}
+     * @param line
+     *
+     */
+    public void changeLineWithNum(int line ,ChangeLineCallback callback){
+        DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
+        if (dwLiveReplay != null) {
+            dwLiveReplay.changeLineWithNum(line,callback);
+        }
+    }
+    /**
      * 更新当前缓冲进度
      */
     public void updateBufferPercent(int percent) {
@@ -341,6 +353,11 @@ public class DWReplayCoreHandler {
         public void onInitFinished() {
 
         }
+
+        @Override
+        public void numberOfReceivedLines(int lines) {
+
+        }
     };
 
 
@@ -352,5 +369,4 @@ public class DWReplayCoreHandler {
             }
         }
     };
-
 }

@@ -1,9 +1,55 @@
 # Live_Android_Play_SDK
-cc视频云直播 Android平台播放SDK和Demo
 
-[Android 直播观看SDK开发指南](https://github.com/CCVideo/Live_Android_Play_SDK/wiki/Android-%E7%9B%B4%E6%92%AD%E8%A7%82%E7%9C%8BSDK%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97)
+![cc_logo](logo/cc_logo.png) 
 
-[Android 直播回放SDK开发指南](https://github.com/CCVideo/Live_Android_Play_SDK/wiki/Android-%E7%9B%B4%E6%92%AD%E5%9B%9E%E6%94%BESDK%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97)
+<details>
+    <summary>获得场景视频</summary>
+<p>
+面向垂直行业用户打造的一站式场景化视频应用综合解决方案品牌
+：<a href="https://www.bokecc.com">https://www.bokecc.com</a>
+</details>
 
-[Android 直播离线回放SDK开发指南](https://github.com/CCVideo/Live_Android_Play_SDK/wiki/Android-%E7%9B%B4%E6%92%AD%E7%A6%BB%E7%BA%BF%E5%9B%9E%E6%94%BESDK%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97)
 
+
+## 1. 简介
+
+ Android Live SDK 是适用于Android平台的云直播SDK，使用此SDK可以与获得场景视频云直播服务进行对接，在Android端使用获得场景云直播功能
+
+## 2. 功能特性
+
+| 功能特性       | 描述                                             |
+| -------------- | ------------------------------------------------ |
+| 视频           | 支持直播视频播放                                 |
+| 文档           | 文档及ppt动画展示                                |
+| 白板画笔       | 支持展示白板及画笔操作                           |
+| 聊天           | 支持公聊和私聊模式                               |
+| 问答           | 支持公开问答和私密问答                           |
+| 签到           | 支持签到功能                                     |
+| 抽奖           | 支持获取抽奖信息                                 |
+| 公告           | 支持获取公告信息                                 |
+| 问卷           | 支持问卷功能                                     |
+| 广播           | 支持获取广播通知消息                             |
+| 答题卡（投票） | 支持答题卡（投票）功能                           |
+| 随堂测         | 支持随堂测功能                                   |
+| 打卡           | 支持打卡功能                                     |
+| 音频模式       | 支持纯音频模式                                   |
+| 实时画笔       | 支持答题卡实时画笔功能                           |
+| 聊天记录补推   | 支持获取最近30条聊天记录                         |
+| 线路切换       | 支持选择直播流线路                               |
+| 音频模式       | 直播时支持选择观看纯音频模式                     |
+| 视频连麦       | 支持与讲师进行视频连麦                           |
+| 语音连麦       | 支持与讲师进行语音连麦                           |
+| 获取在线人数   | 支持获取直播间在线人数                           |
+| 后台播放       | 支持直播和回放退到后台只播放音频                 |
+| 多清晰度       | 支持直播多清晰度切换播放                         |
+| 回放DRM        | 支持回放采用DRM视频加密播放                      |
+| 直播回放       | 支持观看直播回放（包含视频、文档、聊天、问答等） |
+| 回放离线播放   | 回放支持离线下载播放，无需联网即可观看离线回放； |
+| 回放倍速播放   | 回放支持倍速播放                                 |
+| 支持https协议  | 支持接口https请求                                |
+
+
+
+## 3. wiki
+
+[点击跳转——wiki文档](https://github.com/CCVideo/Live_Android_Play_SDK/wiki)

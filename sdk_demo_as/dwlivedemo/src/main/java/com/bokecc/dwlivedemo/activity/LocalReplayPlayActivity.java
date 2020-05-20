@@ -60,8 +60,8 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        requestFullScreenFeature();
         super.onCreate(savedInstanceState);
-        hideActionBar();
         setContentView(R.layout.activity_local_replay_play);
 
         Intent intent = getIntent();
@@ -365,6 +365,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
                         mReplayVideoContainer.addView(mDocLayout);
                         isVideoMain = false;
                         mReplayRoomLayout.setVideoDocSwitchText("切换视频");
+                        mDocLayout.setDocScrollable(true);//webview不可切换
                     } else {
                         // 缓存视频的切换前的画面
                         mReplayVideoContainer.removeAllViews();
@@ -373,6 +374,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
                         mReplayVideoContainer.addView(mReplayVideoView);
                         isVideoMain = true;
                         mReplayRoomLayout.setVideoDocSwitchText("切换文档");
+                        mDocLayout.setDocScrollable(false);//webview不可切换
                     }
                 }
             });

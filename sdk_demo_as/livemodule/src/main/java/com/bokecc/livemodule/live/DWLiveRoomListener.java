@@ -26,4 +26,11 @@ public interface DWLiveRoomListener {
      * 踢出用户
      */
     void onKickOut();
+
+    /**
+     * 信息，一般包括被禁言、禁止提问等
+     *
+     * @param msg
+     */
+    void onInformation(String msg);
 }

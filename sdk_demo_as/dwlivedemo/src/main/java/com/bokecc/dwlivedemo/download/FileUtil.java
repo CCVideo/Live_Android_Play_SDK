@@ -50,5 +50,29 @@ public class FileUtil {
         }
         return sb.toString();
     }
+    public static String getUnzipDir(String path) {
+        File oriFile = new File(path);
+        StringBuilder sb = new StringBuilder();
+        sb.append(oriFile.getParent());
+        sb.append("/");
+        int index = path.indexOf(".");
+        if (index == -1) {
+            sb.append(path);
+        } else {
+            sb.append(path.substring(0, index));
+        }
+        return sb.toString();
+    }
+    public static void createFile(String path){
 
+    }
+    /**
+     * 获取文件的解压目录
+     * @param path 源文件
+     * @return 文件解压后的绝对路径
+     */
+    public static String getUnzipFileName(String path) {
+        File file = new File(path);
+        return file.getName();
+    }
 }

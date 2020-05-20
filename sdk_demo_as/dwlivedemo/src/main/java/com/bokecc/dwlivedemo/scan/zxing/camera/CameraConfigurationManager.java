@@ -60,7 +60,7 @@ final class CameraConfigurationManager {
     Log.e(TAG, "Screen resolution: " + screenResolution);
 //    cameraResolution = getCameraResolution(parameters, screenResolution);
     //TODO 现在是强制指定得，需要待确认
-    cameraResolution = new Point(1920, 1080);
+    cameraResolution = new Point(1280, 720);
     Log.e(TAG, "Camera resolution: " + cameraResolution);
   }
 
