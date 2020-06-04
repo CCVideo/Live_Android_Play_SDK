@@ -8,7 +8,7 @@ import com.bokecc.sdk.mobile.live.DWLive;
 public interface DWLiveVideoListener {
 
     /**
-     * 流结束
+     * 未开课或者已下课
      *
      * @param isNormal 流是否正常结束
      */
@@ -33,4 +33,8 @@ public interface DWLiveVideoListener {
      */
     void onUnbanStream();
 
+    /**
+     * 开始上课
+     */
+    void onStreamStart();
 }

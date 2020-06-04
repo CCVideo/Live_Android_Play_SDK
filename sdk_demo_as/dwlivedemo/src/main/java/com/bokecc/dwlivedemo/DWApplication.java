@@ -12,11 +12,13 @@ import com.bokecc.livemodule.LiveSDKHelper;
 public class DWApplication extends Application {
     private static final String TAG = "DWApplication";
     private static Context context;
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
     @Override
     public void onCreate() {
         super.onCreate();

@@ -9,6 +9,7 @@ import android.os.Message;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -17,6 +18,7 @@ import android.widget.RelativeLayout;
 
 import com.bokecc.livemodule.live.chat.util.DensityUtil;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
+import com.bokecc.sdk.mobile.live.util.DevicesUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +43,8 @@ public class BarrageLayout extends RelativeLayout {
 
     private Context context;
 
-    private int width, height;
+    private int width ;
+    private int height;
 
     private List<BarrageView> bvs = new ArrayList<BarrageView>();
 
@@ -91,6 +94,7 @@ public class BarrageLayout extends RelativeLayout {
             String info = iterator.next();
 //			addBarrageView(height * i / maxBrragePerShow, duration, info + "");
             addBarrageView((height - offset) * i / maxBrragePerShow + offset, duration, info + "");
+
             iterator.remove();
             if (i == size - 1) {
                 break;
@@ -127,16 +131,19 @@ public class BarrageLayout extends RelativeLayout {
     public BarrageLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
+        init();
     }
 
     public BarrageLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        init();
     }
 
     public BarrageLayout(Context context) {
         super(context);
         this.context = context;
+        init();
     }
 
     /**
@@ -148,10 +155,14 @@ public class BarrageLayout extends RelativeLayout {
             @Override
             public void onGlobalLayout() {
                 height = BarrageLayout.this.getHeight();
-                width = BarrageLayout.this.getWidth();
+                Log.e("###","init height = "+height);
+//                width = BarrageLayout.this.getWidth();
                 BarrageLayout.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+//        height = DevicesUtil.getDeviceScreenWidth(context);
+        width = DevicesUtil.getDeviceScreenHeight(context);
+        Log.e("###","init width = "+width);
     }
 
     /**
@@ -175,8 +186,6 @@ public class BarrageLayout extends RelativeLayout {
         if (isStart) {
             return;
         }
-
-        init();
 
         timerTask = new TimerTask() {
             @Override

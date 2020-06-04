@@ -167,10 +167,10 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         mLiveVideoDocSwitch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (DWLiveCoreHandler.getInstance().isRtcing()) {
-                    toastOnUiThread("连麦中，暂不支持切换");
-                    return;
-                }
+//                if (DWLiveCoreHandler.getInstance().isRtcing()) {
+//                    toastOnUiThread("连麦中，暂不支持切换");
+//                    return;
+//                }
                 if (liveRoomStatusListener != null) {
                     boolean flag = liveRoomStatusListener.switchVideoDoc(!isVideoMain);
                     if (flag) {
@@ -383,6 +383,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         showEmojiAction = false;
     }
 
+
     public interface LiveRoomStatusListener {
 
         /**
@@ -490,7 +491,14 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
                 }
                 DWLive.getInstance().sendPublicChatMsg(msg);
                 clearChatInput();
-                hideKeyboard();
+                //判断是否是软键盘谈起  如果不是软键盘  需要单独去将输入框滑动到下方
+                if (isSoftInput){
+                    hideKeyboard();
+                }else{
+                    hideEmoji();
+                    mBottomChatLayout.setTranslationY(0);
+                }
+
                 handler.removeMessages(DELAY_HIDE_WHAT);
                 handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT,3000);
 
@@ -752,4 +760,26 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     public View getFullView() {
         return mLiveFullScreen;
     }
+
+    /**
+     * 开关弹幕 目前只针对首次进入直播间 服务器返回的弹幕开关数据的时候调用
+     * @param isBarrageOn
+     */
+    public void controlBarrageControl(boolean isBarrageOn) {
+        this.isBarrageOn=isBarrageOn;
+        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
+        if (dwLiveCoreHandler == null) {
+            return;
+        }
+        if (mBarrageControl!=null){
+            if (isBarrageOn) {
+                mBarrageControl.setImageResource(R.drawable.barrage_on);
+                dwLiveCoreHandler.setBarrageStatus(true);
+            } else {
+                mBarrageControl.setImageResource(R.drawable.barrage_off);
+                dwLiveCoreHandler.setBarrageStatus(false);
+            }
+        }
+    }
+
 }

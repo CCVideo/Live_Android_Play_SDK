@@ -5,29 +5,21 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 380
-        versionName "3.8.0"
+        versionCode rootProject.ext.android.SDK_VERSION_CODE
+        versionName rootProject.ext.android.SDK_VERSION
 
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a'//,'x86'
+            abiFilters 'armeabi-v7a'//, 'arm64-v8a'
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    useLibrary 'org.apache.http.legacy'
 
-
-    // **********本地集成*****
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
 }
 
 dependencies {
@@ -41,18 +33,19 @@ dependencies {
 
     //===================================live sdk=============================
 
-    // **********本地集成*****
-    api files('libs/dwlivesdk.jar')
-    api files('libs/drmlib.jar')
-    api files('libs/engine-0.8.3.1.jar')
-    api files('libs/hdplayer.jar')
-    api files('libs/rtc.jar')
-    api files('libs/tbs_sdk.jar')
-    api files('libs/libjingle_peerconnection.jar')
-    api files('libs/httplib.jar')
+    // 本地集成  需要将libs中库拷贝到项目中
 
-    // *********远端集成************
-//    api 'com.bokecc:dwlivesdk:3.8.0'
+//    api files('libs/dwlivesdk-3.8.1.jar')
+//    api files('libs/drmlib.jar')
+//    api files('libs/httplib.jar')
+//    api files('libs/engine-0.8.3.1.jar')
+//    api files('libs/hdplayer.jar')
+//    api files('libs/libjingle_peerconnection.jar')
+//    api files('libs/rtc.jar')
+//    api files('libs/tbs_sdk.jar')
+
+    // 远端集成
+    api 'com.bokecc:dwlivesdk:3.8.1'
 
 
 }

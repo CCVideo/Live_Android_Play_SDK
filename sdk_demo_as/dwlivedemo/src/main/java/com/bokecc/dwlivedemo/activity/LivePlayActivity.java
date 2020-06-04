@@ -127,6 +127,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         if (roomInfo != null) {
             // 获取是否显示弹幕
             isBarrageOn = roomInfo.getBarrage() == 1;
+            mLiveRoomLayout.controlBarrageControl(isBarrageOn);
         }
 
     }
@@ -170,7 +171,11 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         super.onDestroy();
         keyboardHeightProvider.close();
         mLiveFloatingView.dismiss();
-        mLiveVideoView.destroy();
+
+        if (DWLiveCoreHandler.getInstance().isRtcing()) {
+            DWLive.getInstance().disConnectSpeak();
+            mLiveVideoView.stop();
+        }
         if (mLiveRtcView != null) {
             mLiveRtcView.destroy();
         }
@@ -178,6 +183,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             mCountDownTimer.cancel();
             mCountDownTimer = null;
         }
+        mLiveVideoView.destroy();
     }
 
     @Override
@@ -209,13 +215,10 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                 mLiveBarrage.stop();
             }
         }
-
-        // 这里暂时没发现有啥用，去掉
-//        if (mLiveBarrage != null) {
-//            mLiveBarrage.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-//            mLiveBarrage.init();
-//        }
-
+        //调整窗口的位置
+        if (mLiveFloatingView!=null&&mLiveFloatingView.isShowing()){
+            mLiveFloatingView.onConfigurationChanged(newConfig);
+        }
     }
 
     @TargetApi(19)
@@ -490,7 +493,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                roomStatusListener.switchVideoDoc(true);
+                roomStatusListener.switchVideoDoc(mLiveRoomLayout.isVideoMain);
                 if (mLiveVideoView != null) {
                     mLiveVideoView.enterRtcMode(isVideoRtc);
                 }

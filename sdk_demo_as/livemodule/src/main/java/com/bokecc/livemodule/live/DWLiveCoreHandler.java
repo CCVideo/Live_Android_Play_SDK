@@ -284,6 +284,7 @@ public class DWLiveCoreHandler {
      * 释放资源
      */
     public void destroy() {
+        isRtcing = false;
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             dwLive.onDestroy();
@@ -432,6 +433,13 @@ public class DWLiveCoreHandler {
         public void onStreamEnd(boolean isNormal) {
             if (dwLiveVideoListener != null) {
                 dwLiveVideoListener.onStreamEnd(isNormal);
+            }
+        }
+
+        @Override
+        public void onStreamStart() {
+            if (dwLiveVideoListener != null) {
+                dwLiveVideoListener.onStreamStart();
             }
         }
 

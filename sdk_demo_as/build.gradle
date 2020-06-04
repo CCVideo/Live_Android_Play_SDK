@@ -1,13 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
+apply from: "conf.gradle"
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
+
+        // 配置bokecc源
         maven {
-             url 'http://nexus-app.bokecc.com/repository/sdk-group/'
+            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
         }
     }
     dependencies {
@@ -26,6 +28,7 @@ allprojects {
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
+        // 配置bokecc源
         maven {
             url 'http://nexus-app.bokecc.com/repository/sdk-group/'
         }

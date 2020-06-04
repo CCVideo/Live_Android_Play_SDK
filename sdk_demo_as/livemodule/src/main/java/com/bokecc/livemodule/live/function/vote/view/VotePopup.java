@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.function.vote.adapter.VoteSummaryAdapter;
 import com.bokecc.livemodule.utils.PopupAnimUtil;
 import com.bokecc.livemodule.view.BasePopupWindow;
@@ -41,6 +42,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class VotePopup extends BasePopupWindow {
+
+    private long currentTime;
 
     public VotePopup(Context context) {
         super(context);
@@ -317,29 +320,32 @@ public class VotePopup extends BasePopupWindow {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (voteType == 0) {
-                    // 判断是否作答
-                    if (selectOption == -1) {
-                        Toast.makeText(mContext, "请先选择答案", Toast.LENGTH_SHORT).show();
-                        return;
+                if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
+                    if (voteType == 0) {
+                        // 判断是否作答
+                        if (selectOption == -1) {
+                            Toast.makeText(mContext, "请先选择答案", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // 提交结果
+                        DWLive.getInstance().sendVoteResult(selectOption);
+                    } else if (voteType == 1) {
+                        // 判断是否作答
+                        if (selectOptions.size() < 1) {
+                            Toast.makeText(mContext, "请先选择答案", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // 生成结果
+                        ArrayList<Integer> selectResult = new ArrayList<>();
+                        for (String option : selectOptions) {
+                            selectResult.add(Integer.valueOf(option));
+                        }
+                        // 提交结果
+                        DWLive.getInstance().sendVoteResult(selectResult);
                     }
-                    // 提交结果
-                    DWLive.getInstance().sendVoteResult(selectOption);
-                } else if (voteType == 1) {
-                    // 判断是否作答
-                    if (selectOptions.size() < 1) {
-                        Toast.makeText(mContext, "请先选择答案", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    // 生成结果
-                    ArrayList<Integer> selectResult = new ArrayList<>();
-                    for (String option : selectOptions) {
-                        selectResult.add(Integer.valueOf(option));
-                    }
-                    // 提交结果
-                    DWLive.getInstance().sendVoteResult(selectResult);
+                    dismiss();
+                    currentTime = System.currentTimeMillis();
                 }
-                dismiss();
             }
         });
 

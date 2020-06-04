@@ -75,18 +75,14 @@ public class ReplayPlayActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_replay_play);
         initViews();
+        showFloatingDocLayout();
         initViewPager();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mRoot.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showFloatingDocLayout();
-            }
-        }, 200);
         mReplayVideoView.start();
     }
 
@@ -124,6 +120,10 @@ public class ReplayPlayActivity extends BaseActivity {
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
         } else {
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+        //调整窗口的位置
+        if (mReplayFloatingView!=null&&mReplayFloatingView.isShowing()){
+            mReplayFloatingView.onConfigurationChanged(newConfig);
         }
     }
 

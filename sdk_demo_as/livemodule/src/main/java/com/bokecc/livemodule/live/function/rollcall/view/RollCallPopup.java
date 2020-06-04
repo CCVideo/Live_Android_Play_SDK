@@ -30,7 +30,7 @@ public class RollCallPopup extends BasePopupWindow {
     TextView endTips;
 
     Button performRollcall;
-
+    private long currentTime = 0;
     @Override
     protected void onViewCreated() {
 
@@ -42,11 +42,14 @@ public class RollCallPopup extends BasePopupWindow {
         performRollcall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onDestroy();
-                Toast.makeText(mContext, "您已签到", Toast.LENGTH_SHORT).show();
-                DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
-                if (dwLiveCoreHandler != null) {
-                    dwLiveCoreHandler.sendRollCall();
+                if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
+                    onDestroy();
+                    Toast.makeText(mContext, "您已签到", Toast.LENGTH_SHORT).show();
+                    DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
+                    if (dwLiveCoreHandler != null) {
+                        dwLiveCoreHandler.sendRollCall();
+                    }
+                    currentTime = System.currentTimeMillis();
                 }
             }
         });

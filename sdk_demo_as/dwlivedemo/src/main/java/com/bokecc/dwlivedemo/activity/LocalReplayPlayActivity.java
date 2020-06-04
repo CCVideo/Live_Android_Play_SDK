@@ -192,6 +192,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         if (dwLocalReplayCoreHandler == null) {
             return;
         }
+        showFloatingDocLayout();
         // 判断当前直播间模版是否有"文档"功能
         if (dwLocalReplayCoreHandler.hasPdfView()) {
             initDocLayout();
@@ -207,12 +208,6 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         // 直播间简介
         initIntroLayout();
         initViewPager();
-        mRoot.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showFloatingDocLayout();
-            }
-        }, 200);
     }
 
 
@@ -472,6 +467,10 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
         } else {
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+        //调整窗口的位置
+        if (mLocalReplayFloatingView!=null&&mLocalReplayFloatingView.isShowing()){
+            mLocalReplayFloatingView.onConfigurationChanged(newConfig);
         }
     }
 

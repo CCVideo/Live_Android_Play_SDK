@@ -462,6 +462,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     // 由 DWLiveListener(DWLiveCoreHandler) --> DWLiveVideoListener(LiveVideoView)
     @Override
     public void onStreamEnd(final boolean isNormal) {
+        Log.e("###","onStreamEnd");
         mRootView.post(new Runnable() {
             @Override
             public void run() {
@@ -491,9 +492,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     case PLAYING:
                         // 直播正在播放
                         mVideoProgressBar.setVisibility(VISIBLE);
-                        if (onStreamCallback!=null){
-                            onStreamCallback.onStreamStart();
-                        }
                         break;
                     case PREPARING:
                         // 直播未开始
@@ -541,5 +539,17 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 dwLiveCoreHandler.start(mSurface);
             }
         }
+    }
+
+    @Override
+    public void onStreamStart() {
+        mRootView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (onStreamCallback!=null){
+                    onStreamCallback.onStreamStart();
+                }
+            }
+        });
     }
 }

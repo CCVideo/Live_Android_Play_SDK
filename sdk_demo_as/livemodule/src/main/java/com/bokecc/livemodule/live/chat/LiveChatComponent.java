@@ -430,7 +430,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             public void run() {
                 if (barrageLayout != null) {
                     // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕
-                    if (!ChatImageUtils.isImgChatMessage(msg.getMessage()) && "0".equals(msg.getStatus())) {
+                    if (!ChatImageUtils.isImgChatMessage(msg.getMessage()) && "0".equals(msg.getStatus())&&getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         barrageLayout.addNewInfo(msg.getMessage());
                     }
                 }
