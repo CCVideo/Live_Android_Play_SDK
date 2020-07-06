@@ -14,6 +14,7 @@ import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.replay.entity.ReplayLineParams;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLoginInfo;
@@ -22,6 +23,7 @@ import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -374,6 +376,12 @@ public class DWReplayMixCoreHandler {
         public void numberOfReceivedLines(int lines) {
 
         }
+
+        @Override
+        public void numberOfReceivedLinesWithVideoAndAudio(List<ReplayLineParams> videoLines, List<ReplayLineParams> audioLines) {
+
+        }
+
     };
 
 

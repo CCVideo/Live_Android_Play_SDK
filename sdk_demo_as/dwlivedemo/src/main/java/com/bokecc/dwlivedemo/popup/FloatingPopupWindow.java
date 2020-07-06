@@ -1,8 +1,13 @@
 package com.bokecc.dwlivedemo.popup;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.res.Configuration;
-import android.view.LayoutInflater;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bokecc.dwlivedemo.R;
-import com.bokecc.sdk.mobile.live.util.DevicesUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,34 +23,39 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class FloatingPopupWindow implements View.OnClickListener {
     private Activity mContext;
-    private View mPopContentView;
     private RelativeLayout mFloatingLayout;
     private float lastX;
     private float lastY;
     private AtomicBoolean isShow = new AtomicBoolean(false);
-    // 删除按钮 暂不显示
-    private ImageView mDismissView;
+
+    // 当前容器里面装载的View
+    private View mNowView;
+    // 删除按钮
+    private ImageView ivClose;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     public FloatingPopupWindow(Activity context) {
         mContext = context;
+        mFloatingLayout = new RelativeLayout(mContext);
+        mFloatingLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBack));
+        mFloatingLayout.setTranslationX(0);
+        mFloatingLayout.setTranslationY(getDeviceScreenHeight(mContext) / 3f);
+
+        ivClose = new ImageView(mContext);
+        ivClose.setImageResource(R.drawable.live_screen_close);
     }
 
-    /**
-     * 是否显示
-     */
-    public boolean isShowing() {
-        return isShow.get();
-    }
+    // region -------------------- 对外提供方法-----------------------------------------------------
 
     /**
      * 添加新View
      */
     public void addView(View view) {
+        mNowView = view;
         if (mFloatingLayout != null) {
-            mFloatingLayout.addView(view);
+            mFloatingLayout.addView(view, 0);
         }
     }
-
 
     /**
      * 移除所有的子布局
@@ -60,108 +69,191 @@ public class FloatingPopupWindow implements View.OnClickListener {
     /**
      * 显示弹出框
      */
+    @SuppressLint("ClickableViewAccessibility")
     public void show(View view) {
         if (isShowing()) {
             return;
         }
         isShow.set(true);
-        mPopContentView = LayoutInflater.from(mContext).inflate(R.layout.popup_window_floating, null);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(300, 224);
-        mPopContentView.setTranslationX(0);
-        mPopContentView.setTranslationY(DevicesUtil.getDeviceScreenHeight(mContext) / 3);
-        ((ViewGroup) mContext.getWindow().getDecorView().getRootView()).addView(mPopContentView, layoutParams);
-        mFloatingLayout = mPopContentView.findViewById(R.id.floating_layout);
-        mPopContentView.setOnTouchListener(new View.OnTouchListener() {
+        ((ViewGroup) mContext.getWindow().getDecorView().getRootView()).removeView(mFloatingLayout);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(dp2px(mContext, 120), dp2px(mContext, 90));
+        ((ViewGroup) mContext.getWindow().getDecorView().getRootView()).addView(mFloatingLayout, layoutParams);
+        mFloatingLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-
                         lastX = event.getRawX();
                         lastY = event.getRawY();
-                        mPopContentView.performClick();
+                        mFloatingLayout.performClick();
                         break;
                     case MotionEvent.ACTION_MOVE:
                         int deltaX = (int) (event.getRawX() - lastX);
                         int deltaY = (int) (event.getRawY() - lastY);
-                        float transX = mPopContentView.getX() + deltaX;
-                        float transY = mPopContentView.getY() + deltaY;
+                        float transX = mFloatingLayout.getX() + deltaX;
+                        float transY = mFloatingLayout.getY() + deltaY;
                         //判断是否超过屏幕外
                         if (transX < 0) {
                             transX = 0;
                         }
-                        if (transX > (DevicesUtil.getDeviceScreenWidth(mContext) - mPopContentView.getWidth())) {
-                            transX = (DevicesUtil.getDeviceScreenWidth(mContext) - mPopContentView.getWidth());
+                        if (transX > (getDeviceScreenWidth(mContext) - mFloatingLayout.getWidth())) {
+                            transX = (getDeviceScreenWidth(mContext) - mFloatingLayout.getWidth());
                         }
                         if (transY < 0) {
                             transY = 0;
                         }
-                        if (transY > (DevicesUtil.getDeviceScreenHeight(mContext) - mPopContentView.getHeight())) {
-                            transY = (DevicesUtil.getDeviceScreenHeight(mContext) - mPopContentView.getHeight());
+                        if (transY > (getDeviceScreenHeight(mContext) - mFloatingLayout.getHeight())) {
+                            transY = (getDeviceScreenHeight(mContext) - mFloatingLayout.getHeight());
                         }
-                        mPopContentView.setTranslationX(transX);
-                        mPopContentView.setTranslationY(transY);
+                        mFloatingLayout.setTranslationX(transX);
+                        mFloatingLayout.setTranslationY(transY);
                         lastX = event.getRawX();
                         lastY = event.getRawY();
+                        if (ivClose.getVisibility() == View.GONE) {
+                            ivClose.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        handler.postDelayed(runnable, 3000);
                         break;
                 }
                 return true;
             }
         });
+        mFloatingLayout.removeView(ivClose);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp2px(mContext, 20), dp2px(mContext, 20));
+        lp.addRule(RelativeLayout.ALIGN_PARENT_END, 1);
+        mFloatingLayout.addView(ivClose, lp);
+        ivClose.setVisibility(View.GONE);
 
-        mDismissView = new ImageView(mContext);
-        mDismissView.setImageResource(R.drawable.live_screen_close);
-        mDismissView.setOnClickListener(this);
-        mDismissView.setVisibility(View.GONE);
+        ivClose.setOnClickListener(this);
     }
 
     /**
      * 隐藏弹出框
      */
     public void dismiss() {
+        handler.removeCallbacks(runnable);
         if (mFloatingLayout != null) {
             if (isShowing()) {
-                ((ViewGroup) mContext.getWindow().getDecorView().getRootView()).removeView(mPopContentView);
+                try {
+                    ((ViewGroup) mContext.getWindow().getDecorView().getRootView()).removeView(mFloatingLayout);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 isShow.set(false);
+                if (floatDismissListener != null) {
+                    floatDismissListener.dismiss();
+                }
             }
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-        dismiss();
     }
 
     /**
      * 横竖屏切换  调整连麦窗口的位置
      *
-     * @param newConfig
+     * @param orientation 屏幕方向 1:竖屏
+     *                    {@link Configuration}
      */
-    public void onConfigurationChanged(Configuration newConfig) {
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (mPopContentView != null) {
-                mPopContentView.setTranslationX(0);
-                float y = DevicesUtil.getDeviceScreenWidth(mContext) / 3;
+    public void onConfigurationChanged(int orientation) {
+        if (!isShowing()) return;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE.value) {
+            if (mFloatingLayout != null) {
+                mFloatingLayout.setTranslationX(0);
+                float y = getDeviceScreenWidth(mContext) / 3f;
                 if (y < 0) {
                     y = 0;
                 }
-                if (y > (DevicesUtil.getDeviceScreenWidth(mContext) - mPopContentView.getHeight())) {
-                    y = (DevicesUtil.getDeviceScreenWidth(mContext) - mPopContentView.getHeight());
+                if (y > (getDeviceScreenWidth(mContext) - mFloatingLayout.getHeight())) {
+                    y = (getDeviceScreenWidth(mContext) - mFloatingLayout.getHeight());
                 }
-                mPopContentView.setTranslationY(y);
+                mFloatingLayout.setTranslationY(y);
             }
-        } else {
-            if (mPopContentView != null) {
-                mPopContentView.setTranslationX(0);
-                float y = DevicesUtil.getDeviceScreenHeight(mContext) / 3;
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT.value) {
+            if (mFloatingLayout != null) {
+                mFloatingLayout.setTranslationX(0);
+                float y = getDeviceScreenHeight(mContext) / 3f;
                 if (y < 0) {
                     y = 0;
                 }
-                if (y > (DevicesUtil.getDeviceScreenHeight(mContext) - mPopContentView.getHeight())) {
-                    y = (DevicesUtil.getDeviceScreenHeight(mContext) - mPopContentView.getHeight());
+                if (y > (getDeviceScreenHeight(mContext) - mFloatingLayout.getHeight())) {
+                    y = (getDeviceScreenHeight(mContext) - mFloatingLayout.getHeight());
                 }
-                mPopContentView.setTranslationY(y);
+                mFloatingLayout.setTranslationY(y);
             }
         }
     }
+
+
+    /**
+     * 获取当前正展示的View
+     */
+    public View getNowView() {
+        return mNowView;
+    }
+
+    /**
+     * 是否显示
+     */
+    public boolean isShowing() {
+        return isShow.get();
+    }
+
+    //endregion
+
+    // region -------------------- 私有方法---------------------------------------------------------
+    // 屏幕方向
+    public enum Configuration {
+        ORIENTATION_PORTRAIT(1), ORIENTATION_LANDSCAPE(2);
+
+        public int value;
+
+        Configuration(int i) {
+            value = i;
+        }
+    }
+
+    // dp-->px
+    private int dp2px(Context context, float dpValue) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, context.getResources().getDisplayMetrics());
+    }
+
+    // 获取设备屏幕高度
+    private int getDeviceScreenHeight(Context context) {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return dm.heightPixels;
+    }
+
+    // 获取设备屏幕宽度
+    public static int getDeviceScreenWidth(Context context) {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return dm.widthPixels;
+    }
+
+    //endregion
+    @Override
+    public void onClick(View v) {
+        dismiss();
+    }
+
+    private FloatDismissListener floatDismissListener;
+
+    public void setFloatDismissListener(FloatDismissListener floatDismissListener) {
+        this.floatDismissListener = floatDismissListener;
+    }
+
+    public interface FloatDismissListener {
+        void dismiss();
+    }
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (ivClose != null) {
+                ivClose.setVisibility(View.GONE);
+            }
+
+        }
+    };
 }

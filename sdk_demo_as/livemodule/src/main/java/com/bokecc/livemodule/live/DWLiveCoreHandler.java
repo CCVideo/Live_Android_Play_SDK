@@ -5,6 +5,7 @@ import android.view.Surface;
 
 import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.doc.LiveDocSizeChangeListener;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.DWLiveListener;
@@ -12,6 +13,7 @@ import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
+import com.bokecc.sdk.mobile.live.pojo.BroadCastAction;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
@@ -612,7 +614,7 @@ public class DWLiveCoreHandler {
         @Override
         public void onSwitchVideoDoc(boolean isVideoMain) {
             if (dwLiveRoomListener != null) {
-                dwLiveRoomListener.onSwitchVideoDoc(isVideoMain);
+                dwLiveRoomListener.onSwitchVideoDoc(isVideoMain? LiveRoomLayout.State.VIDEO: LiveRoomLayout.State.DOC);
             }
         }
 
@@ -633,10 +635,9 @@ public class DWLiveCoreHandler {
                 if (msgs == null) {
                     return;
                 }
-                // 展示历史广播信息
-                for (int i = 0; i < msgs.size(); i++) {
-                    dwLiveChatListener.onBroadcastMsg(msgs.get(i).getContent());
-                }
+                // 展示历史广播信息,这里以前是单条处理，这里修改为多条处理
+                dwLiveChatListener.onHistoryBroadcastMsg(msgs);
+
             }
         }
 
@@ -653,13 +654,42 @@ public class DWLiveCoreHandler {
         }
 
         /**
+         * 收到广播信息（实时）
+         *
+         * @param msg 广播消息 包含id
+         */
+        @Override
+        public void onBroadcastMsg(BroadCastMsg msg) {
+            if (dwLiveChatListener != null) {
+                dwLiveChatListener.onBroadcastMsg(msg);
+            }
+
+        }
+
+        /**
+         * 收到广播信息操作信息
+         *
+         * @param action 广播消息 根据id操作广播消息
+         */
+        @Override
+        public void onBroadcastMsgAction(BroadCastAction action) {
+            if (dwLiveChatListener != null) {
+                // 执行删除操作
+                if (action.getAction() == 1) {
+                    dwLiveChatListener.onBroadcastMsgDel(action.getId());
+                }
+
+            }
+        }
+
+        /**
          * 信息，一般包括被禁言等
          *
          * @param msg
          */
         @Override
         public void onInformation(String msg) {
-            if (dwLiveRoomListener!=null){
+            if (dwLiveRoomListener != null) {
                 dwLiveRoomListener.onInformation(msg);
             }
         }

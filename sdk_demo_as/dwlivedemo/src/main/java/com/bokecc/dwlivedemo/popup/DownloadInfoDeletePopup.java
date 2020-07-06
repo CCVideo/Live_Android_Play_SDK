@@ -10,7 +10,7 @@ import com.bokecc.dwlivedemo.base.BasePopupWindow;
 import com.bokecc.livemodule.utils.PopupAnimUtil;
 
 /**
- * 作者 ${郭鹏飞}.<br/>
+ * 作者 ${bokecc}.<br/>
  */
 
 public class DownloadInfoDeletePopup extends BasePopupWindow {

@@ -2,18 +2,21 @@
 apply from: "conf.gradle"
 buildscript {
     repositories {
+
+        maven {
+            // 需配置该maven库
+            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
+        }
         jcenter()
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
 
-        // 配置bokecc源
-        maven {
-            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
+        // 配置符号表
+        classpath 'com.tencent.bugly:symtabfileuploader:2.2.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         // NOTE: Do not place your application dependencies here; they belong
@@ -23,15 +26,15 @@ buildscript {
 
 allprojects {
     repositories {
-
+        maven {
+            // 需配置该maven库
+            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
+        }
         jcenter()
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
-        // 配置bokecc源
-        maven {
-            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
-        }
+
 
     }
 }

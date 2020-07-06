@@ -155,14 +155,12 @@ public class BarrageLayout extends RelativeLayout {
             @Override
             public void onGlobalLayout() {
                 height = BarrageLayout.this.getHeight();
-                Log.e("###","init height = "+height);
 //                width = BarrageLayout.this.getWidth();
                 BarrageLayout.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
 //        height = DevicesUtil.getDeviceScreenWidth(context);
         width = DevicesUtil.getDeviceScreenHeight(context);
-        Log.e("###","init width = "+width);
     }
 
     /**

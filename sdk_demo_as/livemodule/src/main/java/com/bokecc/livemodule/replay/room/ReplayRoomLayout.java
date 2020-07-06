@@ -6,12 +6,14 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,13 +21,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.DWReplayRoomListener;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
 import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.livemodule.view.RePlaySeekBar;
+import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
@@ -51,7 +56,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     // 当前播放时间
     TextView mCurrentTime;
     // 进度条
-    RePlaySeekBar mPlaySeekBar;
+    public RePlaySeekBar mPlaySeekBar;
     // 播放时长
     TextView mDurationView;
     // 播放/暂停 按钮
@@ -66,10 +71,12 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
     private SeekListener mChatListener;
 
-    private LinearLayout mTipsLayout;
+    public LinearLayout mTipsLayout;
 
     private TextView mTipsView;
-
+    private TextView mSeekTime;
+    private TextView mSumTime;
+    private RelativeLayout mSeekRoot;
 
     /**
      * 播放错误，重试布局
@@ -80,9 +87,9 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
      * 视频控制器是否应该响应手指事件
      * true:响应
      */
-    private boolean controllerShouldResponseFinger = true;
+    public boolean controllerShouldResponseFinger = true;
 
-
+    public int docMode = 1;
     Timer timer = new Timer();
 
     TimerTask timerTask;
@@ -102,6 +109,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         }
     };
     private final int DELAY_HIDE_WHAT = 1;
+    public LiveRoomLayout.State viewState = LiveRoomLayout.State.VIDEO;
 
     public void setVideoView(ReplayVideoView videoView) {
         mVideoView = videoView;
@@ -147,7 +155,9 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
 
         mDocScaleTypeView = findViewById(R.id.doc_scale_type);
-
+        mSeekRoot = findViewById(R.id.seek_root);
+        mSeekTime = findViewById(R.id.tv_seek_time);
+        mSumTime = findViewById(R.id.tv_sum_time);
         mDocScaleTypeView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +173,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 }
             }
         });
-
+        mPlaySeekBar.setCanSeek(false);
         // 设置直播间标题
         if (DWLiveReplay.getInstance().getRoomInfo() != null) {
             if (DWLiveReplay.getInstance().getRoomInfo().getBaseRecordInfo() != null && !TextUtils.isEmpty(DWLiveReplay.getInstance().getRoomInfo().getBaseRecordInfo().getTitle()))
@@ -198,7 +208,20 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             @Override
             public void onClick(View v) {
                 if (replayRoomStatusListener != null) {
-                    replayRoomStatusListener.switchVideoDoc();
+                    if (viewState == LiveRoomLayout.State.VIDEO) {
+                        viewState = LiveRoomLayout.State.DOC;
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                    } else if (viewState == LiveRoomLayout.State.DOC) {
+                        viewState = LiveRoomLayout.State.VIDEO;
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                    } else if (viewState == LiveRoomLayout.State.OPEN_DOC) {
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = LiveRoomLayout.State.VIDEO;
+                    } else if (viewState == LiveRoomLayout.State.OPEN_VIDEO) {
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = LiveRoomLayout.State.DOC;
+                    }
+                    setVideoDocSwitchText(viewState);
                 }
             }
         });
@@ -260,6 +283,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             }
         });
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
+        docMode = DWLiveReplay.getInstance().getRoomInfo().getDocumentDisplayMode();
     }
 
     public void doRetry(boolean updateStream) {
@@ -287,7 +311,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             replayCoreHandler.pause();
         } else {
             mPlayIcon.setSelected(true);
-            replayCoreHandler.start(null);
+            replayCoreHandler.start();
         }
     }
 
@@ -321,8 +345,17 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     }
 
     // 设置文档/视频切换的按钮的文案
-    public void setVideoDocSwitchText(String text) {
-        mVideoDocSwitch.setText(text);
+    public void setVideoDocSwitchText(LiveRoomLayout.State state) {
+        this.viewState = state;
+        if (viewState == LiveRoomLayout.State.VIDEO) {
+            mVideoDocSwitch.setText("切换文档");
+        } else if (viewState == LiveRoomLayout.State.DOC) {
+            mVideoDocSwitch.setText("切换视频");
+        } else if (viewState == LiveRoomLayout.State.OPEN_DOC) {
+            mVideoDocSwitch.setText("打开文档");
+        } else if (viewState == LiveRoomLayout.State.OPEN_VIDEO) {
+            mVideoDocSwitch.setText("打开视频");
+        }
     }
 
     // 进入全屏
@@ -387,13 +420,20 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
      */
     @Override
     public void videoPrepared() {
-        startTimerTask();
+        if (!DWLiveReplay.getInstance().isPlayVideo()) {
+            retryTime = 0;
+            mPlaySeekBar.setCanSeek(true);
+            startTimerTask();
+            isComplete = false;
+        }
     }
 
     @Override
     public void startRending() {
         retryTime = 0;
         mPlaySeekBar.setCanSeek(true);
+        startTimerTask();
+        isComplete = false;
     }
 
     @Override
@@ -408,10 +448,13 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         controllerShouldResponseFinger = true;
         mTopLayout.setVisibility(VISIBLE);
         mBottomLayout.setVisibility(VISIBLE);
-        mTipsLayout.setVisibility(GONE);
-        startTimerTask();
+        if (!isComplete) {
+            mTipsLayout.setVisibility(GONE);
+            startTimerTask();
+        }
     }
 
+    private boolean isComplete = false;
 
     @Override
     public void onPlayComplete() {
@@ -424,7 +467,12 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 mTipsLayout.setVisibility(VISIBLE);
                 mTipsView.setText("播放结束");
                 mTryBtn.setText("重新播放");
+                isComplete = true;
+                DWReplayCoreHandler.getInstance().getPlayer().seekTo(0);
                 mPlaySeekBar.setProgress(0);
+                //将倍速初始化
+                DWLiveReplay.getInstance().setSpeed(1.0f);
+                mReplaySpeed.setText("1.0x");
                 stopTimerTask();
             }
         });
@@ -435,6 +483,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
     @Override
     public void onPlayError(int code) {
+        stopTimerTask();
         if (retryTime < 3) {
             retryTime++;
             doRetry(false);
@@ -450,9 +499,22 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 mTipsLayout.setVisibility(VISIBLE);
                 mTipsView.setText("播放失败");
                 mTryBtn.setText("点击重试");
-                stopTimerTask();
+                //将倍速初始化
+                DWLiveReplay.getInstance().setSpeed(1.0f);
+                mReplaySpeed.setText("1.0x");
             }
         });
+    }
+
+    @Override
+    public void onException(final DWLiveException exception) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mContext, exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     /****************************** 回放直播间状态监听 用于Activity更新UI ******************************/
@@ -465,7 +527,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         /**
          * 视频/文档 切换
          */
-        void switchVideoDoc();
+        void switchVideoDoc(LiveRoomLayout.State state);
 
         /**
          * 退出直播间
@@ -481,6 +543,17 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
          * 点击文档类型
          */
         void onClickDocScaleType(int scaleType);
+
+        /**
+         * 滑动拖拽进度
+         *
+         * @param max
+         * @param progress
+         * @param move
+         * @param isSeek
+         * @param xVelocity
+         */
+        void seek(int max, int progress, float move, boolean isSeek, float xVelocity);
     }
 
     // 回放直播间状态监听
@@ -504,27 +577,31 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                DWReplayCoreHandler replayCoreHandler = DWReplayCoreHandler.getInstance();
-                if (replayCoreHandler == null) {
-                    return;
-                }
-                final DWReplayPlayer player = replayCoreHandler.getPlayer();
-                if (player == null) return;
-                //更新播放器的播放时间
-                if (!player.isPlaying() && (player.getDuration() - player.getCurrentPosition() < 500)) {
-                    setCurrentTime(player.getDuration());
-                } else {
-                    setCurrentTime(player.getCurrentPosition());
-                }
-                mPlayIcon.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mPlayIcon.setSelected(player.isPlaying());
-                    }
-                });
+                setTimeText();
             }
         };
         timer.schedule(timerTask, 0, 1000);
+    }
+
+    public void setTimeText() {
+        DWReplayCoreHandler replayCoreHandler = DWReplayCoreHandler.getInstance();
+        if (replayCoreHandler == null) {
+            return;
+        }
+        final DWReplayPlayer player = replayCoreHandler.getPlayer();
+        if (player == null) return;
+        //更新播放器的播放时间
+        if (!player.isPlaying() && (player.getDuration() - player.getCurrentPosition() < 500)) {
+            setCurrentTime(player.getDuration());
+        } else {
+            setCurrentTime(player.getCurrentPosition());
+        }
+        mPlayIcon.post(new Runnable() {
+            @Override
+            public void run() {
+                mPlayIcon.setSelected(player.isPlaying());
+            }
+        });
     }
 
     // 停止计时器（进度条、播放时间）
@@ -541,11 +618,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
 
     public void release() {
-        startTimerTask();
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+        stopTimerTask();
     }
 
     //***************************************** 动画相关方法 ************************************************
@@ -642,14 +715,84 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     public interface SeekListener {
         void onBackSeek(long progress);
     }
+
+    private float downX, downY, moveX, moveY, downTime, upTime, seekTime;
+    private VelocityTracker mVelocityTracker = null;
+    private boolean isSeek = false;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_UP:
-                performClick();
-                return false;
+        if (docMode == 1
+                && mTipsLayout.getVisibility() != VISIBLE
+                && mPlaySeekBar.isCanSeek()) {
+            if (mVelocityTracker == null) {
+                mVelocityTracker = VelocityTracker.obtain();
+            }
+            mVelocityTracker.addMovement(event);
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    downX = event.getX();
+                    moveX = event.getX();
+                    downY = event.getY();
+                    moveY = event.getY();
+                    downTime = System.currentTimeMillis();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float moveX = event.getX();
+                    float moveY = event.getY();
+                    if (Math.abs(downY - moveY) + 10 < Math.abs(moveX - this.downX)) {
+                        if (Math.abs(moveX - this.downX) > 10 && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.ERROR
+                                && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.BUFFERING
+                                && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.PLAYBACK_COMPLETED) {
+                            stopTimerTask();
+                            mVelocityTracker.computeCurrentVelocity(1000);
+                            replayRoomStatusListener.seek(mPlaySeekBar.getMax(), mPlaySeekBar.getProgress(), (moveX - this.moveX) * 1000, false, mVelocityTracker.getXVelocity(0));
+                            if (mSeekRoot.getVisibility() != VISIBLE)
+                                mSeekRoot.setVisibility(VISIBLE);
+                            mSeekTime.setText(TimeUtil.getFormatTime(mPlaySeekBar.getProgress()));
+                            if (TextUtils.isEmpty(mSumTime.getText()) || mSumTime.getText().equals("00:00")) {
+                                mSumTime.setText(TimeUtil.getFormatTime(mPlaySeekBar.getMax()));
+                            }
+                            this.moveX = moveX;
+                            this.moveY = moveY;
+                            //手势拖拽显示进度条
+                            if (mTopLayout.getVisibility() != VISIBLE) {
+                                show();
+                            }
+                            handler.removeMessages(DELAY_HIDE_WHAT);
+                            isSeek = true;
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    float upX = event.getX();
+                    float upY = event.getY();
+                    upTime = System.currentTimeMillis();
+                    if (isSeek) {
+                        if (Math.abs(upX - downX) > 10) {
+                            stopTimerTask();
+                            replayRoomStatusListener.seek(mPlaySeekBar.getMax(), mPlaySeekBar.getProgress(), (upX - downX), true, mVelocityTracker.getXVelocity(0));
+                        }
+                        handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
+                        isSeek = false;
+                        if (mSeekRoot.getVisibility() != GONE)
+                            mSeekRoot.setVisibility(GONE);
+                        return true;
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    if (mSeekRoot.getVisibility() != GONE)
+                        mSeekRoot.setVisibility(GONE);
+                    break;
+            }
+        } else {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_UP:
+                    performClick();
+                    return false;
 
+            }
         }
         return super.onTouchEvent(event);
     }

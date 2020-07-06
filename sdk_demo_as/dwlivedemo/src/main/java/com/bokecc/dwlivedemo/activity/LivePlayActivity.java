@@ -99,6 +99,16 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
     private RoomInfo roomInfo;
     boolean isOpenMarquee; // 是否显示跑马灯
     private RelativeLayout video_root;
+    private FloatingPopupWindow.FloatDismissListener floatDismissListener = new FloatingPopupWindow.FloatDismissListener() {
+        @Override
+        public void dismiss() {
+            if (mLiveRoomLayout.viewState == LiveRoomLayout.State.VIDEO) {
+                mLiveRoomLayout.setSwitchText(LiveRoomLayout.State.OPEN_DOC);
+            } else if (mLiveRoomLayout.viewState == LiveRoomLayout.State.DOC) {
+                mLiveRoomLayout.setSwitchText(LiveRoomLayout.State.OPEN_VIDEO);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -216,8 +226,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             }
         }
         //调整窗口的位置
-        if (mLiveFloatingView!=null&&mLiveFloatingView.isShowing()){
-            mLiveFloatingView.onConfigurationChanged(newConfig);
+        if (mLiveFloatingView != null) {
+            mLiveFloatingView.onConfigurationChanged(newConfig.orientation);
         }
     }
 
@@ -242,6 +252,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         mLiveVideoContainer = findViewById(R.id.rl_video_container);
         mLiveVideoView = findViewById(R.id.live_video_view);
         mLiveRoomLayout = findViewById(R.id.live_room_layout);
+        mLiveRoomLayout.setVideo(mLiveVideoView);
         mLiveBarrage = findViewById(R.id.live_barrage);
         mNoStreamRoot = findViewById(R.id.no_stream_root);
         mNoStreamText = findViewById(R.id.tv_no_stream);
@@ -259,6 +270,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         // 弹出框界面
         mExitPopupWindow = new ExitPopupWindow(this);
         mLiveFloatingView = new FloatingPopupWindow(LivePlayActivity.this);
+        mLiveFloatingView.setFloatDismissListener(floatDismissListener);
         // 连麦相关
         mLiveRtcView = findViewById(R.id.live_rtc_view);
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
@@ -299,56 +311,72 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
         // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
         @Override
-        public synchronized boolean switchVideoDoc(final boolean videoMain) {
+        public synchronized void switchVideoDoc(final LiveRoomLayout.State state) {
             DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
             if (dwLiveCoreHandler == null) {
-                return false;
+                return;
             }
             // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
-            if (dwLiveCoreHandler.hasPdfView() && mLiveFloatingView != null && mLiveFloatingView.isShowing()) {
+            if (dwLiveCoreHandler.hasPdfView() && mLiveFloatingView != null) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (mDocLayout.getParent() != null)
-                            ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
-                        if (mLiveVideoContainer.getParent() != null)
-                            ((ViewGroup) mLiveVideoContainer.getParent()).removeView(mLiveVideoContainer);
-                        if (DWLiveCoreHandler.getInstance().isRtcing()) {//连麦中切换窗口
-                            if (videoMain) {
-                                mLiveFloatingView.addView(mDocLayout);
-                                video_root.addView(mLiveVideoContainer, 0);
-                                mDocLayout.setDocScrollable(false);//设置webview不可滑动
-                                mLiveVideoContainer.invalidate();
-                            } else {
-                                mLiveFloatingView.addView(mLiveVideoContainer);
-                                ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
-                                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                                mDocLayout.setLayoutParams(lp);
-                                video_root.addView(mDocLayout,0);
-                                mDocLayout.setDocScrollable(true);//设置webview可滑动
-                            }
-                        } else {//ijkplayer拉流切换窗口
-                            if (videoMain) {
-                                mLiveFloatingView.addView(mDocLayout);
-                                video_root.addView(mLiveVideoContainer,0);
-                                mDocLayout.setDocScrollable(false);//设置webview不可滑动
-                            } else {
-                                mLiveFloatingView.addView(mLiveVideoContainer);
+                        if (state == LiveRoomLayout.State.VIDEO) {
+                            //如果当前小窗口开启并且大窗口是视频 将大窗口切换到文档
+                            switchView(true);
+                        } else if (state == LiveRoomLayout.State.DOC) {
+                            switchView(false);
+                        } else if (state == LiveRoomLayout.State.OPEN_DOC) {
+                            mLiveFloatingView.show(mRoot);
+                            if (mDocLayout.getParent() != null)
+                                ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+                            mLiveFloatingView.addView(mDocLayout);
+                        } else if (state == LiveRoomLayout.State.OPEN_VIDEO) {
+                            mLiveFloatingView.show(mRoot);
+                            if (mLiveVideoContainer.getParent() != null)
+                                ((ViewGroup) mLiveVideoContainer.getParent()).removeView(mLiveVideoContainer);
+                            mLiveFloatingView.addView(mLiveVideoContainer);
+                        }
+                    }
+                });
+            }
+        }
+
+        private void switchView(boolean isVideoMain) {
+            if (mDocLayout.getParent() != null)
+                ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+            if (mLiveVideoContainer.getParent() != null)
+                ((ViewGroup) mLiveVideoContainer.getParent()).removeView(mLiveVideoContainer);
+            if (DWLiveCoreHandler.getInstance().isRtcing()) {//连麦中切换窗口
+                if (isVideoMain) {
+                    mLiveFloatingView.addView(mDocLayout);
+                    video_root.addView(mLiveVideoContainer, 0);
+                    mDocLayout.setDocScrollable(false);//设置webview不可滑动
+                    mLiveVideoContainer.invalidate();
+                } else {
+                    mLiveFloatingView.addView(mLiveVideoContainer);
+                    ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
+                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    mDocLayout.setLayoutParams(lp);
+                    video_root.addView(mDocLayout, 0);
+                    mDocLayout.setDocScrollable(true);//设置webview可滑动
+                }
+            } else {//ijkplayer拉流切换窗口
+                if (isVideoMain) {
+                    mLiveFloatingView.addView(mDocLayout);
+                    video_root.addView(mLiveVideoContainer, 0);
+                    mDocLayout.setDocScrollable(false);//设置webview不可滑动
+                } else {
+                    mLiveFloatingView.addView(mLiveVideoContainer);
 //                                ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
 //                                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
 //                                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
 //                                mDocLayout.setLayoutParams(lp);
-                                video_root.addView(mDocLayout,0);
-                                mDocLayout.setDocScrollable(true);//设置webview可滑动
-                            }
-                        }
-
-                    }
-                });
-                return true;
+                    video_root.addView(mDocLayout, 0);
+                    mDocLayout.setDocScrollable(true);//设置webview可滑动
+                }
             }
-            return false;
         }
 
         // 退出直播间
@@ -437,8 +465,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
 
                 }
                 //初始化视频界面并隐藏悬浮框
-                roomStatusListener.switchVideoDoc(true);
-                if (mLiveFloatingView != null && mLiveFloatingView.isShowing()) {
+//                roomStatusListener.switchVideoDoc(true);
+                if (mLiveFloatingView != null) {
                     mLiveFloatingView.dismiss();
                 }
                 //
@@ -452,7 +480,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                 if (mLiveRoomLayout.getFullView() != null) {
                     mLiveRoomLayout.getFullView().setVisibility(VISIBLE);
                 }
-                if (mCountDownTimer!=null){
+                if (mCountDownTimer != null) {
                     mCountDownTimer.cancel();
                     mCountDownTimer = null;
                 }
@@ -493,7 +521,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                roomStatusListener.switchVideoDoc(mLiveRoomLayout.isVideoMain);
+                roomStatusListener.switchVideoDoc(mLiveRoomLayout.viewState);
                 if (mLiveVideoView != null) {
                     mLiveVideoView.enterRtcMode(isVideoRtc);
                 }
@@ -672,7 +700,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         dwLiveCoreHandler.setDwLiveBarrageListener(this);
 
     }
-    public void openMarquee(){
+
+    public void openMarquee() {
         if (DWLive.getInstance().getRoomInfo() != null) {
             isOpenMarquee = DWLive.getInstance().getRoomInfo().getOpenMarquee() == 1;
         }
@@ -684,26 +713,28 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             setMarquee((Marquee) getIntent().getSerializableExtra("marquee"));
         }
     }
-    public void closeMarquee(){
-        if (mMarqueeView!=null){
+
+    public void closeMarquee() {
+        if (mMarqueeView != null) {
             mMarqueeView.stop();
             mMarqueeView.setVisibility(View.GONE);
         }
     }
+
     public void setMarquee(final Marquee marquee) {
         final ViewGroup parent = (ViewGroup) mMarqueeView.getParent();
-        if (parent.getWidth()!=0&&parent.getHeight()!=0){
+        if (parent.getWidth() != 0 && parent.getHeight() != 0) {
             if (marquee != null && marquee.getAction() != null) {
                 if (marquee.getType().equals("text")) {
                     mMarqueeView.setTextContent(marquee.getText().getContent());
                     mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
-                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(this,marquee.getText().getFont_size()));
+                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(this, marquee.getText().getFont_size()));
                     mMarqueeView.setType(1);
                 } else {
                     mMarqueeView.setMarqueeImage(this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
                     mMarqueeView.setType(2);
                 }
-                mMarqueeView.setMarquee(marquee,parent.getHeight(),parent.getWidth());
+                mMarqueeView.setMarquee(marquee, parent.getHeight(), parent.getWidth());
                 mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
                     @Override
                     public void onLoadMarqueeImgFail() {
@@ -713,7 +744,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                 });
                 mMarqueeView.start();
             }
-        }else{
+        } else {
             parent.getViewTreeObserver().addOnGlobalLayoutListener(
                     new ViewTreeObserver.OnGlobalLayoutListener() {
 
@@ -722,8 +753,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                             if (Build.VERSION.SDK_INT >= 16) {
                                 parent.getViewTreeObserver()
                                         .removeOnGlobalLayoutListener(this);
-                            }
-                            else {
+                            } else {
                                 parent.getViewTreeObserver()
                                         .removeGlobalOnLayoutListener(this);
                             }
@@ -733,13 +763,13 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                                 if (marquee.getType().equals("text")) {
                                     mMarqueeView.setTextContent(marquee.getText().getContent());
                                     mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
-                                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(LivePlayActivity.this,marquee.getText().getFont_size()));
+                                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(LivePlayActivity.this, marquee.getText().getFont_size()));
                                     mMarqueeView.setType(1);
                                 } else {
                                     mMarqueeView.setMarqueeImage(LivePlayActivity.this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
                                     mMarqueeView.setType(2);
                                 }
-                                mMarqueeView.setMarquee(marquee,height,width);
+                                mMarqueeView.setMarquee(marquee, height, width);
                                 mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
                                     @Override
                                     public void onLoadMarqueeImgFail() {
@@ -819,9 +849,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         }
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwLiveCoreHandler.hasPdfView()) {
-            if (!mLiveFloatingView.isShowing()) {
-                mLiveFloatingView.show(mRoot);
-            }
+            mLiveFloatingView.show(mRoot);
         }
     }
 

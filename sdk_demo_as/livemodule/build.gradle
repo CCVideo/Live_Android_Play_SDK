@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+
 android {
     compileSdkVersion 29
 
@@ -9,17 +10,16 @@ android {
         versionName rootProject.ext.android.SDK_VERSION
 
         ndk {
-            abiFilters 'armeabi-v7a'//, 'arm64-v8a'
+            abiFilters 'armeabi-v7a'//, 'x86', 'arm64-v8a'
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -32,20 +32,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:3.7.0'
 
     //===================================live sdk=============================
-
-    // 本地集成  需要将libs中库拷贝到项目中
-
-//    api files('libs/dwlivesdk-3.8.1.jar')
-//    api files('libs/drmlib.jar')
-//    api files('libs/httplib.jar')
-//    api files('libs/engine-0.8.3.1.jar')
-//    api files('libs/hdplayer.jar')
-//    api files('libs/libjingle_peerconnection.jar')
-//    api files('libs/rtc.jar')
-//    api files('libs/tbs_sdk.jar')
-
-    // 远端集成
-    api 'com.bokecc:dwlivesdk:3.8.1'
+    
+    api 'com.bokecc:dwlivesdk:' + rootProject.ext.android.SDK_VERSION
 
 
 }

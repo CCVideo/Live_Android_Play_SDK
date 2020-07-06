@@ -55,7 +55,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:entries="@array/spinner_scale_type"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:visibility="gone" />
 
                 <!--切换文档-->
                 <TextView
@@ -120,14 +121,6 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!--下面聊天区 android:layout_marginBottom="0dp" 解决显示问题 具体原因不详-->
-            <!--            <FrameLayout-->
-            <!--                android:id="@+id/id_private_chat_msg_mask"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="50dp"-->
-            <!--                android:layout_marginBottom="0dp"-->
-            <!--                android:alpha="0.5"-->
-            <!--                >-->
             <RelativeLayout
                 android:id="@+id/id_push_chat_layout"
                 android:layout_width="match_parent"

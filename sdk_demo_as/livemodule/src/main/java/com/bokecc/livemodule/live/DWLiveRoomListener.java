@@ -1,5 +1,7 @@
 package com.bokecc.livemodule.live;
 
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
+
 /**
  * 直播间信息回调监听
  */
@@ -8,9 +10,9 @@ public interface DWLiveRoomListener {
     /**
      * 切换视频文档区域
      *
-     * @param isVideoMain 视频是否为主区域
+     * @param state 视频是否为主区域
      */
-    void onSwitchVideoDoc(boolean isVideoMain);
+    void onSwitchVideoDoc(LiveRoomLayout.State state);
 
     /**
      * 展示直播间标题

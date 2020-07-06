@@ -15,7 +15,7 @@ import com.bokecc.livemodule.utils.DensityUtil;
 
 
 /**
- * 作者 ${郭鹏飞}.<br/>
+ * 作者 ${bokecc}.<br/>
  */
 public abstract class BasePopupWindow implements View.OnClickListener {
 

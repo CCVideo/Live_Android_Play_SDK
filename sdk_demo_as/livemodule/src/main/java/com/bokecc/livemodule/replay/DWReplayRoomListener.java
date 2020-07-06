@@ -1,5 +1,7 @@
 package com.bokecc.livemodule.replay;
 
+import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+
 /**
  * 回放直播间信息监听
  */
@@ -48,5 +50,9 @@ public interface DWReplayRoomListener {
      */
     void onPlayError(int code);
 
-
+    /**
+     * 房间内出现错误
+     * @param exception
+     */
+    void onException(DWLiveException exception);
 }

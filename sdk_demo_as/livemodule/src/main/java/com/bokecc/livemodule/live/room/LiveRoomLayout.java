@@ -1,8 +1,5 @@
 package com.bokecc.livemodule.live.room;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
@@ -37,6 +34,7 @@ import com.bokecc.livemodule.live.chat.KeyboardHeightObserver;
 import com.bokecc.livemodule.live.chat.adapter.EmojiAdapter;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.window.BanChatPopup;
+import com.bokecc.livemodule.live.video.LiveVideoView;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
 
@@ -45,49 +43,50 @@ import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
  */
 public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener, KeyboardHeightObserver {
 
-    Context mContext;
-    RelativeLayout mTopLayout;
-    RelativeLayout mBottomLayout;
-    ImageView mBarrageControl;
+    private Context mContext;
+    private RelativeLayout mTopLayout;
+    private RelativeLayout mBottomLayout;
+    private ImageView mBarrageControl;
     // 直播间标题展示
-    TextView mLiveTitle;
+    private TextView mLiveTitle;
     // 直播间人数展示
-    TextView mLiveUserNumberBottom;
-    TextView mLiveUserNumberTop;
+    private TextView mLiveUserNumberBottom;
+    private TextView mLiveUserNumberTop;
     private boolean isShowUserCount;
     // 切换 文档/视频 按钮
-    TextView mLiveVideoDocSwitch;
+    private TextView mLiveVideoDocSwitch;
     // 退出直播间按钮
-    ImageView mLiveClose;
+    private ImageView mLiveClose;
     // 下方输入聊天信息框
-    LinearLayout mBottomChatLayout;
-    RelativeLayout mPortraitLiveBottom;
+    private LinearLayout mBottomChatLayout;
+    private RelativeLayout mPortraitLiveBottom;
     // 全屏按钮
-    ImageView mLiveFullScreen;
-
+    private ImageView mLiveFullScreen;
     // 文档拉伸类型
-    Spinner spinner;
+    private Spinner spinner;
+    private Button mChatSend;
+    private GridView mEmojiGrid;
+    private ImageView mEmoji; // 表情按钮
+    private EditText mInput;
 
     boolean isEmojiShow = false; // emoji是否显示
-    Button mChatSend;
-    GridView mEmojiGrid;
-    ImageView mEmoji; // 表情按钮
-    EditText mInput;
     boolean isSoftInput = false;
-    InputMethodManager mImm;
+    private InputMethodManager mImm;
     //软键盘的高度
     private int softKeyHeight;
     private boolean showEmojiAction = false;
-
-    // 是否视频为主 （用于文档和视频区域展示切换）
-    public boolean isVideoMain = true;
     private BanChatPopup banChatPopup;
-
+    //当前视图状态
+    public State viewState = State.VIDEO;
+    private LiveVideoView mLiveVideoView;
     // 是否显示拉伸类型选项
-    boolean isShowScale = false;
+    private boolean isShowScale = false;
 
-    public boolean isVideoMain() {
-        return isVideoMain;
+    public enum State {
+        VIDEO,//小窗口打开并且视频在大窗口上
+        DOC,//小窗口打开并且文档在大窗口上
+        OPEN_VIDEO,//小窗口关闭并且文档在大窗口上
+        OPEN_DOC//小窗口关闭并且视频在大窗口上
     }
 
     //针对隐藏标题栏和聊天布局的延迟
@@ -118,6 +117,8 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         initRoomListener();
     }
 
+    DWLive.PlayMode playMode = DWLive.PlayMode.VIDEO;
+
     private void initViews() {
         mImm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         View inflate = LayoutInflater.from(mContext).inflate(R.layout.live_room_layout, this, true);
@@ -143,8 +144,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         } else {
             spinner.setVisibility(View.VISIBLE);
         }
-
-
         RoomInfo roomInfo = DWLive.getInstance().getRoomInfo();
         if (roomInfo != null) {
             isShowUserCount = roomInfo.getShowUserCount() == 1;
@@ -172,18 +171,24 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
 //                    return;
 //                }
                 if (liveRoomStatusListener != null) {
-                    boolean flag = liveRoomStatusListener.switchVideoDoc(!isVideoMain);
-                    if (flag) {
-                        if (isVideoMain) {
-                            mLiveVideoDocSwitch.setText("切换视频");
-                            isVideoMain = false;
-                            showScaleType();
-                        } else {
-                            mLiveVideoDocSwitch.setText("切换文档");
-                            isVideoMain = true;
-                            hideScaleType();
-                        }
+                    if (viewState == State.VIDEO) {
+                        viewState = State.DOC;
+                        liveRoomStatusListener.switchVideoDoc(viewState);
+                        showScaleType();
+                    } else if (viewState == State.DOC) {
+                        viewState = State.VIDEO;
+                        liveRoomStatusListener.switchVideoDoc(viewState);
+                        hideScaleType();
+                    } else if (viewState == State.OPEN_DOC) {
+                        liveRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = State.VIDEO;
+                        hideScaleType();
+                    } else if (viewState == State.OPEN_VIDEO) {
+                        liveRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = State.DOC;
+                        showScaleType();
                     }
+                    setSwitchText(viewState);
                 }
             }
         });
@@ -208,7 +213,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
                 // 如果文档是适应窗口模式
-
                 if (liveRoomStatusListener != null) {
                     liveRoomStatusListener.onClickDocScaleType(pos);
                 }
@@ -222,17 +226,27 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
     }
 
-    /**
-     * 设置视频/文档切换的状态
-     */
-    public void setVideoDocSwitchStatus(boolean isVideoMain) {
-        this.isVideoMain = isVideoMain;
-        if (this.isVideoMain) {
+    public void setSwitchText(State state) {
+        this.viewState = state;
+        if (viewState == State.VIDEO) {
             mLiveVideoDocSwitch.setText("切换文档");
-        } else {
+        } else if (viewState == State.DOC) {
             mLiveVideoDocSwitch.setText("切换视频");
+        } else if (viewState == State.OPEN_DOC) {
+            mLiveVideoDocSwitch.setText("打开文档");
+        } else if (viewState == State.OPEN_VIDEO) {
+            mLiveVideoDocSwitch.setText("打开视频");
         }
     }
+
+    public void setVideo(LiveVideoView mLiveVideoView) {
+        this.mLiveVideoView = mLiveVideoView;
+    }
+
+    public State isVideoMain() {
+        return viewState;
+    }
+
 
     // 进入全屏
     public void intoFullScreen() {
@@ -274,31 +288,23 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     /**
      * 切换视频文档区域
      *
-     * @param isVideoMain 视频是否为主区域
+     * @param state 视频是否为主区域
      */
     @Override
-    public void onSwitchVideoDoc(final boolean isVideoMain) {
+    public void onSwitchVideoDoc(final State state) {
         // 判断是否相同，相同没必要触发
-        if (this.isVideoMain == isVideoMain) {
+        if (this.viewState == state) {
             return;
         }
-        this.isVideoMain = isVideoMain;
+        this.viewState = state;
         if (liveRoomStatusListener != null) {
-            boolean b = liveRoomStatusListener.switchVideoDoc(isVideoMain);
-            if (b) {
-                mLiveVideoDocSwitch.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isVideoMain) {
-                            mLiveVideoDocSwitch.setText("切换文档");
-                            hideScaleType();
-                        } else {
-                            mLiveVideoDocSwitch.setText("切换视频");
-                            showScaleType();
-                        }
-                    }
-                });
-            }
+            liveRoomStatusListener.switchVideoDoc(viewState);
+            mLiveVideoDocSwitch.post(new Runnable() {
+                @Override
+                public void run() {
+                    setSwitchText(viewState);
+                }
+            });
         }
     }
 
@@ -389,10 +395,10 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         /**
          * 切换 视频/文档 区域回调
          *
-         * @param videoMain 是否是视频区域为主
+         * @param state 窗口状态
          * @return 是否切换成功 true是切换成功
          */
-        boolean switchVideoDoc(boolean videoMain);
+        void switchVideoDoc(State state);
 
         /**
          * 点击 Back 按钮 退出直播间回调
@@ -469,7 +475,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
                     mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
                 } else if (isEmojiShow) {  //表情键盘显示，软键盘没有显示，则直接显示软键盘
                     boolean b = mImm.showSoftInput(mInput, 0);
-                    if (b){
+                    if (b) {
                         hideEmoji();
                     }
                 } else { //软键盘和表情键盘都没有显示
@@ -492,15 +498,15 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
                 DWLive.getInstance().sendPublicChatMsg(msg);
                 clearChatInput();
                 //判断是否是软键盘谈起  如果不是软键盘  需要单独去将输入框滑动到下方
-                if (isSoftInput){
+                if (isSoftInput) {
                     hideKeyboard();
-                }else{
+                } else {
                     hideEmoji();
                     mBottomChatLayout.setTranslationY(0);
                 }
 
                 handler.removeMessages(DELAY_HIDE_WHAT);
-                handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT,3000);
+                handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
 
             }
         });
@@ -620,13 +626,13 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     private void hide() {
         mTopLayout.clearAnimation();
         mBottomLayout.clearAnimation();
-        if (mLiveFullScreen.getVisibility()==VISIBLE){
+        if (mLiveFullScreen.getVisibility() == VISIBLE) {
             //根据改字段判断是否是全屏 不是全屏的话就隐藏
             mBottomLayout.setVisibility(GONE);
             mTopLayout.setVisibility(GONE);
-        }else{
+        } else {
             //如果是全屏 还需要判断输入框是否显示  如果输入框显示 说明用户正在输入 不需要隐藏
-            if (!mInput.hasFocus()|| (!isSoftInput&&!isEmojiShow)){
+            if (!mInput.hasFocus() || (!isSoftInput && !isEmojiShow)) {
                 mBottomLayout.setVisibility(GONE);
                 mTopLayout.setVisibility(GONE);
             }
@@ -763,15 +769,16 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
 
     /**
      * 开关弹幕 目前只针对首次进入直播间 服务器返回的弹幕开关数据的时候调用
+     *
      * @param isBarrageOn
      */
     public void controlBarrageControl(boolean isBarrageOn) {
-        this.isBarrageOn=isBarrageOn;
+        this.isBarrageOn = isBarrageOn;
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler == null) {
             return;
         }
-        if (mBarrageControl!=null){
+        if (mBarrageControl != null) {
             if (isBarrageOn) {
                 mBarrageControl.setImageResource(R.drawable.barrage_on);
                 dwLiveCoreHandler.setBarrageStatus(true);
@@ -782,4 +789,11 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         }
     }
 
+    /**
+     * 设置视频/文档切换的状态
+     */
+    public void setVideoDocSwitchStatus(State status) {
+        this.viewState = status;
+        setSwitchText(status);
+    }
 }

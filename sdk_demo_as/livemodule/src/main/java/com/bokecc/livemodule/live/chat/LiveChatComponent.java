@@ -1,5 +1,6 @@
 package com.bokecc.livemodule.live.chat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import com.bokecc.livemodule.live.chat.window.BanChatPopup;
 import com.bokecc.livemodule.utils.ChatImageUtils;
 import com.bokecc.livemodule.view.BaseRelativeLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 
 import org.json.JSONArray;
@@ -44,6 +46,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * 直播间聊天展示控件（公共聊天）
@@ -56,24 +60,19 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     private RelativeLayout mChatLayout;
     private EditText mInput;
     private ImageView mEmoji;
-    private Button mChatSend;
     private GridView mEmojiGrid;
 
     // 软键盘是否显示
     private boolean isSoftInput = false;
-    // emoji是否需要显示 emoji是否显示
-    private boolean isEmoji = false, isEmojiShow = false;
+    // emoji是否需要显示
+    private boolean isEmojiShow = false;
     // 聊天是否显示
     private boolean isChat = false;
 
     // 公共聊天适配器
     private LivePublicChatAdapter mChatAdapter;
 
-    // 是否加载过了历史聊天
-    private boolean hasLoadedHistoryChat;
-
     // 软键盘监听
-//    private SoftKeyBoardState mSoftKeyBoardState;
     private InputMethodManager mImm;
 
     // 定义当前支持的最大的可输入的文字数量
@@ -84,6 +83,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     private int softKeyHeight;
     private boolean showEmojiAction = false;
     private BanChatPopup banChatPopup;
+
     public void setOnChatComponentClickListener(OnChatComponentClickListener listener) {
         mChatComponentClickListener = listener;
     }
@@ -106,7 +106,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         mInput = findViewById(R.id.id_push_chat_input);
         mEmoji = findViewById(R.id.id_push_chat_emoji);
         mEmojiGrid = findViewById(R.id.id_push_emoji_grid);
-        mChatSend = findViewById(R.id.id_push_chat_send);
+        Button mChatSend = findViewById(R.id.id_push_chat_send);
 
         mEmoji.setOnClickListener(new OnClickListener() {
             @Override
@@ -118,9 +118,9 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
                     showEmoji();
                     //2隐藏软键盘
                     mImm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-                }else if(isEmojiShow){  //表情键盘显示，软键盘没有显示，则直接显示软键盘
+                } else if (isEmojiShow) {  //表情键盘显示，软键盘没有显示，则直接显示软键盘
                     mImm.showSoftInput(mInput, 0);
-                }else{ //软键盘和表情键盘都没有显示
+                } else { //软键盘和表情键盘都没有显示
                     //显示表情键盘
                     showEmoji();
                 }
@@ -141,8 +141,8 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void initChat() {
-        hasLoadedHistoryChat = false;
         mImm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         mChatList.setLayoutManager(new LinearLayoutManager(mContext));
         mChatAdapter = new LivePublicChatAdapter(mContext);
@@ -176,14 +176,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             }
         });
 
-//        mChatList.addOnItemTouchListener(new BaseOnItemTouch(mChatList, new com.bokecc.livemodule.live.chat.util.OnClickListener() {
-//            @Override
-//            public void onClick(RecyclerView.ViewHolder viewHolder) {
-//                int position = mChatList.getChildAdapterPosition(viewHolder.itemView);
-//
-//            }
-//        }));
-
         mChatList.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -202,6 +194,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     public void initChatView() {
         mInput.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -256,8 +249,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     }
 
 
-
-
     public void hideChatLayout() {
         if (isChat) {
             AlphaAnimation animation = new AlphaAnimation(0f, 1f);
@@ -281,10 +272,10 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         mEmojiGrid.setVisibility(View.VISIBLE);
         mEmoji.setImageResource(R.drawable.push_chat_emoji);
         isEmojiShow = true;
-        float transY ;
-        if(softKeyHeight == 0){
+        float transY;
+        if (softKeyHeight == 0) {
             transY = -mEmojiGrid.getHeight();
-        }else {
+        } else {
             transY = -softKeyHeight;
         }
         mChatLayout.setTranslationY(transY);
@@ -337,6 +328,10 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         mChatAdapter.changeStatus(status, chatIds);
     }
 
+    public void delChatEntity(String chatId) {
+        mChatAdapter.remove(chatId);
+    }
+
 
     private ChatEntity getChatEntity(ChatMessage msg) {
         ChatEntity chatEntity = new ChatEntity();
@@ -361,9 +356,11 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
 
     /**
      * 展示广播内容
-     **/
-    private void showBroadcastMsg(final String msg) {
-        if (msg == null || msg.isEmpty()) {
+     *
+     * @param msg
+     */
+    private void showBroadcastMsg(final BroadCastMsg msg) {
+        if (msg == null) {
             return;
         }
         runOnUiThread(new Runnable() {
@@ -371,11 +368,13 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             public void run() {
                 // 构建一个对象
                 ChatEntity chatEntity = new ChatEntity();
+                chatEntity.setChatId(msg.getId());
+                chatEntity.setIsBroadcast(true);
                 chatEntity.setUserId("");
                 chatEntity.setUserName("");
                 chatEntity.setPrivate(false);
                 chatEntity.setPublisher(true);
-                chatEntity.setMsg("系统消息: " + msg);
+                chatEntity.setMsg(String.format("系统消息: %s", msg.getContent()));
                 chatEntity.setTime("");
                 chatEntity.setStatus("0");  // 显示
                 chatEntity.setUserAvatar("");
@@ -386,39 +385,97 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
 
     //------------------------ 处理直播聊天回调信息 ------------------------------------
 
-    // 收到历史聊天信息
+    // 获取历史消息集合
+    private ArrayList<ChatEntity> list = new ArrayList<>();
+    private boolean hasBroadcastMsg = false; // 主要为了防止数据重复
 
-    //TODO:这里可能是相对时间
+    // 收到历史广播信息，在收到历史消息之前处理
+    @Override
+    public void onHistoryBroadcastMsg(ArrayList<BroadCastMsg> msgs) {
+        hasBroadcastMsg = true;
+        list.clear();
+        final ArrayList<ChatEntity> list1 = mChatAdapter.getChatEntities();
+        for (final BroadCastMsg castMsg : msgs) {
+            ChatEntity chatEntity = new ChatEntity();
+            chatEntity.setChatId(castMsg.getId());
+            chatEntity.setIsBroadcast(true);
+            chatEntity.setUserId("");
+            chatEntity.setUserName("");
+            chatEntity.setPrivate(false);
+            chatEntity.setPublisher(true);
+            chatEntity.setMsg(String.format("系统消息: %s", castMsg.getContent()));
+            chatEntity.setTime(String.valueOf(castMsg.getTime()));
+            chatEntity.setStatus("0");  // 显示
+            chatEntity.setUserAvatar("");
+            if (list1.contains(chatEntity)) {
+                continue;
+            }
+            Log.e("dds_test", "history BroadcastMsg:" + chatEntity.getTime());
+            list.add(chatEntity);
+        }
+
+    }
+
+    // 收到历史聊天信息
     @Override
     public void onHistoryChatMessage(final ArrayList<ChatMessage> historyChats) {
-        // 如果之前已经加载过了历史聊天信息，就不再接收
-//        if (hasLoadedHistoryChat) {
-//            return;
-//        }
         if (historyChats == null || historyChats.size() == 0) {
             return;
         }
-//        hasLoadedHistoryChat = true;
+        if (!hasBroadcastMsg) {
+            list.clear();
+        }
+        hasBroadcastMsg = false;
+        for (int i = 0; i < historyChats.size(); i++) {
+
+            ChatEntity chatEntity = getChatEntity(historyChats.get(i));
+            ArrayList<ChatEntity> chatEntities = mChatAdapter.getChatEntities();
+            if (chatEntities.contains(chatEntity)) {
+                continue;
+            }
+            Log.e("dds_test", "history ChatMessage:" + chatEntity.getTime());
+            if (barrageLayout != null) {
+                // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕 && 聊天状态为显示
+                if (!ChatImageUtils.isImgChatMessage(historyChats.get(i).getMessage()) && "0".equals(historyChats.get(i).getStatus())) {
+                    //判断横竖屏
+                    if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        barrageLayout.addNewInfo(historyChats.get(i).getMessage());
+                    } else if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        //竖屏不需要添加
+                    }
+                }
+            }
+            list.add(chatEntity);
+        }
+        // 排序 -->兼容历史服务器版本处理，服务器最新版不需要加try catch
+        try {
+            Collections.sort(list, new Comparator<ChatEntity>() {
+                @Override
+                public int compare(ChatEntity o1, ChatEntity o2) {
+                    int time = Integer.parseInt(o1.getTime());
+                    int time2 = Integer.parseInt(o2.getTime());
+                    if (time == time2) {
+                        return 0;
+                    }
+                    if (time > time2) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // 注：历史聊天信息中 ChatMessage 的 currentTime = ""
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // 将历史聊天信息添加到UI
-                clearChatEntities();
-                for (int i = 0; i < historyChats.size(); i++) {
-                    if (barrageLayout != null) {
-                        // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕 && 聊天状态为显示
-                        if (!ChatImageUtils.isImgChatMessage(historyChats.get(i).getMessage()) && "0".equals(historyChats.get(i).getStatus())) {
-                            //判断横竖屏
-                            if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                barrageLayout.addNewInfo(historyChats.get(i).getMessage());
-                            } else if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                //竖屏不需要添加
-                            }
-                        }
-                    }
-                    addChatEntity(getChatEntity(historyChats.get(i)));
-                }
+//                 clearChatEntities();
+                mChatAdapter.add(list);
+
             }
         });
     }
@@ -430,7 +487,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             public void run() {
                 if (barrageLayout != null) {
                     // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕
-                    if (!ChatImageUtils.isImgChatMessage(msg.getMessage()) && "0".equals(msg.getStatus())&&getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    if (!ChatImageUtils.isImgChatMessage(msg.getMessage()) && "0".equals(msg.getStatus()) && getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         barrageLayout.addNewInfo(msg.getMessage());
                     }
                 }
@@ -440,11 +497,11 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     }
 
     @Override
-    public void onBanDeleteChat(final String userId){
+    public void onBanDeleteChat(final String userId) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(mChatAdapter != null){
+                if (mChatAdapter != null) {
                     mChatAdapter.banDeleteChat(userId);
                 }
             }
@@ -500,10 +557,10 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (banChatPopup ==null){
+                if (banChatPopup == null) {
                     banChatPopup = new BanChatPopup(getContext());
                 }
-                if (banChatPopup.isShowing()){
+                if (banChatPopup.isShowing()) {
                     banChatPopup.onDestroy();
                 }
                 if (mode == 1) {
@@ -516,6 +573,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         });
 
     }
+
     private View rootView;
 
     public void setPopView(View rootView) {
@@ -532,10 +590,10 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (banChatPopup ==null){
+                if (banChatPopup == null) {
                     banChatPopup = new BanChatPopup(getContext());
                 }
-                if (banChatPopup.isShowing()){
+                if (banChatPopup.isShowing()) {
                     banChatPopup.onDestroy();
                 }
                 if (mode == 1) {
@@ -549,12 +607,33 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
 
     }
 
+
+    @Deprecated
+    @Override
+    public void onBroadcastMsg(String msg) {
+        // showBroadcastMsg(msg);
+    }
+
+
     /**
      * 收到广播信息
      */
     @Override
-    public void onBroadcastMsg(String msg) {
+    public void onBroadcastMsg(BroadCastMsg msg) {
         showBroadcastMsg(msg);
+    }
+
+
+    /*删除广播消息*/
+    @Override
+    public void onBroadcastMsgDel(final String id) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                delChatEntity(id);
+            }
+        });
+
     }
 
     /***************************** 弹幕 ******************************/
@@ -576,7 +655,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
             isEmojiShow = false;
         } else {
-            if(!showEmojiAction){
+            if (!showEmojiAction) {
                 mChatLayout.setTranslationY(0);
                 hideEmoji();
             }

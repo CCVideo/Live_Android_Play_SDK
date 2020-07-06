@@ -1,9 +1,14 @@
 package com.bokecc.livemodule.live.chat.module;
 
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import java.io.Serializable;
+
 /**
  * 聊天实例类
  */
-public class ChatEntity {
+public class ChatEntity implements Serializable {
     /**
      * 此聊天对应的ID
      */
@@ -33,11 +38,11 @@ public class ChatEntity {
      */
     private boolean isPublisher;
     /**
-     *该条信息是私聊的情况下 接收方的id
+     * 该条信息是私聊的情况下 接收方的id
      */
     private String mReceiveUserId;
     /**
-     *该条信息是私聊的情况下 接收方的用户名
+     * 该条信息是私聊的情况下 接收方的用户名
      */
     private String mReceivedUserName;
     /**
@@ -51,11 +56,18 @@ public class ChatEntity {
     /**
      * 聊天时间
      */
-    private String mTime;
+    private String mTime = "0";
     /**
      * 聊天状态（聊天消息的状态 0：显示 1：不显示）
      */
     private String mStatus;
+
+
+    /**
+     * 是否是广播消息，默认为false
+     */
+    private boolean isBroadcast;
+
 
     public String getChatId() {
         return mChatId;
@@ -159,6 +171,32 @@ public class ChatEntity {
 
     public void setStatus(String status) {
         this.mStatus = status;
+    }
+
+    public boolean isBroadcast() {
+        return isBroadcast;
+    }
+
+    public void setIsBroadcast(boolean broadcast) {
+        isBroadcast = broadcast;
+    }
+
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof ChatEntity)) {
+            return false;
+        }
+        ChatEntity stuObj = (ChatEntity) obj;
+        if (this == stuObj) {
+            return true;
+        }
+        if (!TextUtils.isEmpty(this.mChatId) && !TextUtils.isEmpty(stuObj.mChatId) && stuObj.mChatId.equals(this.mChatId)) {
+            return true;
+        } else {
+            return super.equals(obj);
+        }
+
     }
 }
 

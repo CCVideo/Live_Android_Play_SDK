@@ -59,12 +59,12 @@ public class LiveDocComponent extends LinearLayout implements LiveDocSizeChangeL
     // 设置文档的拉伸模式
     public void setScaleType(int type) {
         // 如果不是自适应宽度不会起作用
-        if (!mDocView.isDocFitWidth()) return;
-        if (DocView.ScaleType.CENTER_INSIDE.ordinal() == type) {
+        if (mDocView.isDocFitWidth()) return;
+        if (0 == type) {
             DWLive.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
-        } else if (DocView.ScaleType.FIT_XY.ordinal() == type) {
+        } else if (1 == type) {
             DWLive.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
-        } else if (DocView.ScaleType.CROP_CENTER.ordinal() == type) {
+        } else if (2 == type) {
             DWLive.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
         }
     }

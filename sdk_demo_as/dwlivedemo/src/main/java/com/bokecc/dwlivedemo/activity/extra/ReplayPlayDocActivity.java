@@ -16,6 +16,7 @@ import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -125,7 +126,7 @@ public class ReplayPlayDocActivity extends BaseActivity {
         mExitPopupWindow = new ExitPopupWindow(this);
         mReplayFloatingView = new FloatingPopupWindow(this);
 
-        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
+        //mReplayRoomLayout.setVideoDocSwitchText("切换视频");
 
         mReplayRoomLayout.setReplayRoomStatusListener(roomStatusListener);
     }
@@ -203,9 +204,7 @@ public class ReplayPlayDocActivity extends BaseActivity {
         if (dwReplayCoreHandler == null) {
             return;
         }
-        if (!mReplayFloatingView.isShowing()) {
-            mReplayFloatingView.show(mRoot);
-        }
+        mReplayFloatingView.show(mRoot);
     }
 
     /*************************************** 下方布局 ***************************************/
@@ -282,7 +281,7 @@ public class ReplayPlayDocActivity extends BaseActivity {
     private ReplayRoomLayout.ReplayRoomStatusListener roomStatusListener = new ReplayRoomLayout.ReplayRoomStatusListener() {
 
         @Override
-        public void switchVideoDoc() {
+        public void switchVideoDoc(LiveRoomLayout.State state) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -292,14 +291,14 @@ public class ReplayPlayDocActivity extends BaseActivity {
                         mReplayFloatingView.addView(mReplayVideoView);
                         mReplayVideoContainer.addView(mReplayDocView);
                         isVideoMain = false;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
+//                        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
                     } else {
                         mReplayVideoContainer.removeAllViews();
                         mReplayFloatingView.removeAllView();
                         mReplayFloatingView.addView(mReplayDocView);
                         mReplayVideoContainer.addView(mReplayVideoView);
                         isVideoMain = true;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换文档");
+//                        mReplayRoomLayout.setVideoDocSwitchText("切换文档");
                     }
                 }
             });
@@ -336,6 +335,11 @@ public class ReplayPlayDocActivity extends BaseActivity {
 
         @Override
         public void onClickDocScaleType(int type) {
+
+        }
+
+        @Override
+        public void seek(int max, int progress, float move, boolean isSeek, float xVelocity) {
 
         }
     };

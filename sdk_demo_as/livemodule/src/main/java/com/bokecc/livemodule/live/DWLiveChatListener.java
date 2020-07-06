@@ -1,5 +1,6 @@
 package com.bokecc.livemodule.live;
 
+import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 
 import java.util.ArrayList;
@@ -61,7 +62,23 @@ public interface DWLiveChatListener {
     /**
      * 收到广播信息
      */
+    @Deprecated
     void onBroadcastMsg(String msg);
 
+    /**
+     * 收到历史广播
+     *
+     * @param msgs
+     */
+    void onHistoryBroadcastMsg(ArrayList<BroadCastMsg> msgs);
 
+    /**
+     * 收到广播信息
+     */
+    void onBroadcastMsg(BroadCastMsg msg);
+
+    /**
+     * 根据id删除广播消息
+     */
+    void onBroadcastMsgDel(String id);
 }

@@ -5,9 +5,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,10 +18,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.localplay.DWLocalReplayRoomListener;
+import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.livemodule.view.RePlaySeekBar;
+import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.util.Timer;
@@ -43,7 +49,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     // 当前播放时间
     TextView mCurrentTime;
     // 进度条
-    RePlaySeekBar mPlaySeekBar;
+    public RePlaySeekBar mPlaySeekBar;
     // 播放时长
     TextView mDurationView;
     // 播放/暂停 按钮
@@ -52,7 +58,11 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     Button mReplaySpeed;
     // 全屏按钮
     ImageView mLiveFullScreen;
-
+    public LiveRoomLayout.State viewState = LiveRoomLayout.State.VIDEO;
+    private VelocityTracker mVelocityTracker;
+    private RelativeLayout mSeekRoot;
+    private TextView mSeekTime,mSumTime;
+    public int docMode = -1;
     public LocalReplayRoomLayout(Context context) {
         super(context);
         mContext = context;
@@ -81,7 +91,9 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
         mDurationView = findViewById(R.id.replay_duration);
         mPlaySeekBar = findViewById(R.id.replay_progressbar);
         mPlayIcon.setSelected(true);
-
+        mSeekRoot = findViewById(R.id.seek_root);
+        mSeekTime = findViewById(R.id.tv_seek_time);
+        mSumTime = findViewById(R.id.tv_sum_time);
         // 隐藏 "文档/视频" 切换
         // mVideoDocSwitch.setVisibility(GONE);
 
@@ -105,7 +117,20 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
             @Override
             public void onClick(View v) {
                 if (replayRoomStatusListener != null) {
-                    replayRoomStatusListener.switchVideoDoc();
+                    if (viewState == LiveRoomLayout.State.VIDEO){
+                        viewState = LiveRoomLayout.State.DOC;
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                    }else if (viewState == LiveRoomLayout.State.DOC){
+                        viewState = LiveRoomLayout.State.VIDEO;
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                    }else if (viewState == LiveRoomLayout.State.OPEN_DOC){
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = LiveRoomLayout.State.VIDEO;
+                    }else if (viewState == LiveRoomLayout.State.OPEN_VIDEO){
+                        replayRoomStatusListener.switchVideoDoc(viewState);
+                        viewState = LiveRoomLayout.State.DOC;
+                    }
+                    setVideoDocSwitchText(viewState);
                 }
             }
         });
@@ -149,8 +174,13 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                 }
                 // 获取当前的player，执行seek操作
                 DWReplayPlayer player = localReplayCoreHandler.getPlayer();
-                player.seekTo(progress);
-                player.start();
+                if (progress>=seekBar.getMax()){
+                    player.seekTo(0);
+                    player.pause();
+                }else{
+                    player.seekTo(progress);
+                    player.start();
+                }
             }
         });
     }
@@ -211,8 +241,17 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     }
 
     // 设置文档/视频切换的按钮的文案
-    public void setVideoDocSwitchText(String text) {
-        mVideoDocSwitch.setText(text);
+    public void setVideoDocSwitchText(LiveRoomLayout.State state) {
+        this.viewState = state;
+        if (viewState == LiveRoomLayout.State.VIDEO){
+            mVideoDocSwitch.setText("切换文档");
+        }else if (viewState == LiveRoomLayout.State.DOC){
+            mVideoDocSwitch.setText("切换视频");
+        }else if (viewState == LiveRoomLayout.State.OPEN_DOC){
+            mVideoDocSwitch.setText("打开文档");
+        }else if (viewState == LiveRoomLayout.State.OPEN_VIDEO){
+            mVideoDocSwitch.setText("打开视频");
+        }
     }
 
     // 进入全屏
@@ -245,6 +284,9 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
      */
     @Override
     public void updateRoomTitle(final String title) {
+        if (DWLiveLocalReplay.getInstance().getRoomInfo()!=null){
+            docMode = DWLiveLocalReplay.getInstance().getRoomInfo().getDocumentDisplayMode();
+        }
         if (mTitle != null) {
             mTitle.post(new Runnable() {
                 @Override
@@ -302,8 +344,9 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
 
         /**
          * 视频/文档 切换
+         * @param viewState
          */
-        void switchVideoDoc();
+        void switchVideoDoc(LiveRoomLayout.State viewState);
 
         /**
          * 退出直播间
@@ -314,6 +357,16 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
          * 进入全屏
          */
         void fullScreen();
+
+        /**
+         * 滑动拖拽进度
+         * @param max
+         * @param progress
+         * @param move
+         * @param isSeek
+         * @param xVelocity
+         */
+        void seek(int max, int progress, float move, boolean isSeek, float xVelocity);
     }
 
     // 回放直播间状态监听
@@ -408,43 +461,104 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                     }
                 });
             } else {
-                mTopLayout.setVisibility(VISIBLE);
-                mBottomLayout.setVisibility(VISIBLE);
-                ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", 0);
-                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", 0);
-                AnimatorSet animatorSet = new AnimatorSet();
-                animatorSet.play(top_y).with(bottom_y);
-                //播放动画的持续时间
-                animatorSet.setDuration(500);
-                animatorSet.start();
-                animatorSet.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-                    }
-                });
+                show();
             }
         }
     };
+    public void show(){
+        mTopLayout.setVisibility(VISIBLE);
+        mBottomLayout.setVisibility(VISIBLE);
+        ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", 0);
+        ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", 0);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(top_y).with(bottom_y);
+        //播放动画的持续时间
+        animatorSet.setDuration(500);
+        animatorSet.start();
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+            }
+        });
+    }
+    private float downX,downY,moveX,moveY,downTime,upTime,seekTime;
+    private boolean isSeek = false;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_UP:
-                performClick();
-                return false;
+        if(docMode==1){
+            if (mVelocityTracker == null) {
+                mVelocityTracker = VelocityTracker.obtain();
+            }
+            mVelocityTracker.addMovement(event);
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    downX = event.getX();
+                    moveX = event.getX();
+                    downY = event.getY();
+                    moveY = event.getY();
+                    downTime = System.currentTimeMillis();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float moveX = event.getX();
+                    float moveY = event.getY();
+                    if (Math.abs(downY-moveY)+10<Math.abs(moveX-this.downX)){
+                        if (Math.abs(moveX-this.downX)>10&& DWLocalReplayCoreHandler.getInstance().getPlayer().getPlayerState()!= DWReplayPlayer.State.ERROR
+                                &&DWLocalReplayCoreHandler.getInstance().getPlayer().getPlayerState()!= DWReplayPlayer.State.BUFFERING
+                                &&DWLocalReplayCoreHandler.getInstance().getPlayer().getPlayerState()!= DWReplayPlayer.State.PLAYBACK_COMPLETED){
+                            stopTimerTask();
+                            mVelocityTracker.computeCurrentVelocity(1000);
+                            replayRoomStatusListener.seek(mPlaySeekBar.getMax(),mPlaySeekBar.getProgress(),(moveX-this.moveX)*1000,false,mVelocityTracker.getXVelocity(0));
+                            if (mSeekRoot.getVisibility()!=VISIBLE)
+                                mSeekRoot.setVisibility(VISIBLE);
+                            mSeekTime.setText(TimeUtil.getFormatTime(mPlaySeekBar.getProgress()));
+                            if (TextUtils.isEmpty(mSumTime.getText())||mSumTime.getText().equals("00:00")){
+                                mSumTime.setText(TimeUtil.getFormatTime(mPlaySeekBar.getMax()));
+                            }
+                            this.moveX = moveX;
+                            this.moveY = moveY;
+                            isSeek = true;
+                            if (!mTopLayout.isShown()){
+                                show();
+                            }
+                        }
+                    }
 
+
+                    break;
+                case MotionEvent.ACTION_UP:
+                    float upX = event.getX();
+                    float upY = event.getY();
+                    upTime = System.currentTimeMillis();
+                    if (isSeek){
+                        mSeekRoot.setVisibility(GONE);
+                        if (Math.abs(upX-downX)>10){
+                            replayRoomStatusListener.seek(mPlaySeekBar.getMax(),mPlaySeekBar.getProgress(),(upX-downX),true, mVelocityTracker.getXVelocity(0));
+                            isSeek = false;
+                        }
+                        startTimerTask();
+                    }
+                    break;
+            }
+        }else{
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_UP:
+                    performClick();
+                    return false;
+
+            }
         }
         return super.onTouchEvent(event);
     }

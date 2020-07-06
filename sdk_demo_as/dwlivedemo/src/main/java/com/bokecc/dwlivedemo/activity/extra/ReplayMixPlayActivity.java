@@ -32,9 +32,9 @@ import java.util.List;
 
 /**
  * 回放播放页（支持在线回放和离线回放同页面列表切换）
- *
+ * <p>
  * 注意事项：
- *
+ * <p>
  * 1. 离线回放CCR文件必须已经下载解压好了。
  * 2. 播放离线回放必须已经授权'存储'权限
  */
@@ -199,9 +199,7 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
 
     // 展示文档悬浮窗布局
     private void showFloatingDocLayout() {
-        if (!mReplayFloatingView.isShowing()) {
-            mReplayFloatingView.show(mRoot);
-        }
+        mReplayFloatingView.show(mRoot);
     }
 
     /*************************************** 下方布局 ***************************************/
@@ -432,6 +430,7 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
 
     /**
      * 开始离线回放
+     *
      * @param ccrName CCR文件名称（此部分逻辑可以参考完整的离线回放Demo：localreplaydemo）
      */
     public void startLocalReplay(String ccrName) {

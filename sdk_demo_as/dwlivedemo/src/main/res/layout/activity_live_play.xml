@@ -98,6 +98,7 @@
 
     </RelativeLayout>
 
+    <!--下半部分-->
     <RelativeLayout
         android:id="@+id/ll_pc_live_msg_layout"
         android:layout_width="match_parent"

@@ -25,6 +25,7 @@ import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.localplay.chat.LocalReplayChatComponent;
 import com.bokecc.livemodule.localplay.doc.LocalReplayDocComponent;
@@ -32,6 +33,7 @@ import com.bokecc.livemodule.localplay.intro.LocalReplayIntroComponent;
 import com.bokecc.livemodule.localplay.qa.LocalReplayQAComponent;
 import com.bokecc.livemodule.localplay.room.LocalReplayRoomLayout;
 import com.bokecc.livemodule.localplay.video.LocalReplayVideoView;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -219,6 +221,16 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
     LocalReplayChatComponent mChatLayout;
     // 文档组件
     LocalReplayDocComponent mDocLayout;
+    private FloatingPopupWindow.FloatDismissListener floatDismissListener = new FloatingPopupWindow.FloatDismissListener() {
+        @Override
+        public void dismiss() {
+            if (mReplayRoomLayout.viewState == LiveRoomLayout.State.VIDEO) {
+                mReplayRoomLayout.setVideoDocSwitchText(LiveRoomLayout.State.OPEN_DOC);
+            } else if (mReplayRoomLayout.viewState == LiveRoomLayout.State.DOC) {
+                mReplayRoomLayout.setVideoDocSwitchText(LiveRoomLayout.State.OPEN_VIDEO);
+            }
+        }
+    };
 
     // 初始化聊天布局区域
     private void initChatLayout() {
@@ -246,8 +258,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
 
     // 初始化文档布局区域
     private void initDocLayout() {
-        mLocalReplayFloatingView.removeAllView();
-        if (isVideoMain) {
+        if (mReplayRoomLayout.viewState == LiveRoomLayout.State.VIDEO) {
             mLocalReplayFloatingView.addView(mDocLayout);
         } else {
             mLocalReplayFloatingView.addView(mReplayVideoView);
@@ -297,6 +308,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         mDocTag = findViewById(R.id.live_portrait_info_document);
 
         mLocalReplayFloatingView = new FloatingPopupWindow(this);
+        mLocalReplayFloatingView.setFloatDismissListener(floatDismissListener);
         //退出确认弹框
         mExitPopupWindow = new ExitPopupWindow(this);
 
@@ -334,45 +346,57 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         }
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwLocalReplayCoreHandler.hasPdfView()) {
-            if (!mLocalReplayFloatingView.isShowing()) {
-                mLocalReplayFloatingView.show(mRoot);
-            }
+            mLocalReplayFloatingView.show(mRoot);
         }
     }
 
 
     /**************************************  Room 状态回调监听 *************************************/
 
-    boolean isVideoMain = true;
 
     private LocalReplayRoomLayout.LocalReplayRoomStatusListener roomStatusListener = new LocalReplayRoomLayout.LocalReplayRoomStatusListener() {
 
         @Override
-        public void switchVideoDoc() {
+        public void switchVideoDoc(final LiveRoomLayout.State state) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (isVideoMain) {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoContainer.removeAllViews();
-                        mLocalReplayFloatingView.removeAllView();
-                        mLocalReplayFloatingView.addView(mReplayVideoView);
-                        mReplayVideoContainer.addView(mDocLayout);
-                        isVideoMain = false;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
-                        mDocLayout.setDocScrollable(true);//webview不可切换
-                    } else {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoContainer.removeAllViews();
-                        mLocalReplayFloatingView.removeAllView();
+                    if (state == LiveRoomLayout.State.VIDEO) {
+                        //如果当前小窗口开启并且大窗口是视频 将大窗口切换到文档
+                        switchView(false);
+                    } else if (state == LiveRoomLayout.State.DOC) {
+                        switchView(true);
+                    } else if (state == LiveRoomLayout.State.OPEN_DOC) {
+                        mLocalReplayFloatingView.show(mRoot);
+                        if (mDocLayout.getParent() != null)
+                            ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
                         mLocalReplayFloatingView.addView(mDocLayout);
-                        mReplayVideoContainer.addView(mReplayVideoView);
-                        isVideoMain = true;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换文档");
-                        mDocLayout.setDocScrollable(false);//webview不可切换
+                    } else if (state == LiveRoomLayout.State.OPEN_VIDEO) {
+                        mLocalReplayFloatingView.show(mRoot);
+                        if (mReplayVideoView.getParent() != null)
+                            ((ViewGroup) mReplayVideoView.getParent()).removeView(mReplayVideoView);
+                        mLocalReplayFloatingView.addView(mReplayVideoView);
                     }
                 }
             });
+        }
+
+        public void switchView(boolean isVideoMain) {
+            if (mReplayVideoView.getParent() != null)
+                ((ViewGroup) mReplayVideoView.getParent()).removeView(mReplayVideoView);
+            if (mDocLayout.getParent() != null)
+                ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+            if (isVideoMain) {
+                // 缓存视频的切换前的画面
+                mLocalReplayFloatingView.addView(mReplayVideoView);
+                mReplayVideoContainer.addView(mDocLayout);
+                mDocLayout.setDocScrollable(true);//webview不可切换
+            } else {
+                // 缓存视频的切换前的画面
+                mLocalReplayFloatingView.addView(mDocLayout);
+                mReplayVideoContainer.addView(mReplayVideoView);
+                mDocLayout.setDocScrollable(false);//webview不可切换
+            }
         }
 
         @Override
@@ -403,6 +427,26 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
                     getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
                 }
             });
+        }
+
+        @Override
+        public void seek(int max, int progress, float move, boolean isSeek, float xVelocity) {
+            DWReplayPlayer player = DWLocalReplayCoreHandler.getInstance().getPlayer();
+            if (progress + move < 0) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress(0);
+            } else if (progress + move > max) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress(max);
+            } else if (progress + move < max) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress((int) (progress + ((xVelocity * 10))));
+            } else if (progress + move == max) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress(0);
+            }
+            if (isSeek) {
+                if (player != null) {
+                    player.seekTo(mReplayRoomLayout.mPlaySeekBar.getProgress());
+                }
+
+            }
         }
     };
 
@@ -459,6 +503,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
 //            mExitPopupWindow.show(mRoot);
 //        }
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -469,8 +514,8 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
         }
         //调整窗口的位置
-        if (mLocalReplayFloatingView!=null&&mLocalReplayFloatingView.isShowing()){
-            mLocalReplayFloatingView.onConfigurationChanged(newConfig);
+        if (mLocalReplayFloatingView != null) {
+            mLocalReplayFloatingView.onConfigurationChanged(newConfig.orientation);
         }
     }
 

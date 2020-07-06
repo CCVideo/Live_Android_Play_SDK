@@ -1,5 +1,6 @@
 package com.bokecc.livemodule.live.chat.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import com.bokecc.sdk.mobile.live.pojo.Viewer;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,18 +84,39 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
         pattern = Pattern.compile(regular, Pattern.CASE_INSENSITIVE);
     }
 
-    /**
-     * 添加数据，用于回放的添加
-     */
+
+    public void addBroadcast(ArrayList<ChatEntity> mChatEntities) {
+        this.mChatEntities.addAll(mChatEntities);
+        this.mChatEntitiesForShow.addAll(mChatEntities);
+        notifyItemRangeInserted(0, mChatEntities.size());
+    }
+
     public void add(ArrayList<ChatEntity> mChatEntities) {
-        this.mChatEntities = mChatEntities;
+        this.mChatEntities.addAll(mChatEntities);
         this.mChatEntitiesForShow.clear();
         for (ChatEntity chatEntity : this.mChatEntities) {
-            if ("0".equals(chatEntity.getStatus()) || selfId.equals(chatEntity.getUserId())) {
+            if ("0".equals(chatEntity.getStatus()) || selfId.equals(chatEntity.getUserId()) || chatEntity.isBroadcast()) {
                 mChatEntitiesForShow.add(chatEntity);
             }
         }
         notifyDataSetChanged();
+    }
+
+
+    public void remove(String chatId) {
+        int size = mChatEntitiesForShow.size();
+        int position = -1;
+        for (int i = 0; i < size; i++) {
+            ChatEntity chatEntity = mChatEntitiesForShow.get(i);
+            if (chatEntity.getChatId() != null && chatEntity.getChatId().equals(chatId)) {
+                position = i;
+                break;
+            }
+        }
+        if (position >= 0) {
+            mChatEntitiesForShow.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
 
@@ -123,21 +147,22 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
 
     /**
      * 禁言删除聊天
+     *
      * @param userId
      */
-    public void banDeleteChat(String userId){
-        if(userId.equals(selfId)) return;
+    public void banDeleteChat(String userId) {
+        if (userId.equals(selfId)) return;
         Iterator<ChatEntity> it = mChatEntities.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             ChatEntity entity = it.next();
-            if(entity.getUserId().equals(userId)){
+            if (entity.getUserId().equals(userId)) {
                 it.remove();
             }
         }
         Iterator<ChatEntity> it2 = mChatEntitiesForShow.iterator();
-        while(it2.hasNext()){
+        while (it2.hasNext()) {
             ChatEntity entity = it2.next();
-            if(entity.getUserId().equals(userId)){
+            if (entity.getUserId().equals(userId)) {
                 it2.remove();
             }
         }
@@ -185,7 +210,7 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
     }
 
     @Override
-    public void onBindViewHolder(final ChatViewHolder holder, final int position) {
+    public void onBindViewHolder(final ChatViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         final ChatEntity chatEntity = mChatEntitiesForShow.get(position);
 
         if (holder.viewType == otherType) {
@@ -199,9 +224,7 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
             });
         }
         // 判断是是否是广播，如果是，就展示广播信息
-        if (chatEntity.getUserId().isEmpty() && chatEntity.getUserName().isEmpty()
-                && !chatEntity.isPrivate() && chatEntity.isPublisher()
-                && chatEntity.getTime().isEmpty() && chatEntity.getUserAvatar().isEmpty()) {
+        if (chatEntity.isBroadcast()) {
             // 展示广播信息
             holder.mBroadcast.setText(chatEntity.getMsg());
         } else {
@@ -234,9 +257,9 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                     public void onClick(View v) {
                         if (mChatCompontentClickListener != null) {
                             Bundle bundle = new Bundle();
-                            bundle.putString("type",CONTENT_IMAGE_COMPONENT);
+                            bundle.putString("type", CONTENT_IMAGE_COMPONENT);
                             bundle.putString("url", ChatImageUtils.getImgUrlFromChatMessage(chatEntity.getMsg()));
-                            mChatCompontentClickListener.onChatComponentClick(holder.mChatImg,bundle);
+                            mChatCompontentClickListener.onChatComponentClick(holder.mChatImg, bundle);
                         }
                     }
                 });
@@ -268,20 +291,21 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
                         @Override
                         public void onClick(@NonNull View widget) {
 
-                            if(mChatCompontentClickListener != null){
+                            if (mChatCompontentClickListener != null) {
                                 Bundle bundle = new Bundle();
-                                bundle.putString("type",CONTENT_ULR_COMPONET);
-                                bundle.putString("url",finalUrl);
-                                mChatCompontentClickListener.onChatComponentClick(widget,bundle);
+                                bundle.putString("type", CONTENT_ULR_COMPONET);
+                                bundle.putString("url", finalUrl);
+                                mChatCompontentClickListener.onChatComponentClick(widget, bundle);
                             }
                         }
+
                         //去除连接下划线
                         @Override
                         public void updateDrawState(TextPaint ds) {
                             ds.setUnderlineText(false);
                         }
 
-                    },start,end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     ss.setSpan(new ForegroundColorSpan(Color.parseColor("#2292DD")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
@@ -319,9 +343,7 @@ public class LivePublicChatAdapter extends RecyclerView.Adapter<LivePublicChatAd
         ChatEntity chat = mChatEntitiesForShow.get(position);
 
         // 系统广播 --- 只有 chatEntity.getMsg() 不为空
-        if (chat.getUserId().isEmpty() && chat.getUserName().isEmpty()
-                && !chat.isPrivate() && chat.isPublisher()
-                && chat.getTime().isEmpty() && chat.getUserAvatar().isEmpty()) {
+        if (chat.isBroadcast()) {
             return systemType;
         }
 

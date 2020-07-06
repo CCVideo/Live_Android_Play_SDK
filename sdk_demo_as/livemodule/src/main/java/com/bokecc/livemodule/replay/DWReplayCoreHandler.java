@@ -1,17 +1,17 @@
 package com.bokecc.livemodule.replay;
 
 import android.util.Log;
-import android.view.Surface;
 
 import com.bokecc.livemodule.replay.doc.DocActionListener;
 import com.bokecc.livemodule.replay.doc.ReplayDocSizeChangeListener;
 import com.bokecc.sdk.mobile.live.DWLiveEngine;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
-import com.bokecc.sdk.mobile.live.replay.ChangeLineCallback;
+import com.bokecc.sdk.mobile.live.replay.ReplayLineSwitchListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.replay.entity.ReplayLineParams;
 import com.bokecc.sdk.mobile.live.replay.ReplayErrorListener;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayBroadCastMsg;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayChatMsg;
@@ -21,6 +21,7 @@ import com.bokecc.sdk.mobile.live.replay.pojo.ReplayQAMsg;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import static com.bokecc.sdk.mobile.live.Exception.ErrorCode.DOC_LOAD_FAILED;
@@ -33,7 +34,6 @@ public class DWReplayCoreHandler {
     private static final String TAG = "DWReplayCoreHandler";
 
     private static DWReplayCoreHandler dwReplayCoreHandler = new DWReplayCoreHandler();
-
     /**
      * 获取DWReplayCoreHandler单例的实例
      */
@@ -194,20 +194,27 @@ public class DWReplayCoreHandler {
     /******************************* 视频播放相关 ***************************************/
 
 
-
-
     /**
      * 开始播放
      */
-    public void start(Surface surface) {
+    public void start() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         dwLiveReplay.setReplayErrorListener(mErrorListener);
         dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
-        if (dwLiveReplay != null) {
-            dwLiveReplay.start(null);
-        }
-    }
+        dwLiveReplay.start();
 
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                DWLiveReplay.getInstance().retryReplay(30000, false);
+//            }
+//        }, 2000);
+
+
+
+
+
+    }
 
     public void pause() {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
@@ -231,26 +238,28 @@ public class DWReplayCoreHandler {
 
     /**
      * 重试播放
+     *
      * @param time:时间点，是否强制更新流地址
      */
-    public void retryReplay(long time,boolean updateStream){
+    public void retryReplay(long time, boolean updateStream) {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            dwLiveReplay.retryReplay(time,updateStream);
+            dwLiveReplay.retryReplay(time, updateStream);
         }
     }
 
     /**
      * 切换线路 对应的是{@link com.bokecc.sdk.mobile.live.replay.DWLiveReplayListener numberOfReceivedLines 如果是2 传递0或者1}
-     * @param line
      *
+     * @param line
      */
-    public void changeLineWithNum(int line ,ChangeLineCallback callback){
+    public void changeLineWithNum(int line, ReplayLineSwitchListener callback) {
         DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
         if (dwLiveReplay != null) {
-            dwLiveReplay.changeLineWithNum(line,callback);
+            dwLiveReplay.changeLineWithNum(line, callback);
         }
     }
+
     /**
      * 更新当前缓冲进度
      */
@@ -284,8 +293,8 @@ public class DWReplayCoreHandler {
         }
     }
 
-    public void onRenderStart(){
-        if(replayRoomListener != null){
+    public void onRenderStart() {
+        if (replayRoomListener != null) {
             replayRoomListener.startRending();
         }
     }
@@ -346,7 +355,9 @@ public class DWReplayCoreHandler {
 
         @Override
         public void onException(DWLiveException exception) {
-
+            if (replayRoomListener != null) {
+                replayRoomListener.onException(exception);
+            }
         }
 
         @Override
@@ -358,8 +369,14 @@ public class DWReplayCoreHandler {
         public void numberOfReceivedLines(int lines) {
 
         }
-    };
 
+        @Override
+        public void numberOfReceivedLinesWithVideoAndAudio(List<ReplayLineParams> videoLines, List<ReplayLineParams> audioLines) {
+
+        }
+
+
+    };
 
     public ReplayErrorListener mErrorListener = new ReplayErrorListener() {
         @Override

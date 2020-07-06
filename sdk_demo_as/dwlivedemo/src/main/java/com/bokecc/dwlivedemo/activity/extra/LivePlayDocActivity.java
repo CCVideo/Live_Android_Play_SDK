@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * 直播播放页（默认文档大屏，视频小屏，可手动切换）
- *
+ * <p>
  * 注意：此播放页只适配直播间模版中有'文档'区域的
  */
 public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageListener {
@@ -58,6 +58,18 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
     LiveRoomLayout mLiveRoomLayout;
     // 悬浮弹窗（用于展示文档和视频）
     FloatingPopupWindow mLiveFloatingView;
+    private FloatingPopupWindow.FloatDismissListener floatDismissListener = new FloatingPopupWindow.FloatDismissListener() {
+        @Override
+        public void dismiss() {
+            if (mLiveRoomLayout.viewState == LiveRoomLayout.State.VIDEO) {
+                mLiveRoomLayout.viewState = LiveRoomLayout.State.OPEN_DOC;
+                mLiveRoomLayout.setSwitchText(mLiveRoomLayout.viewState);
+            } else if (mLiveRoomLayout.viewState == LiveRoomLayout.State.DOC) {
+                mLiveRoomLayout.viewState = LiveRoomLayout.State.OPEN_VIDEO;
+                mLiveRoomLayout.setSwitchText(mLiveRoomLayout.viewState);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -152,11 +164,10 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
         // 弹出框界面
         mExitPopupWindow = new ExitPopupWindow(this);
         mLiveFloatingView = new FloatingPopupWindow(LivePlayDocActivity.this);
-
+        mLiveFloatingView.setFloatDismissListener(floatDismissListener);
         // 修改初始的直播间状态，视频小屏
-        mLiveRoomLayout.setVideoDocSwitchStatus(false);
+        mLiveRoomLayout.setVideoDocSwitchStatus(LiveRoomLayout.State.DOC);
     }
-
 
 
     //---------------------------------- 直播间状态监听 --------------------------------------------/
@@ -164,33 +175,56 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
     LiveRoomLayout.LiveRoomStatusListener roomStatusListener = new LiveRoomLayout.LiveRoomStatusListener() {
 
         // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
+        // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
         @Override
-        public boolean switchVideoDoc(final boolean videoMain) {
+        public synchronized void switchVideoDoc(final LiveRoomLayout.State state) {
             DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
             if (dwLiveCoreHandler == null) {
-                return false;
+                return;
             }
             // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
-            if (dwLiveCoreHandler.hasPdfView()&&mLiveFloatingView!=null&&mLiveFloatingView.isShowing()) {
+            if (dwLiveCoreHandler.hasPdfView() && mLiveFloatingView != null) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (videoMain) {
-                            mLiveVideoContainer.removeAllViews();
-                            mLiveFloatingView.removeAllView();
+                        if (state == LiveRoomLayout.State.VIDEO) {
+                            //如果当前小窗口开启并且大窗口是视频 将大窗口切换到文档
+                            switchView(true);
+                        } else if (state == LiveRoomLayout.State.DOC) {
+                            switchView(false);
+                        } else if (state == LiveRoomLayout.State.OPEN_DOC) {
+                            mLiveFloatingView.show(mRoot);
+                            if (mLiveDocView.getParent() != null)
+                                ((ViewGroup) mLiveDocView.getParent()).removeView(mLiveDocView);
                             mLiveFloatingView.addView(mLiveDocView);
-                            mLiveVideoContainer.addView(mLiveVideoView);
-                        } else {
-                            mLiveVideoContainer.removeAllViews();
-                            mLiveFloatingView.removeAllView();
-                            mLiveFloatingView.addView(mLiveVideoView);
-                            mLiveVideoContainer.addView(mLiveDocView);
+                        } else if (state == LiveRoomLayout.State.OPEN_VIDEO) {
+                            mLiveFloatingView.show(mRoot);
+                            if (mLiveVideoContainer.getParent() != null)
+                                ((ViewGroup) mLiveVideoContainer.getParent()).removeView(mLiveVideoContainer);
+                            mLiveFloatingView.addView(mLiveVideoContainer);
                         }
                     }
                 });
-                return true;
             }
-            return false;
+        }
+
+        private void switchView(final boolean isVideoMain) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isVideoMain) {
+                        mLiveVideoContainer.removeAllViews();
+                        mLiveFloatingView.removeAllView();
+                        mLiveFloatingView.addView(mLiveDocView);
+                        mLiveVideoContainer.addView(mLiveVideoView);
+                    } else {
+                        mLiveVideoContainer.removeAllViews();
+                        mLiveFloatingView.removeAllView();
+                        mLiveFloatingView.addView(mLiveVideoView);
+                        mLiveVideoContainer.addView(mLiveDocView);
+                    }
+                }
+            });
         }
 
         // 退出直播间
@@ -238,6 +272,7 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
 
         @Override
         public void onClickDocScaleType(int scaleType) {
+
 
         }
     };
@@ -443,9 +478,7 @@ public class LivePlayDocActivity extends BaseActivity implements DWLiveBarrageLi
         if (dwLiveCoreHandler == null) {
             return;
         }
-        if (!mLiveFloatingView.isShowing()) {
-            mLiveFloatingView.show(mRoot);
-        }
+        mLiveFloatingView.show(mRoot);
     }
 
     /********************************* 工具方法 ***************************************/

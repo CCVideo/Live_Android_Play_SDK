@@ -188,9 +188,8 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
 
         // 文档/视频布局区域 回调事件 #Called From LiveRoomLayout
         @Override
-        public boolean switchVideoDoc(final boolean videoMain) {
+        public void switchVideoDoc(final LiveRoomLayout.State state) {
             // TODO 不建议在此页面布局类型下做切换操作，如需要,请自行添加完善逻辑
-            return false;
         }
 
         // 退出直播间

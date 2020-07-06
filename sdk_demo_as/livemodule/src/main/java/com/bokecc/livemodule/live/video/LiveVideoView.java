@@ -1,10 +1,11 @@
 package com.bokecc.livemodule.live.video;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -84,7 +85,8 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     boolean hasCallStartPlay = false;
     private View mVideoNoplayTip;
-    private Activity mActivity;
+
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     /**
      * 直播视频通知接口
@@ -254,6 +256,9 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             player.stop();
             player.release();
         }
+        if (handler!=null){
+            handler.removeCallbacksAndMessages(null);
+        }
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.destroy();
@@ -334,6 +339,10 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         }
     };
 
+    public Surface getmSurface() {
+        return mSurface;
+    }
+
     /**
      * 直播准备监听器
      */
@@ -348,9 +357,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                         player.setSurface(mSurface);
                     }
                     ELog.i(TAG,"LiveVideoView onPrepared...");
-//                    mVideoProgressBar.setVisibility(VISIBLE);
-                    //显示跑马灯
-
                     // 通知直播视频已经准备就绪
                     if (null != preparedCallback) {
                         preparedCallback.onPrepared(LiveVideoView.this);
@@ -382,11 +388,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         }
     };
 
-//    @Override
-//    protected void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//        mVideoContainer.setLayoutParams(getVideoSizeParams());
-//    }
 
     IMediaPlayer.OnVideoSizeChangedListener onVideoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
         @Override
@@ -412,58 +413,57 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         return mOrientation != Configuration.ORIENTATION_LANDSCAPE;
     }
 
-//    /**
-//     * 视频等比缩放
-//     *
-//     */
-//    private RelativeLayout.LayoutParams getVideoSizeParams() {
-//
-//        int width = wm.getDefaultDisplay().getWidth();
-//        int height;
-//        if (isPortrait()) {
-//            height = wm.getDefaultDisplay().getHeight() / 3;  //TODO 可以根据当前布局方式更改此参数
-//        } else {
-//            height = wm.getDefaultDisplay().getHeight();
-//        }
-//
-//
-//        int vWidth = player.getVideoWidth();
-//        int vHeight = player.getVideoHeight();
-//
-//        if (vWidth == 0) {
-//            vWidth = 600;
-//        }
-//        if (vHeight == 0) {
-//            vHeight = 400;
-//        }
-//
-//        if (vWidth > width || vHeight > height) {
-//            float wRatio = (float) vWidth / (float) width;
-//            float hRatio = (float) vHeight / (float) height;
-//            float ratio = Math.max(wRatio, hRatio);
-//
-//            width = (int) Math.ceil((float) vWidth / ratio);
-//            height = (int) Math.ceil((float) vHeight / ratio);
-//        } else {
-//            float wRatio = (float) width / (float) vWidth;
-//            float hRatio = (float) height / (float) vHeight;
-//            float ratio = Math.min(wRatio, hRatio);
-//
-//            width = (int) Math.ceil((float) vWidth * ratio);
-//            height = (int) Math.ceil((float) vHeight * ratio);
-//        }
-//
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
-//        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-//        return params;
-//    }
+    /**
+     * 视频等比缩放
+     *
+     */
+    private RelativeLayout.LayoutParams getVideoSizeParams() {
+
+        int width = wm.getDefaultDisplay().getWidth();
+        int height;
+        if (isPortrait()) {
+            height = wm.getDefaultDisplay().getHeight() / 3;  //TODO 可以根据当前布局方式更改此参数
+        } else {
+            height = wm.getDefaultDisplay().getHeight();
+        }
+
+
+        int vWidth = player.getVideoWidth();
+        int vHeight = player.getVideoHeight();
+
+        if (vWidth == 0) {
+            vWidth = 600;
+        }
+        if (vHeight == 0) {
+            vHeight = 400;
+        }
+
+        if (vWidth > width || vHeight > height) {
+            float wRatio = (float) vWidth / (float) width;
+            float hRatio = (float) vHeight / (float) height;
+            float ratio = Math.max(wRatio, hRatio);
+
+            width = (int) Math.ceil((float) vWidth / ratio);
+            height = (int) Math.ceil((float) vHeight / ratio);
+        } else {
+            float wRatio = (float) width / (float) vWidth;
+            float hRatio = (float) height / (float) vHeight;
+            float ratio = Math.min(wRatio, hRatio);
+
+            width = (int) Math.ceil((float) vWidth * ratio);
+            height = (int) Math.ceil((float) vHeight * ratio);
+        }
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        return params;
+    }
 
     //------------------------------------- SDK 回调相关 ---------------------------------------
     // 由 DWLiveListener(DWLiveCoreHandler) --> DWLiveVideoListener(LiveVideoView)
     @Override
     public void onStreamEnd(final boolean isNormal) {
-        Log.e("###","onStreamEnd");
-        mRootView.post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 player.pause();
@@ -485,7 +485,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     @Override
     public void onLiveStatus(final DWLive.PlayStatus status) {
-        mRootView.post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 switch (status) {
@@ -513,7 +513,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     @Override
     public void onBanStream(String reason) {
-        mRootView.post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 // 播放器停止播放
@@ -543,7 +543,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     @Override
     public void onStreamStart() {
-        mRootView.post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 if (onStreamCallback!=null){

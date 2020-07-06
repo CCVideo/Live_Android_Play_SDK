@@ -1,8 +1,8 @@
 ext {
     android = [
             SDK_BASENAME    : "dwlivesdk",
-            SDK_VERSION_CODE: 381,
-            SDK_VERSION     : "3.8.1"
+            SDK_VERSION_CODE: AppCode as int,
+            SDK_VERSION     : AppVersion
     ]
 
 

@@ -1,23 +1,32 @@
 package com.bokecc.dwlivedemo.activity;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 
 import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
@@ -25,6 +34,7 @@ import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.util.DensityUtil;
+import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.replay.chat.ReplayChatComponent;
 import com.bokecc.livemodule.replay.doc.ReplayDocComponent;
@@ -32,20 +42,22 @@ import com.bokecc.livemodule.replay.intro.ReplayIntroComponent;
 import com.bokecc.livemodule.replay.qa.ReplayQAComponent;
 import com.bokecc.livemodule.replay.room.ReplayRoomLayout;
 import com.bokecc.livemodule.replay.video.ReplayVideoView;
-import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.OnMarqueeImgFailListener;
 import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Marquee;
+import com.bokecc.sdk.mobile.live.replay.ReplayLineSwitchListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.replay.entity.ReplayLineParams;
+import com.bokecc.sdk.mobile.live.replay.config.ReplayLineConfig;
 import com.bokecc.sdk.mobile.live.widget.MarqueeView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.VISIBLE;
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_IMAGE_COMPONENT;
 import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONTENT_ULR_COMPONET;
-
-import static android.view.View.VISIBLE;
 
 /**
  * 回放播放页（默认文档大屏，视频小屏，可手动切换）
@@ -67,6 +79,10 @@ public class ReplayPlayActivity extends BaseActivity {
     // 跑马灯组件
     MarqueeView mMarqueeView;
 
+    private NotificationReceiver mNotificationReceiver;
+    private boolean isVideo = false;
+    private final String CHANNEL_ID = "HD_SDK_CHANNEL_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestFullScreenFeature();
@@ -76,27 +92,22 @@ public class ReplayPlayActivity extends BaseActivity {
         setContentView(R.layout.activity_replay_play);
         initViews();
         showFloatingDocLayout();
-        initViewPager();
 
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        //DWLiveReplay.getInstance().setLastPosition(30000);
         mReplayVideoView.start();
+        initViewPager();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mReplayVideoView.pause();
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mReplayFloatingView.dismiss();
         mReplayVideoView.destroy();
+        NotificationManager notificationManager = (NotificationManager) ReplayPlayActivity.this
+                .getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(1);
     }
 
     @Override
@@ -122,8 +133,8 @@ public class ReplayPlayActivity extends BaseActivity {
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
         }
         //调整窗口的位置
-        if (mReplayFloatingView!=null&&mReplayFloatingView.isShowing()){
-            mReplayFloatingView.onConfigurationChanged(newConfig);
+        if (mReplayFloatingView != null) {
+            mReplayFloatingView.onConfigurationChanged(newConfig.orientation);
         }
     }
 
@@ -160,7 +171,7 @@ public class ReplayPlayActivity extends BaseActivity {
         // 弹出框界面
         mExitPopupWindow = new ExitPopupWindow(this);
         mReplayFloatingView = new FloatingPopupWindow(this);
-
+        mReplayFloatingView.setFloatDismissListener(floatDismissListener);
         mReplayRoomLayout.setReplayRoomStatusListener(roomStatusListener);
     }
 
@@ -175,7 +186,6 @@ public class ReplayPlayActivity extends BaseActivity {
         // 判断当前直播间模版是否有"文档"功能
         if (dwReplayCoreHandler.hasPdfView()) {
             initDocLayout();
-            ELog.d(TAG, "initDocLayout");
         }
         // 判断当前直播间模版是否有"聊天"功能
         if (dwReplayCoreHandler.hasChatView()) {
@@ -190,8 +200,8 @@ public class ReplayPlayActivity extends BaseActivity {
         // 直播间简介
         initIntroLayout();
 
-        if (DWLiveReplay.getInstance()!=null&&DWLiveReplay.getInstance().getRoomInfo()!=null){
-            if (DWLiveReplay.getInstance().getRoomInfo().getOpenMarquee()==1){
+        if (DWLiveReplay.getInstance() != null && DWLiveReplay.getInstance().getRoomInfo() != null) {
+            if (DWLiveReplay.getInstance().getRoomInfo().getOpenMarquee() == 1) {
                 //设置跑马灯
                 mMarqueeView = findViewById(R.id.marquee_view);
                 mMarqueeView.setVisibility(VISIBLE);
@@ -202,18 +212,18 @@ public class ReplayPlayActivity extends BaseActivity {
 
     public void setMarquee(final Marquee marquee) {
         final ViewGroup parent = (ViewGroup) mMarqueeView.getParent();
-        if (parent.getWidth()!=0&&parent.getHeight()!=0){
+        if (parent.getWidth() != 0 && parent.getHeight() != 0) {
             if (marquee != null && marquee.getAction() != null) {
                 if (marquee.getType().equals("text")) {
                     mMarqueeView.setTextContent(marquee.getText().getContent());
                     mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
-                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(this,marquee.getText().getFont_size()));
+                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(this, marquee.getText().getFont_size()));
                     mMarqueeView.setType(1);
                 } else {
                     mMarqueeView.setMarqueeImage(this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
                     mMarqueeView.setType(2);
                 }
-                mMarqueeView.setMarquee(marquee,parent.getHeight(),parent.getWidth());
+                mMarqueeView.setMarquee(marquee, parent.getHeight(), parent.getWidth());
                 mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
                     @Override
                     public void onLoadMarqueeImgFail() {
@@ -223,7 +233,7 @@ public class ReplayPlayActivity extends BaseActivity {
                 });
                 mMarqueeView.start();
             }
-        }else{
+        } else {
             parent.getViewTreeObserver().addOnGlobalLayoutListener(
                     new ViewTreeObserver.OnGlobalLayoutListener() {
 
@@ -232,8 +242,7 @@ public class ReplayPlayActivity extends BaseActivity {
                             if (Build.VERSION.SDK_INT >= 16) {
                                 parent.getViewTreeObserver()
                                         .removeOnGlobalLayoutListener(this);
-                            }
-                            else {
+                            } else {
                                 parent.getViewTreeObserver()
                                         .removeGlobalOnLayoutListener(this);
                             }
@@ -243,13 +252,13 @@ public class ReplayPlayActivity extends BaseActivity {
                                 if (marquee.getType().equals("text")) {
                                     mMarqueeView.setTextContent(marquee.getText().getContent());
                                     mMarqueeView.setTextColor(marquee.getText().getColor().replace("0x", "#"));
-                                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(ReplayPlayActivity.this,marquee.getText().getFont_size()));
+                                    mMarqueeView.setTextFontSize((int) DensityUtil.sp2px(ReplayPlayActivity.this, marquee.getText().getFont_size()));
                                     mMarqueeView.setType(1);
                                 } else {
                                     mMarqueeView.setMarqueeImage(ReplayPlayActivity.this, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
                                     mMarqueeView.setType(2);
                                 }
-                                mMarqueeView.setMarquee(marquee,height,width);
+                                mMarqueeView.setMarquee(marquee, height, width);
                                 mMarqueeView.setOnMarqueeImgFailListener(new OnMarqueeImgFailListener() {
                                     @Override
                                     public void onLoadMarqueeImgFail() {
@@ -342,9 +351,7 @@ public class ReplayPlayActivity extends BaseActivity {
         ELog.d(TAG, "showFloatingDocLayout() hasPdfView:" + dwReplayCoreHandler.hasPdfView());
         // 判断当前直播间模版是否有"文档"功能，如果没文档，则小窗功能也不应该有
         if (dwReplayCoreHandler.hasPdfView()) {
-            if (!mReplayFloatingView.isShowing()) {
-                mReplayFloatingView.show(mRoot);
-            }
+            mReplayFloatingView.show(mRoot);
         }
     }
 
@@ -416,41 +423,59 @@ public class ReplayPlayActivity extends BaseActivity {
     }
 
     /**************************************  Room 状态回调监听 *************************************/
-
-    boolean isVideoMain = true;
-
+    private FloatingPopupWindow.FloatDismissListener floatDismissListener = new FloatingPopupWindow.FloatDismissListener() {
+        @Override
+        public void dismiss() {
+            if (mReplayRoomLayout.viewState == LiveRoomLayout.State.VIDEO) {
+                mReplayRoomLayout.setVideoDocSwitchText(LiveRoomLayout.State.OPEN_DOC);
+            } else if (mReplayRoomLayout.viewState == LiveRoomLayout.State.DOC) {
+                mReplayRoomLayout.setVideoDocSwitchText(LiveRoomLayout.State.OPEN_VIDEO);
+            }
+        }
+    };
     private ReplayRoomLayout.ReplayRoomStatusListener roomStatusListener = new ReplayRoomLayout.ReplayRoomStatusListener() {
 
         @Override
-        public void switchVideoDoc() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (isVideoMain) {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoContainer.removeAllViews();
-                        mReplayFloatingView.removeAllView();
-                        mReplayFloatingView.addView(mReplayVideoView);
-                        mReplayVideoContainer.addView(mDocLayout);
-                        isVideoMain = false;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
-                        mDocLayout.setDocScrollable(true);//webview可切换
-                    } else {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoContainer.removeAllViews();
-                        mReplayFloatingView.removeAllView();
-                        ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
-                        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                        mDocLayout.setLayoutParams(lp);
-                        mReplayFloatingView.addView(mDocLayout);
-                        mReplayVideoContainer.addView(mReplayVideoView);
-                        isVideoMain = true;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换文档");
-                        mDocLayout.setDocScrollable(false);//webview不可切换
-                    }
-                }
-            });
+        public void switchVideoDoc(LiveRoomLayout.State state) {
+
+            if (state == LiveRoomLayout.State.VIDEO) {
+                //如果当前小窗口开启并且大窗口是视频 将大窗口切换到文档
+                switchView(true);
+            } else if (state == LiveRoomLayout.State.DOC) {
+                switchView(false);
+            } else if (state == LiveRoomLayout.State.OPEN_DOC) {
+                mReplayFloatingView.show(mRoot);
+                if (mDocLayout.getParent() != null)
+                    ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+                mReplayFloatingView.addView(mDocLayout);
+            } else if (state == LiveRoomLayout.State.OPEN_VIDEO) {
+                mReplayFloatingView.show(mRoot);
+                if (mReplayVideoView.getParent() != null)
+                    ((ViewGroup) mReplayVideoView.getParent()).removeView(mReplayVideoView);
+                mReplayFloatingView.addView(mReplayVideoView);
+            }
+        }
+
+        public void switchView(boolean isVideoMain) {
+            if (mReplayVideoView.getParent() != null)
+                ((ViewGroup) mReplayVideoView.getParent()).removeView(mReplayVideoView);
+            if (mDocLayout.getParent() != null)
+                ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+            if (isVideoMain) {
+                // 缓存视频的切换前的画面
+                ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                mDocLayout.setLayoutParams(lp);
+                mReplayFloatingView.addView(mDocLayout);
+                mReplayVideoContainer.addView(mReplayVideoView);
+                mDocLayout.setDocScrollable(false);//webview不可切换
+            } else {
+                // 缓存视频的切换前的画面
+                mReplayFloatingView.addView(mReplayVideoView);
+                mReplayVideoContainer.addView(mDocLayout);
+                mDocLayout.setDocScrollable(true);//webview可切换
+            }
         }
 
         @Override
@@ -490,6 +515,24 @@ public class ReplayPlayActivity extends BaseActivity {
                 mDocLayout.setScaleType(type);
             }
         }
+
+        @Override
+        public void seek(int max, int progress, float move, boolean isSeek, float xVelocity) {
+            DWReplayPlayer player = DWReplayCoreHandler.getInstance().getPlayer();
+            if (progress + move < 0) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress(0);
+            } else if (progress + move >= max) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress(max);
+            } else if (progress + move < max) {
+                mReplayRoomLayout.mPlaySeekBar.setProgress((int) (progress + ((xVelocity * 10))));
+            }
+//            else if (progress + move == max) {
+//                mReplayRoomLayout.mPlaySeekBar.setProgress(0);
+//            }
+            if (isSeek) {
+                player.seekTo(mReplayRoomLayout.mPlaySeekBar.getProgress());
+            }
+        }
     };
 
     //---------------------------------- 全屏相关逻辑 --------------------------------------------/
@@ -527,4 +570,86 @@ public class ReplayPlayActivity extends BaseActivity {
         }
     };
 
+    public void showAlwaysNotify(int playResId) {
+        NotificationReceiver.notifiCallBack = new NotificationReceiver.NotifiCallBack() {
+
+            @Override
+            public void clickPlay() {
+                mReplayRoomLayout.changePlayerStatus();
+                showAlwaysNotify(DWReplayCoreHandler.getInstance().getPlayer().isPlaying() ? R.drawable.icon_pause : R.drawable.icon_play);
+            }
+
+            @Override
+            public void clickExit() {
+                finish();
+            }
+        };
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setComponent(new ComponentName(this, ReplayPlayActivity.class));
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.item_notification);
+        remoteViews.setTextViewText(R.id.id_content, DWLiveReplay.getInstance().getRoomInfo()==null?"直播":DWLiveReplay.getInstance().getRoomInfo().getName());
+        remoteViews.setImageViewResource(R.id.id_play_btn, playResId);
+
+        //暂停播放
+        Intent pauseAction = new Intent(this, NotificationReceiver.class);
+        pauseAction.setAction(NotificationReceiver.ACTION_PLAY_PAUSE);
+        PendingIntent pendingPauseAction = PendingIntent.getBroadcast(this, -1,
+                pauseAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        //结束播放
+        Intent destroyAction = new Intent(this, NotificationReceiver.class);
+        destroyAction.setAction(NotificationReceiver.ACTION_DESTROY);
+        PendingIntent pendingDestroyAction = PendingIntent.getBroadcast(this, -1,
+                destroyAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        remoteViews.setOnClickPendingIntent(R.id.id_play_btn, pendingPauseAction);
+        remoteViews.setOnClickPendingIntent(R.id.id_close_play, pendingDestroyAction);
+
+        builder.setCustomContentView(remoteViews);
+        createNotificationChannel();
+        Notification build = builder.build();
+        build.flags = Notification.FLAG_NO_CLEAR;
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, build);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //TODO：
+            CharSequence name = DWLiveReplay.getInstance().getRoomInfo().getName();
+            String description = "";
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(description);
+            //锁屏显示通知
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager notificationManager = (NotificationManager) ReplayPlayActivity.this
+                .getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(1);
+        NotificationReceiver.notifiCallBack = null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        showAlwaysNotify(DWReplayCoreHandler.getInstance().getPlayer().isPlaying() ? R.drawable.icon_pause : R.drawable.icon_play);
+        mReplayVideoView.onPause();
+    }
 }

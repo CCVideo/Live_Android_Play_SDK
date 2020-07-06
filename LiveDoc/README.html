@@ -31,7 +31,7 @@ input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px;
 #write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
 #write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
 p { line-height: inherit; }
-h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 4; }
 p { orphans: 4; }
 h1 { font-size: 2rem; }
 h2 { font-size: 1.8rem; }
@@ -82,7 +82,7 @@ blockquote > :first-child, li > :first-child { margin-top: 0px; }
 .footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
 #write .footnote-line { white-space: pre-wrap; }
 @media print {
-  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; font-variant-ligatures: no-common-ligatures; }
   #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
   .typora-export * { -webkit-print-color-adjust: exact; }
   html.blink-to-pdf { font-size: 13px; }
@@ -93,11 +93,12 @@ blockquote > :first-child, li > :first-child { margin-top: 0px; }
 a img, img a { cursor: pointer; }
 pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background: rgb(204, 204, 204); display: block; overflow-x: hidden; }
 p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+#write.first-line-indent p > .md-image:only-child:not(.md-img-error) img { left: -2em; position: relative; }
 p > .md-image:only-child { display: inline-block; width: 100%; }
 #write .MathJax_Display { margin: 0.8em 0px 0px; }
 .md-math-block { width: 100%; }
 .md-math-block:not(:empty)::after { display: none; }
-[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus, [contenteditable="false"]:active, [contenteditable="false"]:focus { outline: 0px; box-shadow: none; }
 .md-task-list-item { position: relative; list-style-type: none; }
 .task-list-item.md-task-list-item { padding-left: 0px; }
 .md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
@@ -141,85 +142,377 @@ a.md-print-anchor { white-space: pre !important; border-width: initial !importan
 .MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
 .os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
 .md-diagram-panel > svg { max-width: 100%; }
-[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; height: auto; }
+[lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
 [lang="mermaid"] .node text { font-size: 1rem; }
 table tr th { border-bottom: 0px; }
 video { max-width: 100%; display: block; margin: 0px auto; }
 iframe { max-width: 100%; width: 100%; border: none; }
 .highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+mark { background: rgb(255, 255, 0); color: rgb(0, 0, 0); }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
 
 
-:root { --side-bar-bg-color: #fafafa; --control-text-color: #777; }
-html { font-size: 16px; }
-body { font-family: "Open Sans", "Clear Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; color: rgb(51, 51, 51); line-height: 1.6; }
-#write { max-width: 860px; margin: 0px auto; padding: 30px 30px 100px; }
-#write > ul:first-child, #write > ol:first-child { margin-top: 30px; }
-a { color: rgb(65, 131, 196); }
-h1, h2, h3, h4, h5, h6 { position: relative; margin-top: 1rem; margin-bottom: 1rem; font-weight: bold; line-height: 1.4; cursor: text; }
-h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor { text-decoration: none; }
-h1 tt, h1 code { font-size: inherit; }
-h2 tt, h2 code { font-size: inherit; }
-h3 tt, h3 code { font-size: inherit; }
-h4 tt, h4 code { font-size: inherit; }
-h5 tt, h5 code { font-size: inherit; }
-h6 tt, h6 code { font-size: inherit; }
-h1 { padding-bottom: 0.3em; font-size: 2.25em; line-height: 1.2; border-bottom: 1px solid rgb(238, 238, 238); }
-h2 { padding-bottom: 0.3em; font-size: 1.75em; line-height: 1.225; border-bottom: 1px solid rgb(238, 238, 238); }
-h3 { font-size: 1.5em; line-height: 1.43; }
-h4 { font-size: 1.25em; }
-h5 { font-size: 1em; }
-h6 { font-size: 1em; color: rgb(119, 119, 119); }
-p, blockquote, ul, ol, dl, table { margin: 0.8em 0px; }
-li > ol, li > ul { margin: 0px; }
-hr { height: 2px; padding: 0px; margin: 16px 0px; background-color: rgb(231, 231, 231); border: 0px none; overflow: hidden; box-sizing: content-box; }
-li p.first { display: inline-block; }
-ul, ol { padding-left: 30px; }
-ul:first-child, ol:first-child { margin-top: 0px; }
-ul:last-child, ol:last-child { margin-bottom: 0px; }
-blockquote { border-left: 4px solid rgb(223, 226, 229); padding: 0px 15px; color: rgb(119, 119, 119); }
-blockquote blockquote { padding-right: 0px; }
-table { padding: 0px; word-break: initial; }
-table tr { border-top: 1px solid rgb(223, 226, 229); margin: 0px; padding: 0px; }
-table tr:nth-child(2n), thead { background-color: rgb(248, 248, 248); }
-table tr th { font-weight: bold; border-width: 1px 1px 0px; border-top-style: solid; border-right-style: solid; border-left-style: solid; border-top-color: rgb(223, 226, 229); border-right-color: rgb(223, 226, 229); border-left-color: rgb(223, 226, 229); border-image: initial; border-bottom-style: initial; border-bottom-color: initial; margin: 0px; padding: 6px 13px; }
-table tr td { border: 1px solid rgb(223, 226, 229); margin: 0px; padding: 6px 13px; }
-table tr th:first-child, table tr td:first-child { margin-top: 0px; }
-table tr th:last-child, table tr td:last-child { margin-bottom: 0px; }
-.CodeMirror-lines { padding-left: 4px; }
-.code-tooltip { box-shadow: rgba(0, 28, 36, 0.3) 0px 1px 1px 0px; border-top: 1px solid rgb(238, 242, 242); }
-.md-fences, code, tt { border: 1px solid rgb(231, 234, 237); background-color: rgb(248, 248, 248); border-radius: 3px; padding: 2px 4px 0px; font-size: 0.9em; }
-code { background-color: rgb(243, 244, 244); padding: 0px 2px; }
-.md-fences { margin-bottom: 15px; margin-top: 15px; padding-top: 8px; padding-bottom: 6px; }
-.md-task-list-item > input { margin-left: -1.3em; }
-@media print {
-  html { font-size: 13px; }
-  table, pre { break-inside: avoid; }
-  pre { overflow-wrap: break-word; }
+:root {
+    --side-bar-bg-color: #fafafa;
+    --control-text-color: #777;
 }
-.md-fences { background-color: rgb(248, 248, 248); }
-#write pre.md-meta-block { padding: 1rem; font-size: 85%; line-height: 1.45; background-color: rgb(247, 247, 247); border: 0px; border-radius: 3px; color: rgb(119, 119, 119); margin-top: 0px !important; }
-.mathjax-block > .code-tooltip { bottom: 0.375rem; }
-.md-mathjax-midline { background: rgb(250, 250, 250); }
-#write > h3.md-focus::before { left: -1.5625rem; top: 0.375rem; }
-#write > h4.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
-#write > h5.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
-#write > h6.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
-.md-image > .md-meta { border-radius: 3px; padding: 2px 0px 0px 4px; font-size: 0.9em; color: inherit; }
-.md-tag { color: rgb(167, 167, 167); opacity: 1; }
-.md-toc { margin-top: 20px; padding-bottom: 20px; }
-.sidebar-tabs { border-bottom: none; }
-#typora-quick-open { border: 1px solid rgb(221, 221, 221); background-color: rgb(248, 248, 248); }
-#typora-quick-open-item { background-color: rgb(250, 250, 250); border-color: rgb(254, 254, 254) rgb(229, 229, 229) rgb(229, 229, 229) rgb(238, 238, 238); border-style: solid; border-width: 1px; }
-.on-focus-mode blockquote { border-left-color: rgba(85, 85, 85, 0.12); }
-header, .context-menu, .megamenu-content, footer { font-family: "Segoe UI", Arial, sans-serif; }
-.file-node-content:hover .file-node-icon, .file-node-content:hover .file-node-open-state { visibility: visible; }
-.mac-seamless-mode #typora-sidebar { background-color: var(--side-bar-bg-color); }
-.md-lang { color: rgb(180, 101, 77); }
-.html-for-mac .context-menu { --item-hover-bg-color: #E6F0FE; }
-#md-notification .btn { border: 0px; }
-.dropdown-menu .divider { border-color: rgb(229, 229, 229); }
-.ty-preferences .window-content { background-color: rgb(250, 250, 250); }
-.ty-preferences .nav-group-item.active { color: white; background: rgb(153, 153, 153); }
+
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Open Sans","Clear Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: rgb(51, 51, 51);
+    line-height: 1.6;
+}
+
+#write {
+    max-width: 860px;
+  	margin: 0 auto;
+  	padding: 30px;
+    padding-bottom: 100px;
+}
+
+@media only screen and (min-width: 1400px) {
+	#write {
+		max-width: 1024px;
+	}
+}
+
+@media only screen and (min-width: 1800px) {
+	#write {
+		max-width: 1200px;
+	}
+}
+
+#write > ul:first-child,
+#write > ol:first-child{
+    margin-top: 30px;
+}
+
+a {
+    color: #4183C4;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    padding-bottom: .3em;
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+h2 {
+   padding-bottom: .3em;
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+h4 {
+    font-size: 1.25em;
+}
+h5 {
+    font-size: 1em;
+}
+h6 {
+   font-size: 1em;
+    color: #777;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table{
+    margin: 0.8em 0;
+}
+li>ol,
+li>ul {
+    margin: 0 0;
+}
+hr {
+    height: 2px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}
+
+li p.first {
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote blockquote {
+    padding-right: 0;
+}
+table {
+    padding: 0;
+    word-break: initial;
+}
+table tr {
+    border-top: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
+}
+table tr:nth-child(2n),
+thead {
+    background-color: #f8f8f8;
+}
+table tr th {
+    font-weight: bold;
+    border: 1px solid #dfe2e5;
+    border-bottom: 0;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr td {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr th:first-child,
+table tr td:first-child {
+    margin-top: 0;
+}
+table tr th:last-child,
+table tr td:last-child {
+    margin-bottom: 0;
+}
+
+.CodeMirror-lines {
+    padding-left: 4px;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    border-top: 1px solid #eef2f2;
+}
+
+.md-fences,
+code,
+tt {
+    border: 1px solid #e7eaed;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding: 0;
+    padding: 2px 4px 0px 4px;
+    font-size: 0.9em;
+}
+
+code {
+    background-color: #f3f4f4;
+    padding: 0 2px 0 2px;
+}
+
+.md-fences {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-bottom: 6px;
+}
+
+
+.md-task-list-item > input {
+  margin-left: -1.3em;
+}
+
+@media print {
+    html {
+        font-size: 13px;
+    }
+    table,
+    pre {
+        page-break-inside: avoid;
+    }
+    pre {
+        word-wrap: break-word;
+    }
+}
+
+.md-fences {
+	background-color: #f8f8f8;
+}
+#write pre.md-meta-block {
+	padding: 1rem;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 0;
+    border-radius: 3px;
+    color: #777777;
+    margin-top: 0 !important;
+}
+
+.mathjax-block>.code-tooltip {
+	bottom: .375rem;
+}
+
+.md-mathjax-midline {
+    background: #fafafa;
+}
+
+#write>h3.md-focus:before{
+	left: -1.5625rem;
+	top: .375rem;
+}
+#write>h4.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h5.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h6.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+.md-image>.md-meta {
+    /*border: 1px solid #ddd;*/
+    border-radius: 3px;
+    padding: 2px 0px 0px 4px;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+.md-tag {
+    color: #a7a7a7;
+    opacity: 1;
+}
+
+.md-toc { 
+    margin-top:20px;
+    padding-bottom:20px;
+}
+
+.sidebar-tabs {
+    border-bottom: none;
+}
+
+#typora-quick-open {
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+#typora-quick-open-item {
+    background-color: #FAFAFA;
+    border-color: #FEFEFE #e5e5e5 #e5e5e5 #eee;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/** focus mode */
+.on-focus-mode blockquote {
+    border-left-color: rgba(85, 85, 85, 0.12);
+}
+
+header, .context-menu, .megamenu-content, footer{
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-open-state{
+    visibility: visible;
+}
+
+.mac-seamless-mode #typora-sidebar {
+    background-color: #fafafa;
+    background-color: var(--side-bar-bg-color);
+}
+
+.md-lang {
+    color: #b4654d;
+}
+
+.html-for-mac .context-menu {
+    --item-hover-bg-color: #E6F0FE;
+}
+
+#md-notification .btn {
+    border: 0;
+}
+
+.dropdown-menu .divider {
+    border-color: #e5e5e5;
+}
+
+.ty-preferences .window-content {
+    background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+    color: white;
+    background: #999;
+}
 
  .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
 </style>
@@ -230,6 +523,6 @@ header, .context-menu, .megamenu-content, footer { font-family: "Segoe UI", Aria
 <p>
 面向垂直行业用户打造的一站式场景化视频应用综合解决方案品牌
 ：<a href="https://www.bokecc.com">https://www.bokecc.com</a>
-</p></details><p>&nbsp;</p><h2><a name="1-简介" class="md-header-anchor"></a><span>1. 简介</span></h2><p><span> Android Live SDK 是适用于Android平台的云直播SDK，使用此SDK可以与获得场景视频云直播服务进行对接，在Android端使用“获得场景”云直播功能</span></p><h2><a name="2-功能特性" class="md-header-anchor"></a><span>2. 功能特性</span></h2><figure><table><thead><tr><th><span>功能特性</span></th><th><span>描述</span></th></tr></thead><tbody><tr><td><span>视频</span></td><td><span>支持直播视频播放</span></td></tr><tr><td><span>文档</span></td><td><span>文档及ppt动画展示</span></td></tr><tr><td><span>白板画笔</span></td><td><span>支持展示白板及画笔操作</span></td></tr><tr><td><span>聊天</span></td><td><span>支持公聊和私聊模式</span></td></tr><tr><td><span>问答</span></td><td><span>支持问答功能</span></td></tr><tr><td><span>签到</span></td><td><span>支持签到功能</span></td></tr><tr><td><span>抽奖</span></td><td><span>支持获取抽奖信息</span></td></tr><tr><td><span>公告</span></td><td><span>支持获取公告信息</span></td></tr><tr><td><span>问卷</span></td><td><span>支持问卷功能</span></td></tr><tr><td><span>广播</span></td><td><span>支持获取广播通知消息</span></td></tr><tr><td><span>答题卡</span></td><td><span>支持答题卡功能</span></td></tr><tr><td><span>随堂测</span></td><td><span>支持随堂测功能</span></td></tr><tr><td><span>打卡</span></td><td><span>支持打卡功能</span></td></tr><tr><td><span>音频模式</span></td><td><span>支持纯音频模式</span></td></tr><tr><td><span>实时画笔</span></td><td><span>支持答题卡实时画笔功能</span></td></tr><tr><td><span>聊天记录补推</span></td><td><span>支持获取最近60条聊天记录</span></td></tr><tr><td><span>线路切换</span></td><td><span>支持选择直播流线路</span></td></tr><tr><td><span>音频模式</span></td><td><span>直播时支持选择观看纯音频模式</span></td></tr><tr><td><span>视频连麦</span></td><td><span>支持与讲师进行视频连麦</span></td></tr><tr><td><span>语音连麦</span></td><td><span>支持与讲师进行语音连麦</span></td></tr><tr><td><span>获取在线人数</span></td><td><span>支持获取直播间在线人数</span></td></tr><tr><td><span>后台播放</span></td><td><span>支持直播和回放退到后台只播放音频</span></td></tr><tr><td><span>多清晰度</span></td><td><span>支持直播多清晰度切换播放</span></td></tr><tr><td><span>回放DRM</span></td><td><span>支持回放采用DRM视频加密播放</span></td></tr><tr><td><span>直播回放</span></td><td><span>支持观看直播回放（包含视频、文档、聊天、问答等）</span></td></tr><tr><td><span>回放离线播放</span></td><td><span>回放支持离线下载播放，无需联网即可观看离线回放；</span></td></tr><tr><td><span>回放倍速播放</span></td><td><span>回放支持倍速播放</span></td></tr></tbody></table></figure><p>&nbsp;</p><h2><a name="3-集成文档" class="md-header-anchor"></a><span>3. 集成文档</span></h2><p><strong><span>1. 基础功能</span></strong></p><p><a href='doc/1.SDK接入指南.html'><span>点击跳转——1. SDK接入指南</span></a></p><p><a href='doc/2.直播接入文档.html'><span>点击跳转——2. 直播功能集成</span></a></p><p><a href='doc/3.回放接入文档.html'><span>点击跳转——3. 回放功能集成</span></a></p><p><a href='doc/4.离线回放文档.html'><span>点击跳转——4. 离线回放功能集成</span></a></p><p><strong><span>2. 其他功能</span></strong></p><p><a href='doc/连麦接入文档.html'><span>点击跳转——连麦集成详细文档</span></a><span> </span></p><p><a href='doc/FAQ.html'><span>点击跳转——问题解答FAQ</span></a><span> </span></p><p><a href='doc/关于SDK本地引用迁到远端引用.html'><span>点击跳转——关于3.8.0之后迁移到远端maven集成</span></a></p><h2><a name="4-版本更新文档" class="md-header-anchor"></a><span>4. 版本更新文档</span></h2><p><a href='doc/version/版本更新历史.html'><span>点击跳转——版本更新历史</span></a></p><p><a href='doc/version/3.0版本升级文档.html'><span>点击跳转——3.0之上升级文档</span></a></p><p><a href='doc/version/2.0版本升级文档.html'><span>点击跳转——2.0之上升级文档</span></a><span>    </span></p></div>
+</p></details><p>&nbsp;</p><h2><a name="1-简介" class="md-header-anchor"></a><span>1. 简介</span></h2><p><span> Android Live SDK 是适用于Android平台的云直播SDK，使用此SDK可以与获得场景视频云直播服务进行对接，在Android端使用“获得场景”云直播功能</span></p><h2><a name="2-功能特性" class="md-header-anchor"></a><span>2. 功能特性</span></h2><figure><table><thead><tr><th><span>功能特性</span></th><th><span>描述</span></th></tr></thead><tbody><tr><td><span>视频</span></td><td><span>支持直播视频播放</span></td></tr><tr><td><span>文档</span></td><td><span>文档及ppt动画展示</span></td></tr><tr><td><span>白板画笔</span></td><td><span>支持展示白板及画笔操作</span></td></tr><tr><td><span>聊天</span></td><td><span>支持公聊和私聊模式</span></td></tr><tr><td><span>问答</span></td><td><span>支持问答功能</span></td></tr><tr><td><span>签到</span></td><td><span>支持签到功能</span></td></tr><tr><td><span>抽奖</span></td><td><span>支持获取抽奖信息</span></td></tr><tr><td><span>公告</span></td><td><span>支持获取公告信息</span></td></tr><tr><td><span>问卷</span></td><td><span>支持问卷功能</span></td></tr><tr><td><span>广播</span></td><td><span>支持获取广播通知消息</span></td></tr><tr><td><span>答题卡</span></td><td><span>支持答题卡功能</span></td></tr><tr><td><span>随堂测</span></td><td><span>支持随堂测功能</span></td></tr><tr><td><span>打卡</span></td><td><span>支持打卡功能</span></td></tr><tr><td><span>音频模式</span></td><td><span>支持纯音频模式</span></td></tr><tr><td><span>实时画笔</span></td><td><span>支持答题卡实时画笔功能</span></td></tr><tr><td><span>聊天记录补推</span></td><td><span>支持获取最近60条聊天记录</span></td></tr><tr><td><span>线路切换</span></td><td><span>支持选择直播流线路</span></td></tr><tr><td><span>音频模式</span></td><td><span>直播时支持选择观看纯音频模式</span></td></tr><tr><td><span>视频连麦</span></td><td><span>支持与讲师进行视频连麦</span></td></tr><tr><td><span>语音连麦</span></td><td><span>支持与讲师进行语音连麦</span></td></tr><tr><td><span>获取在线人数</span></td><td><span>支持获取直播间在线人数</span></td></tr><tr><td><span>多清晰度</span></td><td><span>支持直播多清晰度切换播放</span></td></tr><tr><td><span>回放DRM</span></td><td><span>支持回放采用DRM视频加密播放</span></td></tr><tr><td><span>直播回放</span></td><td><span>支持观看直播回放（包含视频、文档、聊天、问答等）</span></td></tr><tr><td><span>回放离线播放</span></td><td><span>回放支持离线下载播放，无需联网即可观看离线回放；</span></td></tr><tr><td><span>回放倍速播放</span></td><td><span>回放支持倍速播放</span></td></tr></tbody></table></figure><p>&nbsp;</p><h2><a name="3-集成文档" class="md-header-anchor"></a><span>3. 集成文档</span></h2><p><strong><span>1. 基础功能</span></strong></p><p><a href='doc/1.SDK接入指南.html'><span>点击跳转——1. SDK接入指南</span></a></p><p><a href='doc/2.直播接入文档.html'><span>点击跳转——2. 直播功能集成</span></a></p><p><a href='doc/3.回放接入文档.html'><span>点击跳转——3. 回放功能集成</span></a></p><p><a href='doc/4.离线回放文档.html'><span>点击跳转——4. 离线回放功能集成</span></a></p><p><strong><span>2. 其他功能</span></strong></p><p><a href='doc/连麦接入文档.html'><span>点击跳转——连麦集成详细文档</span></a><span> </span></p><p><a href='doc/FAQ.html'><span>点击跳转——问题解答FAQ</span></a><span> </span></p><p><a href='doc/关于SDK本地引用迁到远端引用.html'><span>点击跳转——关于3.8.0之后迁移到远端maven集成</span></a></p><h2><a name="4-版本更新文档" class="md-header-anchor"></a><span>4. 版本更新文档</span></h2><p><a href='doc/version/版本更新历史.html'><span>点击跳转——版本更新历史</span></a></p><p><a href='doc/version/3.0版本升级文档.html'><span>点击跳转——3.0之上升级文档</span></a></p><p><a href='doc/version/2.0版本升级文档.html'><span>点击跳转——2.0之上升级文档</span></a><span>    </span></p></div>
 </body>
 </html>

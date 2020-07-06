@@ -8,7 +8,7 @@ import android.util.TypedValue;
 import android.view.Display;
 
 /**
- * 作者 ${郭鹏飞}.<br/>
+ * 作者 ${bokecc}.<br/>
  */
 public class DensityUtil {
     private DensityUtil() {

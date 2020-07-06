@@ -36,6 +36,8 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:largeHeap="true"
+        android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
 
         <!-- 兼容 Android P -->
@@ -107,6 +109,7 @@
         <activity
             android:name="com.bokecc.dwlivedemo.activity.ReplayPlayActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <!-- 直播回放播放页（默认文档为大屏，仅适配模版有'文档'的直播间） -->
@@ -132,7 +135,7 @@
         <activity android:name="com.bokecc.dwlivedemo.activity.DownloadListActivity" />
         <!--离线下载界面-->
         <activity android:name="com.bokecc.dwlivedemo.activity.ImageDetailsActivity" />
-
+        <receiver android:name="com.bokecc.dwlivedemo.activity.NotificationReceiver"/>
     </application>
 
 </manifest>

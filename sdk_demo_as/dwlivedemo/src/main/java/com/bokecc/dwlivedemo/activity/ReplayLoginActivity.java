@@ -93,6 +93,9 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (loginPopupWindow!=null&&loginPopupWindow.isShowing()){
+                    return;
+                }
                 //防止频繁点击
                 if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
                     doLiveLogin();

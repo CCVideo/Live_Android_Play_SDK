@@ -54,4 +54,18 @@ public interface DownLoadStatus {
      * 重复下载
      */
     int DOWNLOAD_REPETITION =12;
+    /**
+     * 开始解析
+     */
+    int PARSE_START =13;
+
+    /**
+     * 解析失败
+     */
+    int PARSE_FAIL =14;
+
+    /**
+     * 解析完成
+     */
+    int PARSE_SUCCESS =15;
 }

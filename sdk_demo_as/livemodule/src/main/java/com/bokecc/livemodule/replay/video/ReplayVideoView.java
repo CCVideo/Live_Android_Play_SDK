@@ -3,26 +3,18 @@ package com.bokecc.livemodule.replay.video;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.view.ResizeTextureView;
-import com.bokecc.sdk.mobile.live.DWLiveEngine;
-import com.bokecc.sdk.mobile.live.replay.ChangeLineCallback;
-import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -85,7 +77,6 @@ public class ReplayVideoView extends RelativeLayout {
         player.setOnSeekCompleteListener(new IMediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(IMediaPlayer mp) {
-
             }
         });
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
@@ -100,7 +91,7 @@ public class ReplayVideoView extends RelativeLayout {
     public void start() {
         DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
         if (dwReplayCoreHandler != null) {
-            dwReplayCoreHandler.start(null);
+            dwReplayCoreHandler.start();
         }
     }
 
@@ -127,7 +118,19 @@ public class ReplayVideoView extends RelativeLayout {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             if (mSurfaceTexture != null) {
-                mTextureView.setSurfaceTexture(mSurfaceTexture);
+                //如果是从后台切换回前台的话
+                if (isNeedUpdateSurface){
+                    if (mSurfaceTexture.hashCode()==surfaceTexture.hashCode()){
+                        mTextureView.setSurfaceTexture(mSurfaceTexture);
+                    }else{
+                        mSurfaceTexture = surfaceTexture;
+                        mSurface = new Surface(surfaceTexture);
+                        player.updateSurface(mSurface);
+                    }
+                }else{
+                    mTextureView.setSurfaceTexture(mSurfaceTexture);
+                }
+                isNeedUpdateSurface = false;
             } else {
                 mSurfaceTexture = surfaceTexture;
                 mSurface = new Surface(surfaceTexture);
@@ -176,6 +179,8 @@ public class ReplayVideoView extends RelativeLayout {
                     if (dwReplayCoreHandler != null) {
                         dwReplayCoreHandler.replayVideoPrepared();
                     }
+
+
                 }
             });
         }
@@ -252,9 +257,16 @@ public class ReplayVideoView extends RelativeLayout {
             DWReplayCoreHandler dwReplayCoreHandler = DWReplayCoreHandler.getInstance();
             if (dwReplayCoreHandler != null) {
                 dwReplayCoreHandler.onPlayComplete();
+
+
             }
         }
     };
-
-
+    /**
+     * 记录用户是否切换到后台 因为部分手机切换到后台再切回到前台会出现视频帧卡住问题
+     */
+    private boolean isNeedUpdateSurface;
+    public void onPause(){
+        isNeedUpdateSurface = true;
+    }
 }
