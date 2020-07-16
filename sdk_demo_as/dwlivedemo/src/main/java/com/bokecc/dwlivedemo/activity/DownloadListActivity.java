@@ -12,14 +12,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bokecc.dwlivedemo.DWApplication;
 import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.download.DownLoadBean;
@@ -219,7 +217,7 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
                 downloadManager.start(downLoadBean);
             }
         });
-        downloadManager.getAllLocalDate();
+        downloadManager.getAllLocalData();
     }
 
 

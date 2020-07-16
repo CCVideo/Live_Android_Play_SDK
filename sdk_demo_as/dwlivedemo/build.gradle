@@ -53,10 +53,4 @@ dependencies {
 
     // ==================================CC SDK Module===============================
     implementation project(':livemodule')
-
-
-}
-
-static def releaseTime() {
-    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("Asia/Shanghai"))
 }

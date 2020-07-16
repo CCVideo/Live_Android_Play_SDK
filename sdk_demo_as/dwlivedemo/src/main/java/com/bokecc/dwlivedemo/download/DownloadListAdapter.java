@@ -108,7 +108,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (downLoadBean.getTaskStatus() == DownLoadStatus.PARSE_SUCCESS) {
+                if (downLoadBean.getTaskStatus() == DownLoadStatus.ZIP_FINISH) {
                     if (mItemClickListener != null) {
                         mItemClickListener.onFinishTaskClick(downLoadBean.getPath());
                     }
@@ -211,12 +211,6 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                     return "下载完成  解压完成";
                 case DownLoadStatus.ZIP_ERROR:
                     return "下载完成  解压失败";
-                case DownLoadStatus.PARSE_START:
-                    return "数据解析中";
-                case DownLoadStatus.PARSE_FAIL:
-                    return "解析失败";
-                case DownLoadStatus.PARSE_SUCCESS:
-                    return "解析完成";
                 default:
                     return "下载失败";
             }

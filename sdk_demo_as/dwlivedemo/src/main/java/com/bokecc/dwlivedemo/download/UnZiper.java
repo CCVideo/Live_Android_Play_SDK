@@ -1,7 +1,5 @@
 package com.bokecc.dwlivedemo.download;
 
-import android.util.Log;
-
 import com.bokecc.sdk.mobile.live.util.SupZipTool;
 
 import java.io.File;
@@ -65,7 +63,7 @@ public class UnZiper {
                 public void run() {
                     status = ZIP_ING;
                     // 调用解压方法
-                    int resultCode = SupZipTool.decompressZipDec(oriFile.getAbsolutePath(), dir);
+                    int resultCode = SupZipTool.decompressZipDecAndSplitFile(oriFile.getAbsolutePath(), dir);
                    // Log.e("dds_test", "file:" + oriFile.getAbsolutePath());
                     //Log.e("dds_test", "result:" + resultCode);
 
