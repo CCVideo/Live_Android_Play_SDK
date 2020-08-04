@@ -410,7 +410,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             if (list1.contains(chatEntity)) {
                 continue;
             }
-            Log.e("dds_test", "history BroadcastMsg:" + chatEntity.getTime());
             list.add(chatEntity);
         }
 
@@ -433,7 +432,6 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             if (chatEntities.contains(chatEntity)) {
                 continue;
             }
-            Log.e("dds_test", "history ChatMessage:" + chatEntity.getTime());
             if (barrageLayout != null) {
                 // 聊天支持发送图片，需要判断聊天内容是否为图片，如果不是图片，再添加到弹幕 && 聊天状态为显示
                 if (!ChatImageUtils.isImgChatMessage(historyChats.get(i).getMessage()) && "0".equals(historyChats.get(i).getStatus())) {

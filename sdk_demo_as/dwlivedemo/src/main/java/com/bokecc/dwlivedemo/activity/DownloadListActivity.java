@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -41,11 +40,7 @@ import java.util.List;
  */
 public class DownloadListActivity extends BaseActivity implements View.OnClickListener, DownLoadTaskListener {
 
-    public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload/";
-
-
-//    public static String DOWNLOAD_DIR ;
-
+    public static String DOWNLOAD_DIR;
     /**
      * activity里最底层的父布局容器，用于弹出PopupWindow使用
      */
@@ -95,7 +90,7 @@ public class DownloadListActivity extends BaseActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         hideActionBar();
         setContentView(R.layout.activity_down_load_list);
-//        DOWNLOAD_DIR = DWApplication.getContext().getExternalFilesDir(null).getPath() + "/CCDownload/";
+        DOWNLOAD_DIR = FileUtil.getCCDownLoadPath(this);
         //初始化控件
         mRoot = getWindow().getDecorView().findViewById(android.R.id.content);
         mDownloadListView = findViewById(R.id.id_download_list);

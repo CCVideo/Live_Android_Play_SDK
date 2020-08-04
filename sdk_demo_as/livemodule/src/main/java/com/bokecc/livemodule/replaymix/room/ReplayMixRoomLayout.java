@@ -19,12 +19,10 @@ import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.livemodule.replaymix.DWReplayMixRoomListener;
 import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
+import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 
 /**
@@ -89,7 +87,7 @@ public class ReplayMixRoomLayout extends RelativeLayout implements DWReplayMixRo
         }
 
         // 隐藏 "文档/视频" 切换
-       // mVideoDocSwitch.setVisibility(GONE);
+        // mVideoDocSwitch.setVisibility(GONE);
 
         this.setOnClickListener(mRoomAnimatorListener);
 
@@ -303,7 +301,7 @@ public class ReplayMixRoomLayout extends RelativeLayout implements DWReplayMixRo
      */
     @Override
     public void onPlayOtherReplayVideo() {
-        if(mReplaySpeed != null){
+        if (mReplaySpeed != null) {
             mReplaySpeed.post(new Runnable() {
                 @Override
                 public void run() {
@@ -335,6 +333,7 @@ public class ReplayMixRoomLayout extends RelativeLayout implements DWReplayMixRo
          * 进入全屏
          */
         void fullScreen();
+
     }
 
     // 回放直播间状态监听
@@ -401,7 +400,7 @@ public class ReplayMixRoomLayout extends RelativeLayout implements DWReplayMixRo
         public void onClick(View v) {
             if (mTopLayout.isShown()) {
                 ObjectAnimator bottom_y = ObjectAnimator.ofFloat(mBottomLayout, "translationY", mBottomLayout.getHeight());
-                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", - 1 * mTopLayout.getHeight());
+                ObjectAnimator top_y = ObjectAnimator.ofFloat(mTopLayout, "translationY", -1 * mTopLayout.getHeight());
                 AnimatorSet animatorSet = new AnimatorSet();
                 animatorSet.play(top_y).with(bottom_y);
 

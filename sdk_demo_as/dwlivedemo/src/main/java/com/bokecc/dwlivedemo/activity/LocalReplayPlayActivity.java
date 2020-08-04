@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 
 import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
+import com.bokecc.dwlivedemo.download.FileUtil;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
@@ -47,8 +47,7 @@ import static com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter.CONT
  */
 public class LocalReplayPlayActivity extends BaseActivity implements DWLocalReplayCoreHandler.LocalTemplateUpdateListener {
 
-    public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload";
-
+    public static String DOWNLOAD_DIR;
     private View mRoot;
     private String mPlayPath;  // CCR文件名
     private LocalReplayVideoView mReplayVideoView;
@@ -65,7 +64,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         requestFullScreenFeature();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_replay_play);
-
+        DOWNLOAD_DIR = FileUtil.getCCDownLoadPath(this);
         Intent intent = getIntent();
         String fileName = intent.getStringExtra("fileName");
         if (TextUtils.isEmpty(fileName)) {
@@ -287,8 +286,12 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mRoot.getHandler() != null) {
+            mRoot.getHandler().removeCallbacksAndMessages(null);
+        }
         mLocalReplayFloatingView.dismiss();
         mReplayVideoView.destroy();
+
 
     }
 
@@ -446,6 +449,13 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
                     player.seekTo(mReplayRoomLayout.mPlaySeekBar.getProgress());
                 }
 
+            }
+        }
+
+        @Override
+        public void onClickDocScaleType(int scaleType) {
+            if (mDocLayout != null) {
+                mDocLayout.setScaleType(scaleType);
             }
         }
     };

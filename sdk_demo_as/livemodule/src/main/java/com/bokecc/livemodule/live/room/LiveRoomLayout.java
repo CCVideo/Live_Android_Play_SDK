@@ -23,7 +23,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,8 +61,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     private RelativeLayout mPortraitLiveBottom;
     // 全屏按钮
     private ImageView mLiveFullScreen;
-    // 文档拉伸类型
-    private Spinner spinner;
     private Button mChatSend;
     private GridView mEmojiGrid;
     private ImageView mEmoji; // 表情按钮
@@ -79,8 +76,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
     //当前视图状态
     public State viewState = State.VIDEO;
     private LiveVideoView mLiveVideoView;
-    // 是否显示拉伸类型选项
-    private boolean isShowScale = false;
+
 
     public enum State {
         VIDEO,//小窗口打开并且视频在大窗口上
@@ -138,12 +134,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         mEmojiGrid = findViewById(R.id.id_push_emoji_grid);
         mChatSend = findViewById(R.id.id_push_chat_send);
         mInput = findViewById(R.id.id_push_chat_input);
-        spinner = findViewById(R.id.spr_scale_type);
-        if (!isShowScale) {
-            spinner.setVisibility(View.GONE);
-        } else {
-            spinner.setVisibility(View.VISIBLE);
-        }
+
         RoomInfo roomInfo = DWLive.getInstance().getRoomInfo();
         if (roomInfo != null) {
             isShowUserCount = roomInfo.getShowUserCount() == 1;
@@ -166,27 +157,20 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         mLiveVideoDocSwitch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (DWLiveCoreHandler.getInstance().isRtcing()) {
-//                    toastOnUiThread("连麦中，暂不支持切换");
-//                    return;
-//                }
+                // 根据类型适配开关
                 if (liveRoomStatusListener != null) {
                     if (viewState == State.VIDEO) {
                         viewState = State.DOC;
                         liveRoomStatusListener.switchVideoDoc(viewState);
-                        showScaleType();
                     } else if (viewState == State.DOC) {
                         viewState = State.VIDEO;
                         liveRoomStatusListener.switchVideoDoc(viewState);
-                        hideScaleType();
                     } else if (viewState == State.OPEN_DOC) {
                         liveRoomStatusListener.switchVideoDoc(viewState);
                         viewState = State.VIDEO;
-                        hideScaleType();
                     } else if (viewState == State.OPEN_VIDEO) {
                         liveRoomStatusListener.switchVideoDoc(viewState);
                         viewState = State.DOC;
-                        showScaleType();
                     }
                     setSwitchText(viewState);
                 }
@@ -209,20 +193,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
             }
         });
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                // 如果文档是适应窗口模式
-                if (liveRoomStatusListener != null) {
-                    liveRoomStatusListener.onClickDocScaleType(pos);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
     }
 
@@ -598,19 +568,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         isEmojiShow = false;
     }
 
-    // 显示拉伸类型按钮
-    public void showScaleType() {
-        if (isShowScale) {
-            spinner.setVisibility(View.VISIBLE);
-        }
-
-    }
-
-    // 隐藏拉伸类型按钮
-    public void hideScaleType() {
-        spinner.setVisibility(View.GONE);
-    }
-
     //***************************************** 控制布局动画相关方法 ******************************
     private OnClickListener mRoomAnimatorListener = new OnClickListener() {
 
@@ -796,4 +753,6 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         this.viewState = status;
         setSwitchText(status);
     }
+
+
 }

@@ -19,7 +19,7 @@ public interface DownLoadTaskListener {
      *               6 更新本地数据库失败
      * @param url 下载的url
      */
-    void error(int status,String url);
+    void error(int status, String url);
 
     /**
      * 下载进度监听
@@ -36,5 +36,5 @@ public interface DownLoadTaskListener {
      * 添加数据成功 显示到界面上
      * @param downLoadBean  下载的数据
      */
-    void addDateSuccess( DownLoadBean downLoadBean);
+    void addDateSuccess(DownLoadBean downLoadBean);
 }

@@ -258,16 +258,26 @@ public class DWLiveCoreHandler {
     /**
      * 开始播放
      */
+    @Deprecated
     public void start(Surface surface) {
+        start();
+    }
+
+    /**
+     * 开始播放
+     */
+    public void start() {
         DWLive dwLive = DWLive.getInstance();
         if (dwLive != null) {
             // 设置播放参数 （回调 及 上下文）
             dwLive.setDWLivePlayParams(dwLiveListener, DWLiveEngine.getInstance().getContext());
             // 调用开始播放逻辑
-            dwLive.start(null);
+            dwLive.start();
+            // 获取随堂测统计信息
             DWLive.getInstance().getPracticeStatis("");
         }
     }
+
 
     /**
      * 停止播放
@@ -614,7 +624,7 @@ public class DWLiveCoreHandler {
         @Override
         public void onSwitchVideoDoc(boolean isVideoMain) {
             if (dwLiveRoomListener != null) {
-                dwLiveRoomListener.onSwitchVideoDoc(isVideoMain? LiveRoomLayout.State.VIDEO: LiveRoomLayout.State.DOC);
+                dwLiveRoomListener.onSwitchVideoDoc(isVideoMain ? LiveRoomLayout.State.VIDEO : LiveRoomLayout.State.DOC);
             }
         }
 

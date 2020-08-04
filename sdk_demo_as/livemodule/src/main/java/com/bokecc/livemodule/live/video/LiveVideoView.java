@@ -35,7 +35,6 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 /**
  * CC 直播视频展示控件
  * 说明: 此处存在Surface动态初始化失败的问题，后续考虑怎么优化
- *
  */
 public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener {
     private final String TAG = LiveVideoView.class.getSimpleName();
@@ -99,13 +98,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
          */
         void onPrepared(LiveVideoView videoView);
     }
+
     /**
      * 直播视频通知接口
      */
     public interface OnStreamCallback {
         /**
          * 流停止了
-         *
          */
         void onStreamEnd(boolean isNormal);
 
@@ -114,6 +113,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
          */
         void onStreamStart();
     }
+
     public LiveVideoView(Context context) {
         super(context);
         initViews(context);
@@ -159,7 +159,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         player.setOnInfoListener(onInfoListener);
         player.setOnVideoSizeChangedListener(onVideoSizeChangedListener);
         player.setOnErrorListener(onErrorListener);
-
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setPlayer(player);
@@ -182,6 +181,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     public void setPreparedCallback(OnPreparedCallback preparedCallback) {
         this.preparedCallback = preparedCallback;
     }
+
     /**
      * 设置视频流开始和关闭回调
      *
@@ -213,7 +213,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      */
     public void exitRtcMode() {
         try {
-            DWLive.getInstance().restartVideo(mSurface);
+            DWLive.getInstance().restartVideo();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (DWLiveException e) {
@@ -224,7 +224,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 开始播放
-     *
      */
     public synchronized void start() {
 //        ELog.i(TAG,"---start--- hasCallStartPlay: "+hasCallStartPlay);
@@ -233,7 +232,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 //        }
 //        hasCallStartPlay = true;
         // 启动直播播放器
-        DWLiveCoreHandler.getInstance().start(null);
+        DWLiveCoreHandler.getInstance().start();
         if (mVideoProgressBar != null) {
             mVideoProgressBar.setVisibility(VISIBLE);
         }
@@ -241,7 +240,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 停止播放
-     *
      */
     public void stop() {
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
@@ -256,7 +254,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             player.stop();
             player.release();
         }
-        if (handler!=null){
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
@@ -272,7 +270,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 文档视频切换时缓存切换前的画面
-     *
      */
     public void cacheScreenBitmap() {
         tempBitmap = mVideoContainer.getBitmap();
@@ -280,8 +277,9 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 恢复暂停时的图像
-//     *
-//     */
+     * //     *
+     * //
+     */
 //    public void showPauseCover() {
 //        if (tempBitmap != null
 //                && !tempBitmap.isRecycled() && surface != null && surface.isValid()) {
@@ -356,7 +354,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                     if (null != mSurface) {
                         player.setSurface(mSurface);
                     }
-                    ELog.i(TAG,"LiveVideoView onPrepared...");
+                    ELog.i(TAG, "LiveVideoView onPrepared...");
                     // 通知直播视频已经准备就绪
                     if (null != preparedCallback) {
                         preparedCallback.onPrepared(LiveVideoView.this);
@@ -372,13 +370,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             switch (what) {
                 // 缓冲开始
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
-                    ELog.i(TAG,"LiveVideoView oninfo...MEDIA_INFO_BUFFERING_START");
+                    ELog.i(TAG, "LiveVideoView oninfo...MEDIA_INFO_BUFFERING_START");
                     mVideoProgressBar.setVisibility(VISIBLE);
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-                    ELog.i(TAG,"LiveVideoView oninfo...MEDIA_INFO_VIDEO_RENDERING_START");
+                    ELog.i(TAG, "LiveVideoView oninfo...MEDIA_INFO_VIDEO_RENDERING_START");
                     mVideoProgressBar.setVisibility(GONE);
                     break;
                 default:
@@ -401,8 +399,12 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     };
     IMediaPlayer.OnErrorListener onErrorListener = new IMediaPlayer.OnErrorListener() {
         @Override
-        public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
-            Toast.makeText(mContext,"播放失败",Toast.LENGTH_SHORT).show();
+        public boolean onError(IMediaPlayer iMediaPlayer, int what, int i1) {
+            if (what == DWLivePlayer.MEDIA_ERROR_TIMEOUT) {
+                Toast.makeText(mContext, "播放失败，网络超时，请检查网络", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
+            }
             return false;
         }
     };
@@ -415,7 +417,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
 
     /**
      * 视频等比缩放
-     *
      */
     private RelativeLayout.LayoutParams getVideoSizeParams() {
 
@@ -470,7 +471,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 player.stop();
                 player.reset();
                 mVideoProgressBar.setVisibility(View.GONE);
-                if (onStreamCallback!=null){
+                if (onStreamCallback != null) {
                     onStreamCallback.onStreamEnd(isNormal);
                 }
             }
@@ -536,17 +537,17 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         if (mSurface != null) {
             DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
             if (dwLiveCoreHandler != null) {
-                dwLiveCoreHandler.start(mSurface);
+                dwLiveCoreHandler.start();
             }
         }
     }
 
     @Override
     public void onStreamStart() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
-                if (onStreamCallback!=null){
+                if (onStreamCallback != null) {
                     onStreamCallback.onStreamStart();
                 }
             }

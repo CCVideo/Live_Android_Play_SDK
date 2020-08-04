@@ -4,7 +4,7 @@ package com.bokecc.livemodule.live.chat.util;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * 作者 ${bokecc}.<br/>
+ * 作者 ${郭鹏飞}.<br/>
  */
 
 public abstract class OnClickListener implements ITouchListener {

@@ -9,7 +9,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -45,11 +43,8 @@ import com.bokecc.livemodule.replay.video.ReplayVideoView;
 import com.bokecc.sdk.mobile.live.OnMarqueeImgFailListener;
 import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Marquee;
-import com.bokecc.sdk.mobile.live.replay.ReplayLineSwitchListener;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
-import com.bokecc.sdk.mobile.live.replay.entity.ReplayLineParams;
-import com.bokecc.sdk.mobile.live.replay.config.ReplayLineConfig;
 import com.bokecc.sdk.mobile.live.widget.MarqueeView;
 
 import java.util.ArrayList;
@@ -71,7 +66,6 @@ public class ReplayPlayActivity extends BaseActivity {
     RelativeLayout mReplayVideoContainer;
     // 回放视频View
     ReplayVideoView mReplayVideoView;
-
     // 悬浮弹窗（用于展示文档和视频）
     FloatingPopupWindow mReplayFloatingView;
     // 回放房间组件
@@ -79,7 +73,7 @@ public class ReplayPlayActivity extends BaseActivity {
     // 跑马灯组件
     MarqueeView mMarqueeView;
 
-    private NotificationReceiver mNotificationReceiver;
+
     private boolean isVideo = false;
     private final String CHANNEL_ID = "HD_SDK_CHANNEL_ID";
 
@@ -97,6 +91,9 @@ public class ReplayPlayActivity extends BaseActivity {
         //DWLiveReplay.getInstance().setLastPosition(30000);
         mReplayVideoView.start();
         initViewPager();
+
+        // 测试音频切换功能
+//        testCase();
     }
 
 
@@ -168,12 +165,16 @@ public class ReplayPlayActivity extends BaseActivity {
         mChatTag = findViewById(R.id.live_portrait_info_chat);
         mDocTag = findViewById(R.id.live_portrait_info_document);
 
+
         // 弹出框界面
         mExitPopupWindow = new ExitPopupWindow(this);
         mReplayFloatingView = new FloatingPopupWindow(this);
         mReplayFloatingView.setFloatDismissListener(floatDismissListener);
         mReplayRoomLayout.setReplayRoomStatusListener(roomStatusListener);
+
+
     }
+
 
     /**
      * 根据直播间模版初始化相关组件
@@ -526,9 +527,6 @@ public class ReplayPlayActivity extends BaseActivity {
             } else if (progress + move < max) {
                 mReplayRoomLayout.mPlaySeekBar.setProgress((int) (progress + ((xVelocity * 10))));
             }
-//            else if (progress + move == max) {
-//                mReplayRoomLayout.mPlaySeekBar.setProgress(0);
-//            }
             if (isSeek) {
                 player.seekTo(mReplayRoomLayout.mPlaySeekBar.getProgress());
             }
@@ -596,7 +594,7 @@ public class ReplayPlayActivity extends BaseActivity {
                 .setPriority(NotificationCompat.PRIORITY_MAX);
 
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.item_notification);
-        remoteViews.setTextViewText(R.id.id_content, DWLiveReplay.getInstance().getRoomInfo()==null?"直播":DWLiveReplay.getInstance().getRoomInfo().getName());
+        remoteViews.setTextViewText(R.id.id_content, DWLiveReplay.getInstance().getRoomInfo() == null ? "直播" : DWLiveReplay.getInstance().getRoomInfo().getName());
         remoteViews.setImageViewResource(R.id.id_play_btn, playResId);
 
         //暂停播放

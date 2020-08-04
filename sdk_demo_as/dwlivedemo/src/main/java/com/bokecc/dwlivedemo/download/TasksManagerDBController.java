@@ -23,7 +23,7 @@ public class TasksManagerDBController {
         db = openHelper.getWritableDatabase();
     }
 
-    public List<DownLoadBean> getAllTasks() {
+    public synchronized List<DownLoadBean> getAllTasks() {
         final Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
         final List<DownLoadBean> list = new ArrayList<>();
         try {
@@ -53,7 +53,7 @@ public class TasksManagerDBController {
      * @param downLoadBean
      * @return 0是成功  -1是参数为null   -2是重复  -3是添加数据库失败
      */
-    public int addTask(DownLoadBean downLoadBean) {
+    public synchronized int addTask(DownLoadBean downLoadBean) {
         if (downLoadBean==null) {
             return -1;
         }
@@ -95,19 +95,19 @@ public class TasksManagerDBController {
         return downLoadBean;
     }
 
-    public int update(DownLoadBean downLoadBean) {
+    public synchronized int update(DownLoadBean downLoadBean) {
         ContentValues values = downLoadBean.toContentValues();
         int ret = db.update(TABLE_NAME, values, "url=?", new String[]{downLoadBean.getUrl() + ""});
         return ret;
     }
 
-    public int removeTask(String url){
+    public synchronized int removeTask(String url){
 
        int ret = db.delete(TABLE_NAME,"url=?", new String[]{url + ""});
 
        return ret;
     }
-    public void onDestroy(){
+    public synchronized void onDestroy(){
         if (db!=null){
             db.close();
         }

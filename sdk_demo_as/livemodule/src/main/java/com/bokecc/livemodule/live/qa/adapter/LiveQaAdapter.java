@@ -363,7 +363,6 @@ public class LiveQaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             mSize = totalSize;
         }
-        //Log.d("dds_test", "getItemCount:" + mSize);
         isDataChange = false;
         return mSize;
     }

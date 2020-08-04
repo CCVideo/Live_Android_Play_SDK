@@ -12,7 +12,6 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.utils.DensityUtil;
@@ -20,7 +19,7 @@ import com.bokecc.livemodule.utils.DensityUtil;
 /**
  * 头像控件
  */
-public class HeadView extends ImageView {
+public class HeadView extends android.support.v7.widget.AppCompatImageView {
 
     public static final int DEFAULT_COLOR = Color.TRANSPARENT;
     public static final int DEFAULT_WIDTH = 0;

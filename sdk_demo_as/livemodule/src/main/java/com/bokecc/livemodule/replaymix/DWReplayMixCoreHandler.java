@@ -56,7 +56,6 @@ public class DWReplayMixCoreHandler {
     }
 
 
-
     /******************************* 各类功能模块监听相关 ***************************************/
 
     private DWReplayMixChatListener replayMixChatListener;
@@ -157,10 +156,11 @@ public class DWReplayMixCoreHandler {
      * 若登录先完成，此时surface可用，则播放正常，若surface不可用，则播放器将会得到一个空的surface，
      * 此时播放将会出现异常，因此当播放在线时，做两次检测，当登录成功surface可用则进行播放，若surface可用
      * 则检测是否登录成功，同时满足条件则播放。
-     *
+     * <p>
      * needStartPlay: true：改回调调用时需要出发播放动作，false：不需要出发播放动作，只有当界面刚进入时
      * 该值才为true，原因见上文，其他动作引发surface发生改变时，needStartPlay始终为false
-     * @param surface 渲染的surface
+     *
+     * @param surface       渲染的surface
      * @param needStartPlay 是否需要触发播放动作，true:触发，false:不触发
      */
     public void onSurfaceAvailable(Surface surface, boolean needStartPlay) {
@@ -202,7 +202,7 @@ public class DWReplayMixCoreHandler {
      * 开始播放在线回放
      */
     public void startLiveReplay(ReplayLoginInfo info) {
-        if(mCurrentPlayType == PlayType.LOCAL){
+        if (mCurrentPlayType == PlayType.LOCAL) {
             DWLiveLocalReplay.getInstance().releasePlayer();
         }
 
@@ -245,6 +245,41 @@ public class DWReplayMixCoreHandler {
     }
 
     /**
+     * 开始播放离线回放
+     */
+    public void startLocalReplay(String localPath) {
+        if (replayMixChatListener != null) {
+            replayMixChatListener.onChatMessage(new TreeSet<ReplayChatMsg>());
+        }
+
+        if (mCurrentPlayType == PlayType.LIVE) {
+            docView.getImageView().setFastDoc(false);
+            docView.getImageView().setVisibility(View.VISIBLE);
+            docView.getWebView().setVisibility(View.GONE);
+            docView.clearDrawInfo();
+            DWLiveReplay liveReplay = DWLiveReplay.getInstance();
+            liveReplay.stop();
+        }
+
+        final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
+        if (mCurrentPlayType == PlayType.LOCAL) {
+            liveLocalReplay.releasePlayer();
+        }
+        mCurrentPlayType = PlayType.LOCAL;
+        if (dwReplayMixVideoListener != null) {
+            dwReplayMixVideoListener.onPlayOtherReplayVideo();
+        }
+        if (dwReplayMixRoomListener != null) {
+            dwReplayMixRoomListener.onPlayOtherReplayVideo();
+        }
+
+
+        liveLocalReplay.setReplayParams(localReplayListener, ijkMediaPlayer, docView, localPath);
+        startPlayReplay();
+    }
+
+
+    /**
      * 设置在线回放播放参数
      */
     private void setPlayParam() {
@@ -263,8 +298,7 @@ public class DWReplayMixCoreHandler {
         if (mCurrentPlayType == PlayType.LIVE) {
             DWLiveReplay dwLiveReplay = DWLiveReplay.getInstance();
             if (dwLiveReplay != null && surface != null) {
-                dwLiveReplay.start(null);
-                //ijkMediaPlayer.updateSurface(surface);
+                dwLiveReplay.start();
             }
         } else if (mCurrentPlayType == PlayType.LOCAL) {
             final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
@@ -273,41 +307,6 @@ public class DWReplayMixCoreHandler {
             }
         }
     }
-
-    /**
-     * 开始播放离线回放
-     */
-    public void startLocalReplay(String localPath) {
-        if (replayMixChatListener != null) {
-            replayMixChatListener.onChatMessage(new TreeSet<ReplayChatMsg>());
-        }
-
-        if (mCurrentPlayType == PlayType.LIVE) {
-            docView.getImageView().setFastDoc(false);
-            docView.getWebView().setVisibility(View.GONE);
-            docView.clearDrawInfo();
-            final DWLiveReplay liveReplay = DWLiveReplay.getInstance();
-            liveReplay.stop();
-        }
-
-        final DWLiveLocalReplay liveLocalReplay = DWLiveLocalReplay.getInstance();
-        if(mCurrentPlayType == PlayType.LOCAL){
-            liveLocalReplay.releasePlayer();
-        }
-        mCurrentPlayType = PlayType.LOCAL;
-        if (dwReplayMixVideoListener != null) {
-            dwReplayMixVideoListener.onPlayOtherReplayVideo();
-        }
-
-        if (dwReplayMixRoomListener != null) {
-            dwReplayMixRoomListener.onPlayOtherReplayVideo();
-        }
-
-
-        liveLocalReplay.setReplayParams(localReplayListener, ijkMediaPlayer, docView, localPath);
-        startPlayReplay();
-    }
-
 
     //******************************* 在线回放和离线回放 功能 监听器 ***************************************/
 
@@ -353,7 +352,7 @@ public class DWReplayMixCoreHandler {
         }
 
         @Override
-        public void onPageChange(String docId, String docName, int width ,int height,int pageNum, int docTotalPage) {
+        public void onPageChange(String docId, String docName, int width, int height, int pageNum, int docTotalPage) {
 
         }
 

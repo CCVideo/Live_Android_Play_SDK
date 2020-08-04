@@ -21,6 +21,7 @@ import java.util.TreeSet;
  * 离线回放相关逻辑核心处理机制
  */
 public class DWLocalReplayCoreHandler {
+    private final static String TAG = DWLocalReplayCoreHandler.class.getSimpleName();
 
     private static DWLocalReplayCoreHandler dwLocalReplayCoreHandler = new DWLocalReplayCoreHandler();
 
@@ -110,6 +111,18 @@ public class DWLocalReplayCoreHandler {
             return dwLiveReplay.getReplayLiveInfo();
         }
         return null;
+    }
+
+    /**
+     * 重试播放
+     *
+     * @param time:时间点，是否强制更新流地址
+     */
+    public void retryReplay(long time) {
+        DWLiveLocalReplay dwLiveReplay = DWLiveLocalReplay.getInstance();
+        if (dwLiveReplay != null) {
+            dwLiveReplay.retryReplay(time);
+        }
     }
 
     /**
@@ -313,4 +326,15 @@ public class DWLocalReplayCoreHandler {
         void onLocalTemplateUpdate();
     }
 
+    public void onPlayComplete() {
+        if (localReplayRoomListener != null) {
+            localReplayRoomListener.onPlayComplete();
+        }
+    }
+
+    public void playError(int code) {
+        if (localReplayRoomListener != null) {
+            localReplayRoomListener.onPlayError(code);
+        }
+    }
 }

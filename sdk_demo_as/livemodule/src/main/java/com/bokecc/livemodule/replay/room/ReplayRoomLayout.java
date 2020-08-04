@@ -283,7 +283,9 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             }
         });
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
+
         docMode = DWLiveReplay.getInstance().getRoomInfo().getDocumentDisplayMode();
+
     }
 
     public void doRetry(boolean updateStream) {
@@ -471,7 +473,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 DWReplayCoreHandler.getInstance().getPlayer().seekTo(0);
                 mPlaySeekBar.setProgress(0);
                 //将倍速初始化
-                DWLiveReplay.getInstance().setSpeed(1.0f);
+                if (DWReplayCoreHandler.getInstance().getPlayer() != null)
+                    DWReplayCoreHandler.getInstance().getPlayer().setSpeed(1.0f);
                 mReplaySpeed.setText("1.0x");
                 stopTimerTask();
             }
@@ -500,7 +503,8 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 mTipsView.setText("播放失败");
                 mTryBtn.setText("点击重试");
                 //将倍速初始化
-                DWLiveReplay.getInstance().setSpeed(1.0f);
+                if (DWReplayCoreHandler.getInstance().getPlayer() != null)
+                    DWReplayCoreHandler.getInstance().getPlayer().setSpeed(1.0f);
                 mReplaySpeed.setText("1.0x");
             }
         });
@@ -722,9 +726,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (docMode == 1
-                && mTipsLayout.getVisibility() != VISIBLE
-                && mPlaySeekBar.isCanSeek()) {
+        if (docMode == 1 && mTipsLayout.getVisibility() != VISIBLE && mPlaySeekBar.isCanSeek()) {
             if (mVelocityTracker == null) {
                 mVelocityTracker = VelocityTracker.obtain();
             }
@@ -741,9 +743,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                     float moveX = event.getX();
                     float moveY = event.getY();
                     if (Math.abs(downY - moveY) + 10 < Math.abs(moveX - this.downX)) {
-                        if (Math.abs(moveX - this.downX) > 10 && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.ERROR
-                                && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.BUFFERING
-                                && DWReplayCoreHandler.getInstance().getPlayer().getPlayerState() != DWReplayPlayer.State.PLAYBACK_COMPLETED) {
+                        if (Math.abs(moveX - this.downX) > 10 && DWReplayCoreHandler.getInstance().getPlayer().isInPlaybackState()) {
                             stopTimerTask();
                             mVelocityTracker.computeCurrentVelocity(1000);
                             replayRoomStatusListener.seek(mPlaySeekBar.getMax(), mPlaySeekBar.getProgress(), (moveX - this.moveX) * 1000, false, mVelocityTracker.getXVelocity(0));
@@ -801,4 +801,6 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     public boolean performClick() {
         return super.performClick();
     }
+
+
 }

@@ -51,11 +51,13 @@ public class ReplayDocComponent extends LinearLayout implements ReplayDocSizeCha
             replayCoreHandler.setDocView(mDocView);
         }
     }
+
     public void setDocScrollable(boolean isDocScrollable){
         if (mDocView!=null){
             mDocView.setScrollable(isDocScrollable);
         }
     }
+
     public void setScaleType(int type) {
         mCurrentScaleType = type;
         if (SCALE_CENTER_INSIDE == mCurrentScaleType) {

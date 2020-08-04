@@ -27,4 +27,16 @@ public interface DWLocalReplayRoomListener {
      * @param playerDuration 播放时长
      */
     void showVideoDuration(long playerDuration);
+    /**
+     * 播放完成
+     */
+    void onPlayComplete();
+
+    /**
+     * 播放错误
+     *
+     * @param code code
+     */
+    void onPlayError(int code);
+
 }

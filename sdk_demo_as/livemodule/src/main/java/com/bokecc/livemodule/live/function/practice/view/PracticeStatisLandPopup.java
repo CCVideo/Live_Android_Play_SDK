@@ -1,5 +1,6 @@
 package com.bokecc.livemodule.live.function.practice.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
@@ -11,7 +12,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -28,7 +28,6 @@ import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 随堂测统计弹出界面(横屏)
@@ -36,8 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PracticeStatisLandPopup extends BasePopupWindow {
 
     String[] orders = new String[]{"A", "B", "C", "D", "E", "F"};
-    String[] orders2 = new String[]{"√","×"};
-    public AtomicBoolean isClose = new AtomicBoolean(false);
+    String[] orders2 = new String[]{"√", "×"};
     private ImageView qsClose;
 
     private TextView mPracticeOverDesc;
@@ -49,20 +47,20 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
     private RecyclerView mStatisList;
 
     private PracticeStatisAdapter mStatisAdapter;
-    private Handler handler = new Handler(){
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case 1://定时刷新随堂测结果
                     DWLive.getInstance().getPracticeStatis(info.getId());
                     handler.removeMessages(1);
-                    handler.sendEmptyMessageDelayed(1,1000);
-                    isClose.set(true);
+                    handler.sendEmptyMessageDelayed(1, 1000);
                     break;
             }
         }
-    } ;
+    };
     private PracticeStatisInfo info;
     private OnCloseListener onCloseListener;
     private TextView timerText;
@@ -85,10 +83,10 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
         setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                if (onCloseListener!=null){
+                if (onCloseListener != null) {
                     onCloseListener.onClose();
                 }
-                if (handler!=null){
+                if (handler != null) {
                     handler.removeMessages(1);
                     handler.removeCallbacksAndMessages(null);
                 }
@@ -104,10 +102,12 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
         mStatisAdapter = new PracticeStatisAdapter(mContext);
         mStatisList.setAdapter(mStatisAdapter);
     }
-    public void show(View view,OnCloseListener onCloseListener) {
+
+    public void show(View view, OnCloseListener onCloseListener) {
         super.show(view);
-        this.onCloseListener=onCloseListener;
+        this.onCloseListener = onCloseListener;
     }
+
     /**
      * 展示随堂测统计信息
      */
@@ -115,9 +115,11 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
         if (info == null) {
             return;
         }
-        this.info=info;
         handler.removeMessages(1);
-        handler.sendEmptyMessageDelayed(1,1000);
+        if (info.getStatus() != 2 && isShow) {
+            handler.sendEmptyMessageDelayed(1, 1000);
+        }
+        this.info = info;
         if (info.getStatus() == 1) {
             mPracticeingDesc.setVisibility(View.VISIBLE);
             mPracticeOverDesc.setVisibility(View.GONE);
@@ -127,7 +129,7 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
         }
 
         mStatisAdapter.setAllPracticeNumber(info.getAnswerPersonNum());
-        mPracticePeopleNum.setText("共" + info.getAnswerPersonNum() + "人回答，正确率" + info.getCorrectRate() );
+        mPracticePeopleNum.setText("共" + info.getAnswerPersonNum() + "人回答，正确率" + info.getCorrectRate());
 
         ArrayList<Integer> practiceHistoryResult = DWLiveCoreHandler.getInstance().getPracticeResult(info.getId());
 
@@ -136,9 +138,9 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
 
         for (int i = 0; i < info.getOptionStatis().size(); i++) {
             if (info.getOptionStatis().get(i).isCorrect()) {
-                if (info.getType()==0){
+                if (info.getType() == 0) {
                     corrects.append(orders2[i]);
-                }else{
+                } else {
                     corrects.append(orders[i]);
                 }
             }
@@ -148,9 +150,9 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
             mPracticeAnswerDesc.setVisibility(View.GONE);
         } else {
             for (int i = 0; i < practiceHistoryResult.size(); i++) {
-                if (info.getType()==0){
+                if (info.getType() == 0) {
                     yourChoose.append(orders2[practiceHistoryResult.get(i)]);
-                }else{
+                } else {
                     yourChoose.append(orders[practiceHistoryResult.get(i)]);
                 }
             }
@@ -174,7 +176,7 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
 
         mPracticeAnswerDesc.setText(ss);
 
-        mStatisAdapter.add(info.getOptionStatis(),info.getType());
+        mStatisAdapter.add(info.getOptionStatis(), info.getType());
     }
 
     // 展示随堂测停止的UI
@@ -224,8 +226,9 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
         numberFormat.setMaximumFractionDigits(1);
         return numberFormat.format((float) selectCount / (float) all * 100);
     }
+
     public void setText(final String formatTime) {
-        if (timerText != null&&!TextUtils.isEmpty(formatTime)) {
+        if (timerText != null && !TextUtils.isEmpty(formatTime)) {
             timerText.post(new Runnable() {
                 @Override
                 public void run() {
@@ -234,5 +237,29 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
                 }
             });
         }
+    }
+
+
+    //---------------------------解决重复弹出的问题---------------------------------
+    private boolean isShow = false;
+
+    @Override
+    public boolean isShowing() {
+        if (isShow) {
+            return true;
+        }
+        return super.isShowing();
+    }
+
+    @Override
+    public void show(View view) {
+        super.show(view);
+        isShow = true;
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        isShow = false;
     }
 }

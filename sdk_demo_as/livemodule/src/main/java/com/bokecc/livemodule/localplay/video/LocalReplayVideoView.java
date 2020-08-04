@@ -75,11 +75,14 @@ public class LocalReplayVideoView extends RelativeLayout {
         player.setOnPreparedListener(preparedListener);
         player.setOnVideoSizeChangedListener(videoSizeChangedListener);
         player.setOnInfoListener(infoListener);
+        player.setOnErrorListener(errorListener);
+        player.setOnCompletionListener(completionListener);
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLocalReplayCoreHandler != null) {
             dwLocalReplayCoreHandler.setPlayer(player);
         }
     }
+
     IMediaPlayer.OnVideoSizeChangedListener videoSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
         @Override
         public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
@@ -88,11 +91,34 @@ public class LocalReplayVideoView extends RelativeLayout {
             }
         }
     };
+    IMediaPlayer.OnErrorListener errorListener = new IMediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(IMediaPlayer mp, int what, int extra) {
+            DWLocalReplayCoreHandler dwReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
+            if (dwReplayCoreHandler != null) {
+                dwReplayCoreHandler.playError(what);
+            }
+            return false;
+        }
+    };
+
+    IMediaPlayer.OnCompletionListener completionListener = new IMediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(IMediaPlayer mp) {
+            DWLocalReplayCoreHandler dwReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
+            if (dwReplayCoreHandler != null) {
+                dwReplayCoreHandler.onPlayComplete();
+            }
+        }
+    };
 
     /**
      * 开始播放
      */
     public void start() {
+        if (player.getPlayerState() == DWReplayPlayer.State.PAUSED) {
+            return;
+        }
         DWLocalReplayCoreHandler dwLocalReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
         if (dwLocalReplayCoreHandler != null) {
             dwLocalReplayCoreHandler.start();

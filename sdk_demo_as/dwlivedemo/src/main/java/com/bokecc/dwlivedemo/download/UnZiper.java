@@ -64,8 +64,6 @@ public class UnZiper {
                     status = ZIP_ING;
                     // 调用解压方法
                     int resultCode = SupZipTool.decompressZipDecAndSplitFile(oriFile.getAbsolutePath(), dir);
-                   // Log.e("dds_test", "file:" + oriFile.getAbsolutePath());
-                    //Log.e("dds_test", "result:" + resultCode);
 
                     if (resultCode != 0) {
                         status = ZIP_ERROR;

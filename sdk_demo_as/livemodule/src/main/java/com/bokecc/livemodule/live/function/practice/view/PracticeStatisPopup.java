@@ -28,6 +28,7 @@ import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * 随堂测统计弹出界面
@@ -93,11 +94,9 @@ public class PracticeStatisPopup extends BasePopupWindow {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            switch (msg.what) {
-                case 1://定时刷新随堂测结果
-                    DWLive.getInstance().getPracticeStatis(info.getId());
-                    handler.sendEmptyMessageDelayed(1, 1000);
-                    break;
+            if (msg.what == 1) {//定时刷新随堂测结果
+                DWLive.getInstance().getPracticeStatis(info.getId());
+                handler.sendEmptyMessageDelayed(1, 1000);
             }
         }
     };
@@ -106,13 +105,14 @@ public class PracticeStatisPopup extends BasePopupWindow {
      * 展示随堂测统计信息
      */
     public void showPracticeStatis(final PracticeStatisInfo info) {
+        if (info == null) {
+            return;
+        }
         handler.removeMessages(1);
-        if (info.getStatus() != 2) {
+        if (info.getStatus() != 2 && isShow) {
             handler.sendEmptyMessageDelayed(1, 1000);
         }
-
         this.info = info;
-
         if (info.getStatus() == 1) {
             mPracticeingDesc.setVisibility(View.VISIBLE);
             mPracticeOverDesc.setVisibility(View.GONE);
@@ -120,15 +120,12 @@ public class PracticeStatisPopup extends BasePopupWindow {
             mPracticeOverDesc.setVisibility(View.VISIBLE);
             mPracticeingDesc.setVisibility(View.GONE);
         }
-
         mStatisAdapter.setAllPracticeNumber(info.getAnswerPersonNum());
-        mPracticePeopleNum.setText("共" + info.getAnswerPersonNum() + "人回答，正确率" + info.getCorrectRate());
-
+        mPracticePeopleNum.setText(String.format(Locale.getDefault(), "共%d人回答，正确率%s",
+                info.getAnswerPersonNum(), info.getCorrectRate()));
         ArrayList<Integer> practiceHistoryResult = DWLiveCoreHandler.getInstance().getPracticeResult(info.getId());
-
         StringBuilder yourChoose = new StringBuilder();
         StringBuilder corrects = new StringBuilder();
-
         for (int i = 0; i < info.getOptionStatis().size(); i++) {
             if (info.getOptionStatis().get(i).isCorrect()) {
                 if (info.getType() == 0) {
@@ -138,7 +135,6 @@ public class PracticeStatisPopup extends BasePopupWindow {
                 }
             }
         }
-
         if (practiceHistoryResult == null) {
             mPracticeAnswerDesc.setVisibility(View.GONE);
         } else {
@@ -152,11 +148,8 @@ public class PracticeStatisPopup extends BasePopupWindow {
             }
             mPracticeAnswerDesc.setVisibility(View.VISIBLE);
         }
-
         String msg = "您的答案：" + yourChoose.toString() + "     正确答案：" + corrects.toString();
-
         SpannableString ss = new SpannableString(msg);
-
         ss.setSpan(new ForegroundColorSpan(Color.parseColor(getMyAnswerColor(yourChoose.toString().equals(corrects.toString())))),
                 5,
                 5 + yourChoose.length(),
@@ -166,10 +159,7 @@ public class PracticeStatisPopup extends BasePopupWindow {
                 5 + yourChoose.length() + 10,
                 5 + yourChoose.length() + 10 + corrects.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-
         mPracticeAnswerDesc.setText(ss);
-
         mStatisAdapter.add(info.getOptionStatis(), info.getType());
     }
 
@@ -236,5 +226,28 @@ public class PracticeStatisPopup extends BasePopupWindow {
                 }
             });
         }
+    }
+
+    //---------------------------解决重复弹出的问题---------------------------------
+    private boolean isShow = false;
+
+    @Override
+    public boolean isShowing() {
+        if (isShow) {
+            return true;
+        }
+        return super.isShowing();
+    }
+
+    @Override
+    public void show(View view) {
+        super.show(view);
+        isShow = true;
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        isShow = false;
     }
 }

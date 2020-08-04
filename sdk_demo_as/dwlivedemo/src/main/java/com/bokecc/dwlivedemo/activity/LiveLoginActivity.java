@@ -74,7 +74,6 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         parseUriIntent();
 
     }
-    private static final String PERMISSION_WINDOW = "permission_window";
 
     private void parseUriIntent() {
         Intent intent = getIntent();
@@ -133,7 +132,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 //防止频繁点击
-                if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
+                if (currentTime == 0 || System.currentTimeMillis() - currentTime > 2000) {
                     doLiveLogin();
                     currentTime = System.currentTimeMillis();
                 }
@@ -154,6 +153,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             }
         });
     }
+
     private long currentTime = 0;
 
     /**
@@ -249,7 +249,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
         editor.putString("liveroomid", lllLoginLiveRoomid.getText().trim());
         editor.putString("liveusername", lllLoginLiveName.getText().trim());
         editor.putString("livepassword", lllLoginLivePassword.getText().trim());
-        editor.commit();
+        editor.apply();
     }
 
     private void getSharePreference() {
@@ -350,7 +350,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (charSequence.length()>20){
+            if (charSequence.length() > 20) {
                 toastOnUiThread(getResources().getString(R.string.username_max_length));
             }
         }
@@ -367,6 +367,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
             btnLoginLive.setTextColor(isLoginEnabled ? Color.parseColor("#ffffff") : Color.parseColor("#f7d8c8"));
         }
     };
+
     // 检测登录按钮是否应该可用
     public static boolean isNewLoginButtonEnabled(LoginLineLayout... views) {
         for (int i = 0; i < views.length; i++) {

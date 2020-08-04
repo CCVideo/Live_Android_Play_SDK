@@ -1,8 +1,10 @@
 package com.bokecc.dwlivedemo.activity.extra;
 
+import android.annotation.TargetApi;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
+import com.bokecc.dwlivedemo.download.FileUtil;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
 import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
@@ -40,22 +43,18 @@ import java.util.List;
  */
 public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickListener {
 
-    //离线资源文件路径
-    public static String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() + "/CCDownload";
-
-    //321F98549889D4CE.ccr
-    String fileName = "D7B39691C40AC4D1.ccr";  // TODO 替换为要播放离线回放
-
     View mRoot;
 
     FrameLayout mReplayMsgLayout;
 
+    // 大屏布局
     RelativeLayout mReplayVideoContainer;
-    // 回放视频View
-    ReplayMixVideoView mReplayVideoView;
-
     // 悬浮弹窗（用于展示文档和视频）
     FloatingPopupWindow mReplayFloatingView;
+    // 回放视频View
+    ReplayMixVideoView mReplayVideoView;
+    // 文档组件
+    ReplayMixDocComponent mDocLayout;
 
     ReplayMixRoomLayout mReplayRoomLayout;
 
@@ -63,8 +62,7 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 隐藏状态栏
-        hideActionBar();
+        requestFullScreenFeature();
         // 屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
@@ -161,8 +159,6 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
     // 聊天组件
     ReplayMixChatComponent mChatLayout;
 
-    // 文档组件
-    ReplayMixDocComponent mDocLayout;
 
     // 初始化聊天布局区域
     private void initChatLayout() {
@@ -277,30 +273,36 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
 
         @Override
         public void switchVideoDoc() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (isVideoMain) {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoView.cacheScreenBitmap();
-                        mReplayVideoContainer.removeAllViews();
-                        mReplayFloatingView.removeAllView();
-                        mReplayFloatingView.addView(mReplayVideoView);
-                        mReplayVideoContainer.addView(mDocLayout);
-                        isVideoMain = false;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换视频");
-                    } else {
-                        // 缓存视频的切换前的画面
-                        mReplayVideoView.cacheScreenBitmap();
-                        mReplayVideoContainer.removeAllViews();
-                        mReplayFloatingView.removeAllView();
-                        mReplayFloatingView.addView(mDocLayout);
-                        mReplayVideoContainer.addView(mReplayVideoView);
-                        isVideoMain = true;
-                        mReplayRoomLayout.setVideoDocSwitchText("切换文档");
-                    }
-                }
-            });
+            if (isVideoMain) {
+                // 缓存视频的切换前的画面
+                mReplayVideoView.cacheScreenBitmap();
+                mReplayVideoContainer.removeAllViews();
+                mReplayFloatingView.removeAllView();
+                ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                mDocLayout.setLayoutParams(lp);
+                mDocLayout.setLayoutParams(lp);
+                mReplayFloatingView.addView(mReplayVideoView);
+                mReplayVideoContainer.addView(mDocLayout);
+                isVideoMain = false;
+                mReplayRoomLayout.setVideoDocSwitchText("切换视频");
+
+            } else {
+                // 缓存视频的切换前的画面
+                mReplayVideoView.cacheScreenBitmap();
+                mReplayVideoContainer.removeAllViews();
+                mReplayFloatingView.removeAllView();
+                ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                mDocLayout.setLayoutParams(lp);
+                mReplayFloatingView.addView(mDocLayout);
+                mReplayVideoContainer.addView(mReplayVideoView);
+                isVideoMain = true;
+                mReplayRoomLayout.setVideoDocSwitchText("切换文档");
+            }
+
         }
 
         @Override
@@ -331,6 +333,7 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
                 }
             });
         }
+
     };
 
     //---------------------------------- 全屏相关逻辑 --------------------------------------------/
@@ -363,40 +366,61 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
     };
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 横屏隐藏状态栏
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(true));
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
+        }
+        //调整窗口的位置
+        if (mReplayFloatingView != null) {
+            mReplayFloatingView.onConfigurationChanged(newConfig.orientation);
+        }
+    }
+
+    @TargetApi(19)
+    private static int getSystemUiVisibility(boolean isFull) {
+        if (isFull) {
+            int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            return flags;
+        } else {
+            return View.SYSTEM_UI_FLAG_VISIBLE;
+        }
+
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             // 回放切换
             case R.id.replay_one:
-//                ReplayLoginInfo replayLoginInfoOne = new ReplayLoginInfo();
-//                replayLoginInfoOne.setRoomId("7A69CC542B18A9AB9C33DC5901307461");
-//                replayLoginInfoOne.setUserId("B27039502337407C");
-//                replayLoginInfoOne.setLiveId("C5E179F3DA38A94A");
-//                replayLoginInfoOne.setRecordId("DAF45492DF286EDA");
-//                replayLoginInfoOne.setViewerName("111");
-//                replayLoginInfoOne.setViewerToken("111");
-//                startLiveReplay(replayLoginInfoOne);
                 ReplayLoginInfo replayLoginInfoOne = new ReplayLoginInfo();
-                replayLoginInfoOne.setRoomId("F4F90F55B2BF615F9C33DC5901307461");
-                replayLoginInfoOne.setUserId("E038C54084076CA5");
-                replayLoginInfoOne.setLiveId("8FB99F8B711B58DE");
-                replayLoginInfoOne.setRecordId("AAA549815FF39AAB");
-                replayLoginInfoOne.setViewerName("111");
-                replayLoginInfoOne.setViewerToken("111");
+                replayLoginInfoOne.setRoomId("896BDA71539A20AC9C33DC5901307461");
+                replayLoginInfoOne.setUserId("69C460216B6BCC91");
+                replayLoginInfoOne.setLiveId("A3A1E9B472495DB3");
+                replayLoginInfoOne.setRecordId("B55599701E812B77");
+                replayLoginInfoOne.setViewerName("123");
+                replayLoginInfoOne.setViewerToken("123");
                 startLiveReplay(replayLoginInfoOne);
                 break;
             case R.id.replay_two:
                 ReplayLoginInfo replayLoginInfoTwo = new ReplayLoginInfo();
-                replayLoginInfoTwo.setRoomId("F2A76C986EDCBFB89C33DC5901307461");
-                replayLoginInfoTwo.setUserId("5D2636511DBBCADD");
-                replayLoginInfoTwo.setLiveId("C10B87686023E6A6");
-                replayLoginInfoTwo.setRecordId("C10B87686023E6A6");
-                replayLoginInfoTwo.setViewerName("111");
-                replayLoginInfoTwo.setViewerToken("xuetiancn");
+                replayLoginInfoTwo.setRoomId("896BDA71539A20AC9C33DC5901307461");
+                replayLoginInfoTwo.setUserId("69C460216B6BCC91");
+                replayLoginInfoTwo.setLiveId("DB19B272E56954CC");
+                replayLoginInfoTwo.setRecordId("A0EA236E5E604A19");
+                replayLoginInfoTwo.setViewerName("123");
+                replayLoginInfoTwo.setViewerToken("123");
                 startLiveReplay(replayLoginInfoTwo);
                 break;
             case R.id.replay_three:
                 // 需要 "存储" 权限
-                startLocalReplay("D7B39691C40AC4D1.ccr");
+                startLocalReplay("758E03DFBDBA3497.ccr");
                 break;
             default:
                 break;
@@ -434,7 +458,10 @@ public class ReplayMixPlayActivity extends BaseActivity implements View.OnClickL
      * @param ccrName CCR文件名称（此部分逻辑可以参考完整的离线回放Demo：localreplaydemo）
      */
     public void startLocalReplay(String ccrName) {
+        //离线资源文件路径
+        String DOWNLOAD_DIR = FileUtil.getCCDownLoadPath(this);
         File oriFile = new File(DOWNLOAD_DIR, ccrName);
+
         String unzipDir = getUnzipDir(oriFile);
         DWReplayMixCoreHandler handler = DWReplayMixCoreHandler.getInstance();
         handler.startLocalReplay(unzipDir);

@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replaymix.DWReplayMixCoreHandler;
 import com.bokecc.livemodule.replaymix.DWReplayMixVideoListener;
-
 import com.bokecc.livemodule.view.ResizeTextureView;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
@@ -43,6 +41,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
     DWReplayPlayer player;
 
     Surface surface;
+
     private float currentSpeed = 1.0f;
 
     public ReplayMixVideoView(Context context) {
@@ -195,7 +194,7 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                 onSurfaceAvailable(true);
                 hasCallStartPlay = true;
             }
-            if(player != null){
+            if (player != null) {
                 if (mSurfaceTexture != null) {
                     mTextureView.setSurfaceTexture(mSurfaceTexture);
                 } else {
@@ -266,8 +265,6 @@ public class ReplayMixVideoView extends RelativeLayout implements DWReplayMixVid
                     break;
                 // 缓冲结束
                 case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
-                    mVideoProgressBar.setVisibility(GONE);
-                    break;
                 case IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
                     mVideoProgressBar.setVisibility(GONE);
                     break;

@@ -55,7 +55,6 @@ public class PracticeHandler implements OnCloseListener {
             return;
         }
         startTimer(info);
-        mPracticeStatisLandPopup.isClose.set(false);
         if (isPortrait(mContext)) {
             mPracticePopup.startPractice(info);
             mPracticePopup.show(root);
@@ -80,12 +79,10 @@ public class PracticeHandler implements OnCloseListener {
                 mPracticeStatisPopup.setText(formatTime);
             }
         } else {
-            if (!mPracticeStatisLandPopup.isClose.get()){
-                mPracticeStatisLandPopup.showPracticeStatis(info);
-                if (!mPracticeStatisLandPopup.isShowing()) {
-                    mPracticeStatisLandPopup.show(root, this);
-                    mPracticeStatisLandPopup.setText(formatTime);
-                }
+            mPracticeStatisLandPopup.showPracticeStatis(info);
+            if (!mPracticeStatisLandPopup.isShowing()) {
+                mPracticeStatisLandPopup.show(root, this);
+                mPracticeStatisLandPopup.setText(formatTime);
             }
         }
     }

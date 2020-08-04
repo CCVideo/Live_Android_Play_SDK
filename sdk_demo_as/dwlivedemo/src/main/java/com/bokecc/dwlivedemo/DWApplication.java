@@ -29,7 +29,7 @@ public class DWApplication extends Application {
         if (context == null) {
             context = this;
         }
-//      初始化SDK
+        //      初始化SDK
         LiveSDKHelper.initSDK(this);
     }
 

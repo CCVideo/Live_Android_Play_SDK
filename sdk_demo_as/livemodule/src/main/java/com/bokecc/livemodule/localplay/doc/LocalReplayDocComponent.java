@@ -7,13 +7,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
+import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 
 /**
  * 回放直播间文档展示控件
  */
 public class LocalReplayDocComponent extends LinearLayout {
+    private final int SCALE_CENTER_INSIDE = 0;
+    private final int SCALE_FIT_XY = 1;
+    private final int SCALE_CROP_CENTER = 2;
 
+    private int mCurrentScaleType = SCALE_CENTER_INSIDE;
     private Context mContext;
 
     private DocView mDocView;
@@ -41,6 +46,18 @@ public class LocalReplayDocComponent extends LinearLayout {
             replayCoreHandler.setDocView(mDocView);
         }
     }
+
+    public void setScaleType(int type) {
+        mCurrentScaleType = type;
+        if (SCALE_CENTER_INSIDE == mCurrentScaleType) {
+            DWLiveLocalReplay.getInstance().setDocScaleType(DocView.ScaleType.CENTER_INSIDE);
+        } else if (SCALE_FIT_XY == mCurrentScaleType) {
+            DWLiveLocalReplay.getInstance().setDocScaleType(DocView.ScaleType.FIT_XY);
+        } else if (SCALE_CROP_CENTER == mCurrentScaleType) {
+            DWLiveLocalReplay.getInstance().setDocScaleType(DocView.ScaleType.CROP_CENTER);
+        }
+    }
+
 
     // 设置文档区域是否可滑动
     public void setDocScrollable(boolean scrollable) {

@@ -34,6 +34,8 @@ public class DWReplayCoreHandler {
     private static final String TAG = "DWReplayCoreHandler";
 
     private static DWReplayCoreHandler dwReplayCoreHandler = new DWReplayCoreHandler();
+
+
     /**
      * 获取DWReplayCoreHandler单例的实例
      */
@@ -211,9 +213,6 @@ public class DWReplayCoreHandler {
 //        }, 2000);
 
 
-
-
-
     }
 
     public void pause() {
@@ -372,7 +371,9 @@ public class DWReplayCoreHandler {
 
         @Override
         public void numberOfReceivedLinesWithVideoAndAudio(List<ReplayLineParams> videoLines, List<ReplayLineParams> audioLines) {
-
+            if (testCase != null) {
+                testCase.numberOfReceivedLinesWithVideo(videoLines, audioLines);
+            }
         }
 
 
@@ -386,4 +387,18 @@ public class DWReplayCoreHandler {
             }
         }
     };
+
+
+
+    // ----------------------------------测试代码--------------------------------------------------
+    private TestCase testCase;
+
+    // todo 测试线路切换 需删除
+    public void setTestCase(TestCase testCase) {
+        this.testCase = testCase;
+    }
+
+    public interface TestCase {
+        void numberOfReceivedLinesWithVideo(List<ReplayLineParams> videoLines, List<ReplayLineParams> audioLines);
+    }
 }

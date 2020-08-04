@@ -48,8 +48,8 @@ dependencies {
     // 文件下载库
     implementation files('libs/hddownload.jar')
     //腾讯bugly
-    implementation 'com.tencent.bugly:crashreport:3.2.2'
-    implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
+    implementation 'com.tencent.bugly:crashreport:3.2.33'
+    implementation 'com.tencent.bugly:nativecrashreport:3.7.3'
 
     // ==================================CC SDK Module===============================
     implementation project(':livemodule')

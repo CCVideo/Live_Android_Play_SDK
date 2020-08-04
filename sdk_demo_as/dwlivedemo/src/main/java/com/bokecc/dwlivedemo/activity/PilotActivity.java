@@ -21,7 +21,6 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class PilotActivity extends BaseActivity {
     private static final String TAG = "PilotActivity";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // 全屏
@@ -93,6 +92,7 @@ public class PilotActivity extends BaseActivity {
 
 
     }
+
     private void checkoutLivePermission(final Intent intent) {
         Permissions.request(this, new String[]{Manifest.permission.CAMERA,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
