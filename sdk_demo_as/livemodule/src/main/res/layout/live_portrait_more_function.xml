@@ -28,6 +28,19 @@
         android:background="@null"
         a_zhon:fab_orientation="top"
         a_zhon:fab_spacing="10dp" />
+    <TextView
+        android:id="@+id/tv_portrait_vote"
+        android:layout_width="40dp"
+        android:visibility="gone"
+        android:layout_height="40dp"
+        android:layout_marginRight="15dp"
+        android:elevation="15dp"
+        android:translationZ="10dp"
+        android:gravity="center"
+        android:layout_toLeftOf="@+id/fab_top"
+        android:layout_alignBottom="@+id/fab_top"
+        android:textSize="18sp"
+        android:textColor="@color/withe"/>
 
     <com.bokecc.livemodule.live.morefunction.rtc.RTCControlLayout
         android:id="@+id/rtc_layout"

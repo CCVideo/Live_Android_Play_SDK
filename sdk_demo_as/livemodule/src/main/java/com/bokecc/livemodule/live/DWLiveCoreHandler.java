@@ -273,8 +273,6 @@ public class DWLiveCoreHandler {
             dwLive.setDWLivePlayParams(dwLiveListener, DWLiveEngine.getInstance().getContext());
             // 调用开始播放逻辑
             dwLive.start();
-            // 获取随堂测统计信息
-            DWLive.getInstance().getPracticeStatis("");
         }
     }
 

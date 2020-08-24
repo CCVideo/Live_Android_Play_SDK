@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -116,18 +117,22 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
             return;
         }
         handler.removeMessages(1);
-        if (info.getStatus() != 2 && isShow) {
+        if (info.getStatus() == 1) {
             handler.sendEmptyMessageDelayed(1, 1000);
         }
         this.info = info;
         if (info.getStatus() == 1) {
             mPracticeingDesc.setVisibility(View.VISIBLE);
             mPracticeOverDesc.setVisibility(View.GONE);
-        } else if (info.getStatus() == 2) {
-            mPracticeOverDesc.setVisibility(View.VISIBLE);
-            mPracticeingDesc.setVisibility(View.GONE);
+        } else if (info.getStatus() == 2||info.getStatus()==3) {
+            showPracticeStop();
         }
-
+        if (info.getStatus() == 1){
+            //发布中
+            mPracticeingDesc.setText("答题进行中");
+        }else if (info.getStatus() == 2||info.getStatus() == 3){
+            mPracticeingDesc.setText("答题已结束");
+        }
         mStatisAdapter.setAllPracticeNumber(info.getAnswerPersonNum());
         mPracticePeopleNum.setText("共" + info.getAnswerPersonNum() + "人回答，正确率" + info.getCorrectRate());
 
@@ -183,6 +188,7 @@ public class PracticeStatisLandPopup extends BasePopupWindow {
     public void showPracticeStop() {
         mPracticeOverDesc.setVisibility(View.VISIBLE);
         mPracticeingDesc.setVisibility(View.GONE);
+        handler.removeMessages(1);
     }
 
     String wrongTextColor = "#fc512b";

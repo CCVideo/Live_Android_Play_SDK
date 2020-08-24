@@ -62,14 +62,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="离线回放1" />
+                android:text="在线回放2" />
 
             <Button
                 android:id="@+id/replay_three"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="离线回放2" />
+                android:text="离线回放1" />
         </LinearLayout>
 
     </FrameLayout>

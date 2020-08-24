@@ -22,6 +22,7 @@ import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveVideoListener;
 import com.bokecc.livemodule.view.ResizeTextureView;
+import com.bokecc.livemodule.view.VideoLoadingView;
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
@@ -53,7 +54,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     /**
      * 视频加载进度
      */
-    private ProgressBar mVideoProgressBar;
+    private VideoLoadingView mVideoProgressBar;
 
     /**
      * 直播播放器
@@ -86,7 +87,6 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
     private View mVideoNoplayTip;
 
     private Handler handler = new Handler(Looper.getMainLooper());
-
     /**
      * 直播视频通知接口
      */
@@ -159,6 +159,7 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
         player.setOnInfoListener(onInfoListener);
         player.setOnVideoSizeChangedListener(onVideoSizeChangedListener);
         player.setOnErrorListener(onErrorListener);
+        player.setSpeedListener(speedListener);
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setPlayer(player);
@@ -226,15 +227,12 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      * 开始播放
      */
     public synchronized void start() {
-//        ELog.i(TAG,"---start--- hasCallStartPlay: "+hasCallStartPlay);
-//        if (hasCallStartPlay || null == surface) {
-//            return;
-//        }
-//        hasCallStartPlay = true;
-        // 启动直播播放器
-        DWLiveCoreHandler.getInstance().start();
-        if (mVideoProgressBar != null) {
-            mVideoProgressBar.setVisibility(VISIBLE);
+        if (!DWLiveCoreHandler.getInstance().isRtcing()) {
+            // 启动直播播放器
+            DWLiveCoreHandler.getInstance().start();
+            if (mVideoProgressBar != null) {
+                mVideoProgressBar.setVisibility(VISIBLE);
+            }
         }
     }
 
@@ -242,9 +240,11 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
      * 停止播放
      */
     public void stop() {
-        DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
-        if (dwLiveCoreHandler != null) {
-            dwLiveCoreHandler.stop();
+        if (!DWLiveCoreHandler.getInstance().isRtcing()) {
+            DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
+            if (dwLiveCoreHandler != null) {
+                dwLiveCoreHandler.stop();
+            }
         }
     }
 
@@ -363,7 +363,14 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             });
         }
     };
-
+    DWLivePlayer.LiveSpeedListener speedListener = new DWLivePlayer.LiveSpeedListener() {
+        @Override
+        public void onBufferSpeed(float speed) {
+            if (mVideoProgressBar!=null){
+                mVideoProgressBar.setSpeed(speed);
+            }
+        }
+    };
     IMediaPlayer.OnInfoListener onInfoListener = new IMediaPlayer.OnInfoListener() {
         @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
@@ -404,6 +411,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 Toast.makeText(mContext, "播放失败，网络超时，请检查网络", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
+            }
+            try {
+                DWLive.getInstance().restartVideo();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (DWLiveException e) {
+                e.printStackTrace();
             }
             return false;
         }
@@ -552,5 +566,9 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
                 }
             }
         });
+    }
+
+    public void setShowSpeed(boolean showSpeed) {
+        mVideoProgressBar.showSpeeed(showSpeed);
     }
 }

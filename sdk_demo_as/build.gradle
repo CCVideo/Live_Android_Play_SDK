@@ -2,16 +2,13 @@
 apply from: "conf.gradle"
 buildscript {
     repositories {
-
-        maven {
-            // 需配置该maven库
-            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
-        }
         jcenter()
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
-
+        maven {
+             url 'http://nexus-app.bokecc.com/repository/sdk-group/'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -27,7 +24,6 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            // 需配置该maven库
             url 'http://nexus-app.bokecc.com/repository/sdk-group/'
         }
         jcenter()

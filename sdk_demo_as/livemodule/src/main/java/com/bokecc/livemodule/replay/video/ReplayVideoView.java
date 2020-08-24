@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.view.ResizeTextureView;
+import com.bokecc.livemodule.view.VideoLoadingView;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -27,7 +29,7 @@ public class ReplayVideoView extends RelativeLayout {
     private Context mContext;
     private ResizeTextureView mTextureView;
     private TextView mVideoNoPlayTip;
-    private ProgressBar mVideoProgressBar;
+    private VideoLoadingView mVideoProgressBar;
     private DWReplayPlayer player;
     private Handler handler = new Handler();
     private SurfaceTexture mSurfaceTexture;
@@ -73,6 +75,7 @@ public class ReplayVideoView extends RelativeLayout {
         player.setOnErrorListener(errorListener);
         player.setOnCompletionListener(completionListener);
         player.setOnVideoSizeChangedListener(videoSizeChangedListener);
+        player.setSpeedListener(replaySpeedListener);
         player.setBufferTimeout(20);
         player.setOnSeekCompleteListener(new IMediaPlayer.OnSeekCompleteListener() {
             @Override
@@ -262,11 +265,20 @@ public class ReplayVideoView extends RelativeLayout {
             }
         }
     };
+    DWReplayPlayer.ReplaySpeedListener replaySpeedListener = new DWReplayPlayer.ReplaySpeedListener() {
+        @Override
+        public void onBufferSpeed(float speed) {
+            mVideoProgressBar.setSpeed(speed);
+        }
+    };
     /**
      * 记录用户是否切换到后台 因为部分手机切换到后台再切回到前台会出现视频帧卡住问题
      */
     private boolean isNeedUpdateSurface;
     public void onPause(){
         isNeedUpdateSurface = true;
+    }
+    public void setShowSpeed(boolean showSpeed) {
+        mVideoProgressBar.showSpeeed(showSpeed);
     }
 }

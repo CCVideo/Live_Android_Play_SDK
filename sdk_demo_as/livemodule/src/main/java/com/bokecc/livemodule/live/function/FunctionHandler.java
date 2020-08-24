@@ -1,8 +1,13 @@
 package com.bokecc.livemodule.live.function;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.FontRequest;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -11,14 +16,19 @@ import android.widget.Toast;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
 import com.bokecc.livemodule.live.DWLiveFunctionListener;
 import com.bokecc.livemodule.live.function.lottery.LotteryHandler;
+import com.bokecc.livemodule.live.function.practice.PracticeConfig;
 import com.bokecc.livemodule.live.function.practice.PracticeHandler;
+import com.bokecc.livemodule.live.function.practice.PracticeListener;
 import com.bokecc.livemodule.live.function.prize.PrizeHandler;
 import com.bokecc.livemodule.live.function.punch.PunchHandler;
 import com.bokecc.livemodule.live.function.questionnaire.QuestionnaireHandler;
 import com.bokecc.livemodule.live.function.rollcall.RollCallHandler;
+import com.bokecc.livemodule.live.function.vote.VoteListener;
+import com.bokecc.livemodule.live.function.vote.VoteConfig;
 import com.bokecc.livemodule.live.function.vote.VoteHandler;
 import com.bokecc.sdk.mobile.live.BaseCallback;
 import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.broadcast.NetBroadcastReceiver;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeRankInfo;
 import com.bokecc.sdk.mobile.live.pojo.PracticeStatisInfo;
@@ -26,8 +36,13 @@ import com.bokecc.sdk.mobile.live.pojo.PracticeSubmitResultInfo;
 import com.bokecc.sdk.mobile.live.pojo.PunchAction;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
+import com.bokecc.sdk.mobile.live.replay.utils.NetworkUtils;
 
 import org.json.JSONObject;
+
+import java.nio.file.attribute.GroupPrincipal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 直播功能处理机制（签到、答题卡/投票、问卷、抽奖）
@@ -44,10 +59,14 @@ public class FunctionHandler implements DWLiveFunctionListener {
     private PracticeHandler practiceHandler;  // '随堂测' 功能处理机制
     private PrizeHandler prizeHandler;  // '奖品' 功能处理机制
     private PunchHandler punchHandler;//'打卡' 功能处理机制
-
-    public void initFunctionHandler(Context context) {
+    private NetStatusBroadcastReceiver mNetWorkChangReceiver;
+    /**
+     * 当前正在进行的随堂测ID
+     */
+    private String practiceId = "";
+    public void initFunctionHandler(Context context,FunctionCallBack functionCallBack) {
         this.context = context.getApplicationContext();
-
+        this.functionCallBack =functionCallBack;
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setDwLiveFunctionListener(this);
@@ -95,6 +114,11 @@ public class FunctionHandler implements DWLiveFunctionListener {
                 });
             }
         });
+        //注册网络监听
+        mNetWorkChangReceiver = new NetStatusBroadcastReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(mNetWorkChangReceiver, filter);
     }
 
     /**
@@ -145,7 +169,7 @@ public class FunctionHandler implements DWLiveFunctionListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                voteHandler.startVote(rootView, voteCount, VoteType);
+                voteHandler.startVote(rootView, voteCount, VoteType,minimizeListener );
             }
         });
     }
@@ -173,6 +197,9 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onVoteResult(final JSONObject jsonObject) {
+        if(functionCallBack!=null){
+            functionCallBack.onClose();
+        }
         if (rootView == null) {
             return;
         }
@@ -351,21 +378,38 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onPracticePublish(final PracticeInfo info) {
-        if (rootView == null || info == null) {
-            return;
-        }
-
-        // 如果此随堂测已经回答过了，就不展示随堂测做题的界面
-        if (info.isAnswered()) {
-            return;
-        }
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                practiceHandler.startPractice(rootView, info);
+                if (rootView == null) {
+                    return;
+                }
+                if ( info == null){
+                    practiceHandler.onPracticeClose("");
+                    return;
+                }
+                if (info.getIsExist() == 0){
+                    //如果不存在随堂测 关闭所有的随堂测弹框
+                    practiceHandler.onPracticeClose("");
+                    return;
+                }
+                practiceId = info.getId();
+                // 如果此随堂测已经回答过了，就不展示随堂测做题的界面
+                if (info.getStatus() ==1) {
+                    if (info.isAnswered()){
+                        DWLive.getInstance().getPracticeStatis(info.getId());
+                    }else{
+                        practiceHandler.startPractice(rootView, info,practiceListener);
+                    }
+                }else if (info.getStatus() == 2) {//停止发布
+                    DWLive.getInstance().getPracticeStatis(info.getId());
+                }else if (info.getStatus() == 3){//关闭
+                    onPracticeStop(info.getId());
+                }
             }
         });
+
+
     }
     /**
      * 收到随堂测提交结果
@@ -374,15 +418,18 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onPracticeSubmitResult(final PracticeSubmitResultInfo info) {
-        if (rootView == null) {
+        if (rootView == null&&info!=null) {
             return;
         }
-
+        practiceId = info.getId();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 toastOnUiThread("展示随堂测提交结果");
                 practiceHandler.showPracticeSubmitResult(rootView, info);
+                if (functionCallBack!=null){
+                    functionCallBack.onClose();
+                }
             }
         });
     }
@@ -394,13 +441,17 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onPracticStatis(final PracticeStatisInfo info) {
-        if (rootView == null) {
+        if (rootView == null&&info!=null) {
             return;
         }
+        practiceId = info.getId();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 practiceHandler.showPracticeStatis(rootView, info);
+                if (functionCallBack!=null){
+                    functionCallBack.onClose();
+                }
             }
         });
     }
@@ -417,11 +468,15 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onPracticeStop(final String practiceId) {
+        this.practiceId = practiceId;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 toastOnUiThread("随堂测停止");
-                practiceHandler.onPracticeStop(practiceId);
+                practiceHandler.onPracticeStop(practiceId,rootView,functionCallBack==null?false:functionCallBack.isSmall);
+                if (functionCallBack!=null){
+                    functionCallBack.onClose();
+                }
             }
         });
     }
@@ -433,11 +488,15 @@ public class FunctionHandler implements DWLiveFunctionListener {
      */
     @Override
     public void onPracticeClose(final String practiceId) {
+        this.practiceId = "";
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 toastOnUiThread("随堂测关闭");
                 practiceHandler.onPracticeClose(practiceId);
+                if (functionCallBack!=null){
+                    functionCallBack.onClose();
+                }
             }
         });
     }
@@ -490,5 +549,88 @@ public class FunctionHandler implements DWLiveFunctionListener {
     // 判断当前的线程是否是UI线程
     private boolean checkOnMainThread() {
         return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+
+    private VoteConfig voteConfig;
+    private PracticeConfig practiceConfig;
+    private VoteListener minimizeListener = new VoteListener() {
+        @Override
+        public void onMinimize( int voteCount, int VoteType, int selectIndex, List<Integer> selectIndexs) {
+            //用户点击缩小的时候 需要记录当前的答题记录 以及已经选择的条目
+            if (voteConfig == null){
+                voteConfig = new VoteConfig();
+            }
+            voteConfig.setVoteCount(voteCount);
+            voteConfig.setVoteType(VoteType);
+            voteConfig.setSelectIndex(selectIndex);
+            voteConfig.setSelectIndexs(selectIndexs);
+            if (functionCallBack!=null){
+                functionCallBack.onMinimize(true);
+            }
+        }
+    };
+    private PracticeListener practiceListener = new PracticeListener() {
+        @Override
+        public void onMinimize(PracticeInfo practiceInfo, int VoteType, int selectIndex, List<Integer> selectIndexs) {
+            if (practiceConfig == null){
+                practiceConfig = new PracticeConfig();
+            }
+            practiceConfig.setPracticeInfo(practiceInfo);
+            practiceConfig.setVoteType(VoteType);
+            practiceConfig.setSelectIndex(selectIndex);
+            practiceConfig.setSelectIndexs(selectIndexs);
+            if (functionCallBack!=null){
+                functionCallBack.onMinimize(false);
+            }
+        }
+    };
+    /**
+     * 针对缩小的回调
+     */
+    private FunctionCallBack functionCallBack;
+    /**
+     * 展示答题卡选择筐 只针对缩小之后进行的展示
+     */
+    public void onVoteStart(){
+        if (voteConfig!=null){
+            voteHandler.startVote(rootView, voteConfig.getVoteCount(), voteConfig.getVoteType(),voteConfig.getSelectIndex(),voteConfig.getSelectIndexs(),minimizeListener );
+        }
+    }
+    /**
+     * 展示随堂测选择筐 只针对缩小之后进行的展示
+     */
+    public void onPractic(){
+        if (practiceConfig!=null){
+            practiceHandler.startPractice(rootView, practiceConfig,practiceListener);
+        }
+    }
+
+    public void onDestroy(Context context) {
+        if (mNetWorkChangReceiver!=null){
+            context.unregisterReceiver(mNetWorkChangReceiver);
+        }
+    }
+    public class NetStatusBroadcastReceiver extends BroadcastReceiver {
+        private boolean isNeed = false;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())&&practiceHandler!=null){
+                boolean isConnected = NetworkUtils.isConnected();
+                if (isConnected){
+                    Log.e("###","isNeed = "+isNeed);
+                    if (isNeed){
+//                        onPracticeClose("");
+                        DWLive.getInstance().getPracticeInformation();
+                        if (functionCallBack!=null){
+                            functionCallBack.onClose();
+                        }
+                    }
+                    isNeed = false;
+                }else{
+                    isNeed = true;
+                }
+            }
+        }
     }
 }

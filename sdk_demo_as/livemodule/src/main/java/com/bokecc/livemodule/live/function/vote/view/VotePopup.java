@@ -27,11 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
-import com.bokecc.livemodule.live.DWLiveCoreHandler;
+import com.bokecc.livemodule.live.function.vote.VoteListener;
 import com.bokecc.livemodule.live.function.vote.adapter.VoteSummaryAdapter;
 import com.bokecc.livemodule.utils.PopupAnimUtil;
 import com.bokecc.livemodule.view.BasePopupWindow;
 import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.util.NetworkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +41,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class VotePopup extends BasePopupWindow {
 
     private long currentTime;
+    private VoteListener minimizeListener;
+    private TextView network_error;
 
     public VotePopup(Context context) {
         super(context);
@@ -130,6 +134,10 @@ public class VotePopup extends BasePopupWindow {
         qsClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectOption = -1;
+                if (selectOptions!=null&&selectOptions.size()>0){
+                    selectOptions.clear();
+                }
                 dismiss();
             }
         });
@@ -137,7 +145,7 @@ public class VotePopup extends BasePopupWindow {
         // 答题界面
         selectLayout = findViewById(R.id.qs_select_layout);
         selectNav = findViewById(R.id.qs_select_nav);
-
+        network_error = findViewById(R.id.network_error);
         radioGroup = findViewById(R.id.rg_qs_multi);
         radio0 = findViewById(R.id.rb_multi_0);
         radio1 = findViewById(R.id.rb_multi_1);
@@ -320,6 +328,12 @@ public class VotePopup extends BasePopupWindow {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!NetworkUtils.isNetworkAvailable(mContext)) {
+                    network_error.setVisibility(View.VISIBLE);
+                    return;
+                } else {
+                    network_error.setVisibility(View.INVISIBLE);
+                }
                 if (currentTime==0||System.currentTimeMillis() -currentTime>2000){
                     if (voteType == 0) {
                         // 判断是否作答
@@ -345,6 +359,24 @@ public class VotePopup extends BasePopupWindow {
                     }
                     dismiss();
                     currentTime = System.currentTimeMillis();
+                }
+            }
+        });
+        //缩小点击事件
+        findViewById(R.id.btn_qs_minimize).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (minimizeListener!=null){
+                    //判断是否是单选
+                    ArrayList<Integer> selectResult = null;
+                    if (voteType ==1){
+                        selectResult = new ArrayList<>();
+                        for (String option : selectOptions) {
+                            selectResult.add(Integer.valueOf(option));
+                        }
+                    }
+                    minimizeListener.onMinimize(voteCount,voteType,selectOption,selectResult);
+                    dismiss();
                 }
             }
         });
@@ -388,8 +420,18 @@ public class VotePopup extends BasePopupWindow {
         initRadioButtonAndImageView();
         // 设定当前选择的选项
         selectOption = index;
-        rbs.get(index).setChecked(true);
-        ivs.get(index).setVisibility(View.VISIBLE);
+        if (voteCount == 2){
+            if (index == 0){
+                double0.setChecked(true);
+                doubleIv0.setVisibility(View.VISIBLE);
+            }else{
+                double1.setChecked(true);
+                doubleIv1.setVisibility(View.VISIBLE);
+            }
+        }else{
+            rbs.get(index).setChecked(true);
+            ivs.get(index).setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -447,14 +489,35 @@ public class VotePopup extends BasePopupWindow {
 
     int voteCount;
     int voteType; // 0为单选，1为多选
-
+    JSONObject jsonObject;//统计结果的json
     public void startVote(int voteCount, int type) {
         this.voteCount = voteCount;
         this.voteType = type;
-
         showSelectLayout();
     }
-
+    public void startVote(int voteCount, int voteType, int selectIndex, List<Integer> selectIndexs) {
+        this.voteCount = voteCount;
+        this.voteType = voteType;
+        this.selectOption=selectIndex;
+        if (selectOptions ==null){
+            selectOptions = new ArrayList<>();
+        }
+        showSelectLayout();
+        //选中已经选择过的答案
+        if (voteType == 0||voteType == 1){
+            //判断题或者单选题
+            if (selectIndex>=0)
+                setSelect(selectIndex);
+        }else{
+            //多选题
+            if (selectIndexs!=null){
+                for (Integer i :selectIndexs){
+                    selectOptions.add(String.valueOf(i));
+                    setCheck(i, true);
+                }
+            }
+        }
+    }
     private void showSelectLayout() {
         changeLayoutShow(true);
 
@@ -522,6 +585,7 @@ public class VotePopup extends BasePopupWindow {
     int correntOption;
     ArrayList<VoteSingleStatisics> voteStatisices = new ArrayList<>();
     public void onVoteResult(JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
         initVoteResult();
         showSummaryLayout();
 
@@ -722,6 +786,10 @@ public class VotePopup extends BasePopupWindow {
 
     private void showSummaryLayout() {
         changeLayoutShow(false);
+    }
+
+    public void setMinimizeListener(VoteListener minimizeListener) {
+        this.minimizeListener=minimizeListener;
     }
 
     public static final class VoteSingleStatisics {

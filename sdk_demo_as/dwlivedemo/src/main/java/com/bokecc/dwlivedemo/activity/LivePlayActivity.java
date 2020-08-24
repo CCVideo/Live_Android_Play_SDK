@@ -39,6 +39,7 @@ import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
 import com.bokecc.livemodule.live.chat.util.DensityUtil;
 import com.bokecc.livemodule.live.doc.LiveDocComponent;
+import com.bokecc.livemodule.live.function.FunctionCallBack;
 import com.bokecc.livemodule.live.function.FunctionHandler;
 import com.bokecc.livemodule.live.intro.LiveIntroComponent;
 import com.bokecc.livemodule.live.morefunction.MoreFunctionLayout;
@@ -109,6 +110,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             }
         }
     };
+    private TextView mLandVote;
+    private TextView mPortraitVote;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,7 +126,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         initViewPager();
         initRoomStatusListener();
         mFunctionHandler = new FunctionHandler();
-        mFunctionHandler.initFunctionHandler(this);
+        mFunctionHandler.initFunctionHandler(this,functionCallBack);
         keyboardHeightProvider = new KeyboardHeightProvider(this);
         mRoot.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -154,15 +157,8 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         if (isBarrageOn && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mLiveBarrage.start();
         }
-        // 展示悬浮窗
-        if (!DWLiveCoreHandler.getInstance().isRtcing()) {
-            mRoot.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLiveVideoView.start();
-                }
-            }, 500);
-        }
+        // 开始播放
+        mLiveVideoView.start();
     }
 
     @Override
@@ -170,9 +166,9 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         super.onPause();
         keyboardHeightProvider.clearObserver();
         mFunctionHandler.removeRootView();
-        if (!DWLiveCoreHandler.getInstance().isRtcing()) {
-            mLiveVideoView.stop();
-        }
+        // 停止直播
+        mLiveVideoView.stop();
+        // 停止弹幕
         mLiveBarrage.stop();
     }
 
@@ -181,7 +177,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         super.onDestroy();
         keyboardHeightProvider.close();
         mLiveFloatingView.dismiss();
-
+        mFunctionHandler.onDestroy(this);
         if (DWLiveCoreHandler.getInstance().isRtcing()) {
             DWLive.getInstance().disConnectSpeak();
             mLiveVideoView.stop();
@@ -219,10 +215,19 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             if (mLiveBarrage != null && isBarrageOn) {
                 mLiveBarrage.start();
             }
+            //如果随堂测 答题卡的缩小按钮存在
+            if (mPortraitVote.getVisibility()==VISIBLE){
+                mPortraitVote.setVisibility(View.GONE);
+                mLandVote.setVisibility(VISIBLE);
+            }
         } else {
             getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility(false));
             if (mLiveBarrage != null) {
                 mLiveBarrage.stop();
+            }
+            if (mLandVote.getVisibility()==VISIBLE){
+                mLandVote.setVisibility(View.GONE);
+                mPortraitVote.setVisibility(VISIBLE);
             }
         }
         //调整窗口的位置
@@ -277,6 +282,11 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setDwLiveRTCListener(this);
         }
+        //随堂测 答题卡缩小的按钮
+        mLandVote = findViewById(R.id.tv_land_vote);
+        mLandVote.setOnClickListener(voteClickListener);
+        mPortraitVote = findViewById(R.id.tv_portrait_vote);
+        mPortraitVote.setOnClickListener(voteClickListener);
         // 检测权限（用于连麦）
         doPermissionCheck();
         //首次进入默认竖屏 所以需要关闭弹幕
@@ -347,6 +357,7 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
                 ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
             if (mLiveVideoContainer.getParent() != null)
                 ((ViewGroup) mLiveVideoContainer.getParent()).removeView(mLiveVideoContainer);
+            mLiveVideoView.setShowSpeed(!isVideoMain);
             if (DWLiveCoreHandler.getInstance().isRtcing()) {//连麦中切换窗口
                 if (isVideoMain) {
                     mLiveFloatingView.addView(mDocLayout);
@@ -885,6 +896,56 @@ public class LivePlayActivity extends BaseActivity implements DWLiveBarrageListe
             mExitPopupWindow.show(mRoot);
         }
     }
+    private boolean isVote;
+    //添加答题卡收起监听
+    private FunctionCallBack functionCallBack = new FunctionCallBack() {
+        @Override
+        public void onMinimize(boolean isVote) {
+            super.onMinimize(isVote);
+            LivePlayActivity.this.isVote = isVote;
+            if (isVote){
+                mPortraitVote.setBackgroundResource(R.drawable.float_answer2);
+                mLandVote.setBackgroundResource(R.drawable.float_answer2);
+            }else{
+                mPortraitVote.setBackgroundResource(R.drawable.float_answer);
+                mLandVote.setBackgroundResource(R.drawable.float_answer);
+            }
+            //显示按钮
+            if (isPortrait()){
+                mPortraitVote.setVisibility(VISIBLE);
+                mLandVote.setVisibility(View.GONE);
+            }else{
+                mLandVote.setVisibility(VISIBLE);
+                mPortraitVote.setVisibility(View.GONE);
+            }
+        }
 
-
+        @Override
+        public void onClose() {
+            super.onClose();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //隐藏按钮
+                    mPortraitVote.setVisibility(View.GONE);
+                    mLandVote.setVisibility(View.GONE);
+                }
+            });
+        }
+    };
+    //随堂测 答题卡缩小按钮的点击时间
+    View.OnClickListener voteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mFunctionHandler!=null){
+                if (isVote){
+                    mFunctionHandler.onVoteStart();
+                }else{
+                    mFunctionHandler.onPractic();
+                }
+            }
+            mPortraitVote.setVisibility(View.GONE);
+            mLandVote.setVisibility(View.GONE);
+        }
+    };
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@id/id_popup_window_outside_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="#99000000"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--进度提示-->
+    <ProgressBar
+        android:id="@+id/video_progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="#99FFFFFF"
+        android:indeterminateTintMode="src_atop"
+        tools:ignore="UnusedAttribute" />
+    <TextView
+        android:id="@+id/tv_video_loadingtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/vertical_scroll_bar"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="视频加载中"/>
+    <TextView
+        android:id="@+id/tv_net"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/vertical_scroll_bar"
+        />
+</LinearLayout>

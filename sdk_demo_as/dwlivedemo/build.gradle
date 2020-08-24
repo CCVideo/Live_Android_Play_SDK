@@ -14,14 +14,51 @@ android {
         ndk {
             abiFilters 'armeabi-v7a'//, 'arm64-v8a'//, 'x86'
         }
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+    }
+
+    productFlavors {
+
+    }
+
+    signingConfigs {
+        release {
+            keyAlias 'bokecc'
+            keyPassword 'bokecc'
+            storeFile file('bokecc.jks')
+            storePassword 'bokecc'
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix '.debug'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+    }
+
+    // 打包改名
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (outputFileName.endsWith('.apk')) {
+                def fileName = "HD_live_" + AppVersion + "_" + releaseTime() + ".apk"
+                if (VersionType != "") {
+                    fileName = "HD_live_" + AppVersion + "_" + VersionType + "_" + AppDate + ".apk"
+                }
+                outputFileName = fileName
+            }
         }
     }
+
 }
 
 dependencies {
@@ -48,9 +85,17 @@ dependencies {
     // 文件下载库
     implementation files('libs/hddownload.jar')
     //腾讯bugly
-    implementation 'com.tencent.bugly:crashreport:3.2.33'
-    implementation 'com.tencent.bugly:nativecrashreport:3.7.3'
+    implementation 'com.tencent.bugly:crashreport:3.2.2'
+    implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
+    // 内存泄漏检测
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 
     // ==================================CC SDK Module===============================
     implementation project(':livemodule')
+
+
+}
+
+static def releaseTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("Asia/Shanghai"))
 }

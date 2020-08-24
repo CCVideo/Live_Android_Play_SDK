@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -51,7 +52,7 @@ public class PracticeStatisPopup extends BasePopupWindow {
     private PracticeStatisInfo info;
     private OnCloseListener onCloseListener;
     private TextView timerText;
-
+    private boolean isSubmit = false;
     // 构造函数
     public PracticeStatisPopup(Context context) {
         super(context);
@@ -90,7 +91,7 @@ public class PracticeStatisPopup extends BasePopupWindow {
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler() {
+    private Handler  handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -109,16 +110,16 @@ public class PracticeStatisPopup extends BasePopupWindow {
             return;
         }
         handler.removeMessages(1);
-        if (info.getStatus() != 2 && isShow) {
+        if (info.getStatus() != 2) {
             handler.sendEmptyMessageDelayed(1, 1000);
         }
         this.info = info;
         if (info.getStatus() == 1) {
             mPracticeingDesc.setVisibility(View.VISIBLE);
             mPracticeOverDesc.setVisibility(View.GONE);
-        } else if (info.getStatus() == 2) {
-            mPracticeOverDesc.setVisibility(View.VISIBLE);
-            mPracticeingDesc.setVisibility(View.GONE);
+            mPracticeingDesc.setText("答题进行中");
+        } else if (info.getStatus() == 2||info.getStatus() == 3) {
+            showPracticeStop();
         }
         mStatisAdapter.setAllPracticeNumber(info.getAnswerPersonNum());
         mPracticePeopleNum.setText(String.format(Locale.getDefault(), "共%d人回答，正确率%s",
@@ -135,18 +136,14 @@ public class PracticeStatisPopup extends BasePopupWindow {
                 }
             }
         }
-        if (practiceHistoryResult == null) {
-            mPracticeAnswerDesc.setVisibility(View.GONE);
-        } else {
+        if (practiceHistoryResult != null) {
             for (int i = 0; i < practiceHistoryResult.size(); i++) {
                 if (info.getType() == 0) {
                     yourChoose.append(orders2[practiceHistoryResult.get(i)]);
                 } else {
                     yourChoose.append(orders[practiceHistoryResult.get(i)]);
                 }
-
             }
-            mPracticeAnswerDesc.setVisibility(View.VISIBLE);
         }
         String msg = "您的答案：" + yourChoose.toString() + "     正确答案：" + corrects.toString();
         SpannableString ss = new SpannableString(msg);
@@ -248,6 +245,7 @@ public class PracticeStatisPopup extends BasePopupWindow {
     @Override
     public void dismiss() {
         super.dismiss();
+        handler.removeMessages(1);
         isShow = false;
     }
 }

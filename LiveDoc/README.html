@@ -2,21 +2,21 @@
 <html>
 <head>
 <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
-<title>README</title><link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color:#ffffff; --text-color:#333333; --select-text-bg-color:#B5D6FC; --select-text-font-color:auto; --monospace:"Lucida Console",Consolas,"Courier",monospace; }
+<title>README</title><link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
 html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
-body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857; overflow-x: hidden; background: inherit; tab-size: 4; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
 iframe { margin: auto; }
 a.url { word-break: break-all; }
 a:active, a:hover { outline: 0px; }
 .in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
-#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; overflow-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
 #write.first-line-indent p { text-indent: 2em; }
 #write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
 #write.first-line-indent li { margin-left: 2em; }
 .for-image #write { padding-left: 8px; padding-right: 8px; }
 body.typora-export { padding-left: 30px; padding-right: 30px; }
 .typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 500px) { 
   body.typora-export { padding-left: 0px; padding-right: 0px; }
   #write { padding-left: 20px; padding-right: 20px; }
   .CodeMirror-sizer { margin-left: 0px !important; }
@@ -25,13 +25,13 @@ body.typora-export { padding-left: 30px; padding-right: 30px; }
 #write li > figure:last-child { margin-bottom: 0.5rem; }
 #write ol, #write ul { position: relative; }
 img { max-width: 100%; vertical-align: middle; }
-button, input, select, textarea { color: inherit; font: inherit; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
 input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
 *, ::after, ::before { box-sizing: border-box; }
 #write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
 #write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
 p { line-height: inherit; }
-h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 4; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
 p { orphans: 4; }
 h1 { font-size: 2rem; }
 h2 { font-size: 1.8rem; }
@@ -43,7 +43,7 @@ h6 { font-size: 1rem; }
 .hidden { display: none; }
 .md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
 a { cursor: pointer; }
-sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-radius: 4px; cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
 sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
 #write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
 figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
@@ -52,8 +52,8 @@ tr { break-inside: avoid; break-after: auto; }
 thead { display: table-header-group; }
 table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
 table.md-table td { min-width: 32px; }
-.CodeMirror-gutters { border-right: 0px; background-color: inherit; }
-.CodeMirror-linenumber { user-select: none; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
 .CodeMirror { text-align: left; }
 .CodeMirror-placeholder { opacity: 0.3; }
 .CodeMirror pre { padding: 0px 4px; }
@@ -63,7 +63,7 @@ div.hr:focus { cursor: none; }
 #write.fences-no-line-wrapping pre { white-space: pre; }
 #write pre.ty-contain-cm { white-space: normal; }
 .CodeMirror-gutters { margin-right: 4px; }
-.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background: inherit; position: relative !important; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
 .md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
 #write .md-fences.mock-cm { white-space: pre-wrap; }
 .md-fences.md-fences-with-lineno { padding-left: 0px; }
@@ -72,7 +72,7 @@ div.hr:focus { cursor: none; }
 .CodeMirror-line, twitterwidget { break-inside: avoid; }
 .footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
 .footnotes + .footnotes { margin-top: 0px; }
-.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; background: 0px 0px; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; -webkit-tap-highlight-color: transparent; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
 li div { padding-top: 0px; }
 blockquote { margin: 1rem 0px; }
 li .mathjax-block, li p { margin: 0.5rem 0px; }
@@ -81,8 +81,8 @@ blockquote > :last-child { margin-bottom: 0px; }
 blockquote > :first-child, li > :first-child { margin-top: 0px; }
 .footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
 #write .footnote-line { white-space: pre-wrap; }
-@media print {
-  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; font-variant-ligatures: no-common-ligatures; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
   #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
   .typora-export * { -webkit-print-color-adjust: exact; }
   html.blink-to-pdf { font-size: 13px; }
@@ -91,9 +91,8 @@ blockquote > :first-child, li > :first-child { margin-top: 0px; }
 }
 .footnote-line { margin-top: 0.714em; font-size: 0.7em; }
 a img, img a { cursor: pointer; }
-pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background: rgb(204, 204, 204); display: block; overflow-x: hidden; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
 p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
-#write.first-line-indent p > .md-image:only-child:not(.md-img-error) img { left: -2em; position: relative; }
 p > .md-image:only-child { display: inline-block; width: 100%; }
 #write .MathJax_Display { margin: 0.8em 0px 0px; }
 .md-math-block { width: 100%; }
@@ -103,7 +102,7 @@ p > .md-image:only-child { display: inline-block; width: 100%; }
 .task-list-item.md-task-list-item { padding-left: 0px; }
 .md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
 .math { font-size: 1rem; }
-.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-radius: 10px; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
 .md-toc-content { position: relative; margin-left: 0px; }
 .md-toc-content::after, .md-toc::after { display: none; }
 .md-toc-item { display: block; color: rgb(65, 131, 196); }
@@ -116,7 +115,7 @@ p > .md-image:only-child { display: inline-block; width: 100%; }
 .md-toc-h4 .md-toc-inner { margin-left: 6em; }
 .md-toc-h5 .md-toc-inner { margin-left: 8em; }
 .md-toc-h6 .md-toc-inner { margin-left: 10em; }
-@media screen and (max-width: 48em) {
+@media screen and (max-width: 48em) { 
   .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
   .md-toc-h4 .md-toc-inner { margin-left: 5em; }
   .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
@@ -127,29 +126,29 @@ a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; 
 .md-attr { display: none; }
 .md-fn-count::after { content: "."; }
 code, pre, samp, tt { font-family: var(--monospace); }
-kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
 .md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
-code { text-align: left; vertical-align: initial; }
-a.md-print-anchor { white-space: pre !important; border-width: initial !important; border-style: none !important; border-color: initial !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; background: 0px 0px !important; text-decoration: initial !important; text-shadow: initial !important; }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
 .md-inline-math .MathJax_SVG .noError { display: none !important; }
 .html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
 .md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
 .MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
 .MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
 .MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
-.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; overflow-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
-.MathJax_SVG * { transition: none 0s ease 0s; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
 .MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
 .os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
 .md-diagram-panel > svg { max-width: 100%; }
 [lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
 [lang="mermaid"] .node text { font-size: 1rem; }
-table tr th { border-bottom: 0px; }
+table tr th { border-bottom-width: 0px; }
 video { max-width: 100%; display: block; margin: 0px auto; }
 iframe { max-width: 100%; width: 100%; border: none; }
 .highlight td, .highlight tr { border: 0px; }
 svg[id^="mermaidChart"] { line-height: 1em; }
-mark { background: rgb(255, 255, 0); color: rgb(0, 0, 0); }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
 .md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
 mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
 
@@ -177,19 +176,6 @@ body {
   	padding: 30px;
     padding-bottom: 100px;
 }
-
-@media only screen and (min-width: 1400px) {
-	#write {
-		max-width: 1024px;
-	}
-}
-
-@media only screen and (min-width: 1800px) {
-	#write {
-		max-width: 1200px;
-	}
-}
-
 #write > ul:first-child,
 #write > ol:first-child{
     margin-top: 30px;
@@ -514,15 +500,15 @@ header, .context-menu, .megamenu-content, footer{
     background: #999;
 }
 
- .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
+
 </style>
 </head>
-<body class='typora-export os-windows' >
-<div  id='write'  class = 'is-node'><h1><a name="liveandroidplaysdk" class="md-header-anchor"></a><span>Live_Android_Play_SDK</span></h1><p><img src="logo/cc_logo.png" referrerpolicy="no-referrer" alt="cc_logo"><span> </span></p><details>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><h1><a name="liveandroidplaysdk" class="md-header-anchor"></a><span>Live_Android_Play_SDK</span></h1><p><img src="logo/cc_logo.png" referrerpolicy="no-referrer" alt="cc_logo"><span> </span></p><details>
     <summary>获得场景视频</summary>
 <p>
 面向垂直行业用户打造的一站式场景化视频应用综合解决方案品牌
 ：<a href="https://www.bokecc.com">https://www.bokecc.com</a>
-</p></details><p>&nbsp;</p><h2><a name="1-简介" class="md-header-anchor"></a><span>1. 简介</span></h2><p><span> Android Live SDK 是适用于Android平台的云直播SDK，使用此SDK可以与获得场景视频云直播服务进行对接，在Android端使用“获得场景”云直播功能</span></p><h2><a name="2-功能特性" class="md-header-anchor"></a><span>2. 功能特性</span></h2><figure><table><thead><tr><th><span>功能特性</span></th><th><span>描述</span></th></tr></thead><tbody><tr><td><span>视频</span></td><td><span>支持直播视频播放</span></td></tr><tr><td><span>文档</span></td><td><span>文档及ppt动画展示</span></td></tr><tr><td><span>白板画笔</span></td><td><span>支持展示白板及画笔操作</span></td></tr><tr><td><span>聊天</span></td><td><span>支持公聊和私聊模式</span></td></tr><tr><td><span>问答</span></td><td><span>支持问答功能</span></td></tr><tr><td><span>签到</span></td><td><span>支持签到功能</span></td></tr><tr><td><span>抽奖</span></td><td><span>支持获取抽奖信息</span></td></tr><tr><td><span>公告</span></td><td><span>支持获取公告信息</span></td></tr><tr><td><span>问卷</span></td><td><span>支持问卷功能</span></td></tr><tr><td><span>广播</span></td><td><span>支持获取广播通知消息</span></td></tr><tr><td><span>答题卡</span></td><td><span>支持答题卡功能</span></td></tr><tr><td><span>随堂测</span></td><td><span>支持随堂测功能</span></td></tr><tr><td><span>打卡</span></td><td><span>支持打卡功能</span></td></tr><tr><td><span>音频模式</span></td><td><span>支持纯音频模式</span></td></tr><tr><td><span>实时画笔</span></td><td><span>支持答题卡实时画笔功能</span></td></tr><tr><td><span>聊天记录补推</span></td><td><span>支持获取最近60条聊天记录</span></td></tr><tr><td><span>线路切换</span></td><td><span>支持选择直播流线路</span></td></tr><tr><td><span>音频模式</span></td><td><span>直播时支持选择观看纯音频模式</span></td></tr><tr><td><span>视频连麦</span></td><td><span>支持与讲师进行视频连麦</span></td></tr><tr><td><span>语音连麦</span></td><td><span>支持与讲师进行语音连麦</span></td></tr><tr><td><span>获取在线人数</span></td><td><span>支持获取直播间在线人数</span></td></tr><tr><td><span>多清晰度</span></td><td><span>支持直播多清晰度切换播放</span></td></tr><tr><td><span>回放DRM</span></td><td><span>支持回放采用DRM视频加密播放</span></td></tr><tr><td><span>直播回放</span></td><td><span>支持观看直播回放（包含视频、文档、聊天、问答等）</span></td></tr><tr><td><span>回放离线播放</span></td><td><span>回放支持离线下载播放，无需联网即可观看离线回放；</span></td></tr><tr><td><span>回放倍速播放</span></td><td><span>回放支持倍速播放</span></td></tr></tbody></table></figure><p>&nbsp;</p><h2><a name="3-集成文档" class="md-header-anchor"></a><span>3. 集成文档</span></h2><p><strong><span>1. 基础功能</span></strong></p><p><a href='doc/1.SDK接入指南.html'><span>点击跳转——1. SDK接入指南</span></a></p><p><a href='doc/2.直播接入文档.html'><span>点击跳转——2. 直播功能集成</span></a></p><p><a href='doc/3.回放接入文档.html'><span>点击跳转——3. 回放功能集成</span></a></p><p><a href='doc/4.离线回放文档.html'><span>点击跳转——4. 离线回放功能集成</span></a></p><p><strong><span>2. 其他功能</span></strong></p><p><a href='doc/连麦接入文档.html'><span>点击跳转——连麦集成详细文档</span></a><span> </span></p><p><a href='doc/FAQ.html'><span>点击跳转——问题解答FAQ</span></a><span> </span></p><p><a href='doc/关于SDK本地引用迁到远端引用.html'><span>点击跳转——关于3.8.0之后迁移到远端maven集成</span></a></p><h2><a name="4-版本更新文档" class="md-header-anchor"></a><span>4. 版本更新文档</span></h2><p><a href='doc/version/版本更新历史.html'><span>点击跳转——版本更新历史</span></a></p><p><a href='doc/version/3.0版本升级文档.html'><span>点击跳转——3.0之上升级文档</span></a></p><p><a href='doc/version/2.0版本升级文档.html'><span>点击跳转——2.0之上升级文档</span></a><span>    </span></p></div>
+</p></details><p>&nbsp;</p><h2><a name="1-简介" class="md-header-anchor"></a><span>1. 简介</span></h2><p><span> Android Live SDK 是适用于Android平台的云直播SDK，使用此SDK可以与获得场景视频云直播服务进行对接，在Android端使用“获得场景”云直播功能</span></p><h2><a name="2-功能特性" class="md-header-anchor"></a><span>2. 功能特性</span></h2><figure><table><thead><tr><th><span>功能特性</span></th><th><span>描述</span></th></tr></thead><tbody><tr><td><span>视频</span></td><td><span>支持直播视频播放</span></td></tr><tr><td><span>文档</span></td><td><span>文档及ppt动画展示</span></td></tr><tr><td><span>白板画笔</span></td><td><span>支持展示白板及画笔操作</span></td></tr><tr><td><span>聊天</span></td><td><span>支持公聊和私聊模式</span></td></tr><tr><td><span>问答</span></td><td><span>支持问答功能</span></td></tr><tr><td><span>签到</span></td><td><span>支持签到功能</span></td></tr><tr><td><span>抽奖</span></td><td><span>支持获取抽奖信息</span></td></tr><tr><td><span>公告</span></td><td><span>支持获取公告信息</span></td></tr><tr><td><span>问卷</span></td><td><span>支持问卷功能</span></td></tr><tr><td><span>广播</span></td><td><span>支持获取广播通知消息</span></td></tr><tr><td><span>答题卡</span></td><td><span>支持答题卡功能</span></td></tr><tr><td><span>随堂测</span></td><td><span>支持随堂测功能</span></td></tr><tr><td><span>打卡</span></td><td><span>支持打卡功能</span></td></tr><tr><td><span>音频模式</span></td><td><span>支持纯音频模式</span></td></tr><tr><td><span>实时画笔</span></td><td><span>支持答题卡实时画笔功能</span></td></tr><tr><td><span>聊天记录补推</span></td><td><span>支持获取最近60条聊天记录</span></td></tr><tr><td><span>线路切换</span></td><td><span>支持选择直播流线路</span></td></tr><tr><td><span>音频模式</span></td><td><span>直播时支持选择观看纯音频模式</span></td></tr><tr><td><span>视频连麦</span></td><td><span>支持与讲师进行视频连麦</span></td></tr><tr><td><span>语音连麦</span></td><td><span>支持与讲师进行语音连麦</span></td></tr><tr><td><span>获取在线人数</span></td><td><span>支持获取直播间在线人数</span></td></tr><tr><td><span>多清晰度</span></td><td><span>支持直播多清晰度切换播放</span></td></tr><tr><td><span>回放DRM</span></td><td><span>支持回放采用DRM视频加密播放</span></td></tr><tr><td><span>直播回放</span></td><td><span>支持观看直播回放（包含视频、文档、聊天、问答等）</span></td></tr><tr><td><span>回放离线播放</span></td><td><span>回放支持离线下载播放，无需联网即可观看离线回放；</span></td></tr><tr><td><span>回放倍速播放</span></td><td><span>回放支持倍速播放</span></td></tr><tr><td><span>回放记忆播放</span></td><td><span>支持离线回放、在线回放记忆播放</span></td></tr></tbody></table></figure><p>&nbsp;</p><h2><a name="3-集成文档" class="md-header-anchor"></a><span>3. 集成文档</span></h2><p><strong><span>1. 基础功能</span></strong></p><p><a href='doc/1.SDK接入指南.html'><span>点击跳转——1. SDK接入指南</span></a></p><p><a href='doc/2.直播接入文档.html'><span>点击跳转——2. 直播功能集成</span></a></p><p><a href='doc/3.回放接入文档.html'><span>点击跳转——3. 回放功能集成</span></a></p><p><a href='doc/4.离线回放文档.html'><span>点击跳转——4. 离线回放功能集成</span></a></p><p><a href='doc/5.连麦接入文档.html'><span>点击跳转——5. 连麦接入文档</span></a></p><p><strong><span>2. 其他问题</span></strong></p><p><a href='doc/关于集成文档的建议.html'><span>点击跳转——关于集成文档的建议.html</span></a><span> </span></p><p><a href='doc/关于SDK本地引用迁到远端引用.html'><span>点击跳转——关于SDK本地引用迁到远端引用.html</span></a><span> </span></p><p><a href='doc/FAQ.html'><span>点击跳转——问题解答FAQ</span></a><span> </span></p><p><a href='doc/远程引用冲突问题自查手册.html'><span>点击跳转——远程引用冲突问题自查手册</span></a></p><h2><a name="4-版本更新文档" class="md-header-anchor"></a><span>4. 版本更新文档</span></h2><p><a href='doc/version/版本更新历史.html'><span>点击跳转——版本更新历史</span></a></p><p><a href='doc/version/3.0版本升级文档.html'><span>点击跳转——3.0之上升级文档</span></a></p><p><a href='doc/version/2.0版本升级文档.html'><span>点击跳转——2.0之上升级文档</span></a><span>    </span></p></div>
 </body>
 </html>

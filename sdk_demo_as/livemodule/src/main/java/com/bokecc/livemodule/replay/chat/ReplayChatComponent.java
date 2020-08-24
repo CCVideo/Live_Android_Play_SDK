@@ -43,7 +43,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
 
     private OnChatComponentClickListener mChatComponentClickListener;
 
-    public void setOnChatComponentClickListener(OnChatComponentClickListener listener){
+    public void setOnChatComponentClickListener(OnChatComponentClickListener listener) {
         mChatComponentClickListener = listener;
     }
 
@@ -81,7 +81,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
         mChatAdapter.setOnChatcomponentClickListener(new ReplayChatAdapter.OnChatComponentClickListener() {
             @Override
             public void onChatComponentClick(View view, Bundle bundle) {
-                if(mChatComponentClickListener != null){
+                if (mChatComponentClickListener != null) {
                     mChatComponentClickListener.onClickChatComponent(bundle);
                 }
             }
@@ -127,6 +127,7 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
     }
 
     private ArrayList<ChatEntity> mChatEntities = new ArrayList<>();
+
 
     private ChatEntity getReplayChatEntity(ReplayChatMsg msg) {
         ChatEntity chatEntity = new ChatEntity();
@@ -221,8 +222,10 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
                             tempChatEntities.clear();
                             for (int i = currentPos; i < mChatEntities.size(); i++) {
                                 ChatEntity entity = mChatEntities.get(i);
-                                if (!TextUtils.isEmpty(entity.getTime()) && Integer.valueOf(entity.getTime()) <= time) {
-                                    tempChatEntities.add(entity);
+                                if (entity!=null){
+                                    if (!TextUtils.isEmpty(entity.getTime()) && Integer.valueOf(entity.getTime()) <= time) {
+                                        tempChatEntities.add(entity);
+                                    }
                                 }
                             }
 //                            for (ChatEntity entity : mChatEntities) {
@@ -259,16 +262,24 @@ public class ReplayChatComponent extends RelativeLayout implements DWReplayChatL
 
 
     public void release() {
-        startTimerTask();
+        stopTimerTask();
         if (timer != null) {
             timer.cancel();
             timer = null;
+        }
+        if (tempChatEntities != null) {
+            tempChatEntities.clear();
+            tempChatEntities = null;
+        }
+        if (mChatEntities != null) {
+            mChatEntities.clear();
+            mChatEntities = null;
         }
     }
 
     @Override
     public void onBackSeek(final long progress) {
-        lastChatTime = (int) (progress/1000);
+        lastChatTime = (int) (progress / 1000);
         currentPos = 0;
         mChatRecyclerView.post(new Runnable() {
             @Override

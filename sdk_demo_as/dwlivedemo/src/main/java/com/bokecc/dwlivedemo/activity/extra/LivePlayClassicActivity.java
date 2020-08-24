@@ -70,7 +70,7 @@ public class LivePlayClassicActivity extends BaseActivity implements DWLiveBarra
         initViewPager();
         initRoomStatusListener();
         mFunctionHandler = new FunctionHandler();
-        mFunctionHandler.initFunctionHandler(this);
+        mFunctionHandler.initFunctionHandler(this,null);
     }
 
     @Override

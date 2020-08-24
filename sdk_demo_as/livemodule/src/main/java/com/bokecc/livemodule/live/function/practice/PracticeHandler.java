@@ -2,6 +2,7 @@ package com.bokecc.livemodule.live.function.practice;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.util.Log;
 import android.view.View;
 
 import com.bokecc.livemodule.live.function.practice.view.OnCloseListener;
@@ -35,7 +36,10 @@ public class PracticeHandler implements OnCloseListener {
     PracticeStatisLandPopup mPracticeStatisLandPopup; // 随堂测答题统计界面(横屏)
     private long departTime;
     private String formatTime;
-
+    private boolean close = false;//是否已经关闭
+    Timer timer;
+    TimerTask timerTask;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
      * 初始化随堂测功能
      */
@@ -48,77 +52,129 @@ public class PracticeHandler implements OnCloseListener {
         mPracticeStatisLandPopup = new PracticeStatisLandPopup(mContext);
     }
 
-    // 开始随堂测
-    public void startPractice(View root, PracticeInfo info) {
+    @Override
+    public void onClose() {
+        close = true;
+    }
+
+    public void startPractice(View root, PracticeInfo info, PracticeListener practiceListener) {
+        close = false;
         //判断随堂测是否已结束
         if (info.getStatus() == 2) {
             return;
         }
-        startTimer(info);
+        if (mPracticePopup.isShowing()&&(mPracticePopup.practiceInfo==null||!mPracticePopup.practiceInfo.getId().equals(info.getId()))){
+            mPracticePopup.dismiss();
+        }
+        if (mPracticeLandPopup.isShowing()&&(mPracticeLandPopup.practiceInfo==null||!mPracticeLandPopup.practiceInfo.getId().equals(info.getId()))){
+            mPracticeLandPopup.dismiss();
+        }
+        startTimer(info,0);
         if (isPortrait(mContext)) {
-            mPracticePopup.startPractice(info);
+            mPracticePopup.startPractice(info,practiceListener);
             mPracticePopup.show(root);
         } else {
-            mPracticeLandPopup.startPractice(info);
+            mPracticeLandPopup.startPractice(info,practiceListener);
+            mPracticeLandPopup.show(root);
+        }
+    }
+    public void startPractice(View root, PracticeConfig practiceConfig, PracticeListener practiceListener) {
+        close = false;
+        close = false;
+        //判断随堂测是否已结束
+        if (practiceConfig.getPracticeInfo().getStatus() == 2) {
+            return;
+        }
+        startTimer(practiceConfig.getPracticeInfo(),this.departTime);
+        if (isPortrait(mContext)) {
+            mPracticePopup.startPractice(practiceConfig,practiceListener);
+            mPracticePopup.show(root);
+        } else {
+            mPracticeLandPopup.startPractice(practiceConfig,practiceListener);
             mPracticeLandPopup.show(root);
         }
     }
 
     // 展示随堂测提交结果
     public void showPracticeSubmitResult(View root, PracticeSubmitResultInfo info) {
+        if (mSubmitResultPopup.isShowing()){
+            mSubmitResultPopup.dismiss();
+        }
         mSubmitResultPopup.showPracticeSubmitResult(info);
         mSubmitResultPopup.show(root);
     }
-
     // 展示随堂测统计数据
     public void showPracticeStatis(View root, PracticeStatisInfo info) {
+        if (mPracticePopup.isShowing()){
+            mPracticePopup.dismiss();
+        }
+        if (mPracticeLandPopup.isShowing()){
+            mPracticeLandPopup.dismiss();
+        }
+        if (info.getStatus()==2){
+            stopTimer();
+        }
+        if (info.getStatus()==3){
+            onPracticeClose(info.getId());
+            stopTimer();
+        }
+        if (close){
+            return;
+        }
         if (isPortrait(mContext)) {
             mPracticeStatisPopup.showPracticeStatis(info);
-            if (!mPracticeStatisPopup.isShowing()) {
+            if (!mPracticeStatisPopup.isShowing())
                 mPracticeStatisPopup.show(root, this);
+            if (info.getStatus()==2){
+                String formatTime = TimeUtil.getFormatTime(info.getStopTime()*1000);
+                mPracticeStatisPopup.setText(formatTime);
+            }else{
                 mPracticeStatisPopup.setText(formatTime);
             }
+
         } else {
             mPracticeStatisLandPopup.showPracticeStatis(info);
-            if (!mPracticeStatisLandPopup.isShowing()) {
+            if (!mPracticeStatisPopup.isShowing())
                 mPracticeStatisLandPopup.show(root, this);
+            if (info.getStatus()==2){
+                mPracticeStatisLandPopup.setText(TimeUtil.getFormatTime(info.getStopTime()));
+            }else{
                 mPracticeStatisLandPopup.setText(formatTime);
             }
         }
     }
-
-    @Override
-    public void onClose() {
-        stopTimer();
-    }
-
     // 停止随堂测
-    public void onPracticeStop(String practiceId) {
-        if (mPracticePopup != null && mPracticePopup.isShowing()) {
-            mPracticePopup.dismiss();
-            //如果还没有提交问题 需要去手动获取结果
+    public void onPracticeStop(String practiceId, View root,boolean isSmall) {
+        if (mPracticePopup.isShowing()||mPracticeLandPopup.isShowing()||isSmall){//如果是未提交 请求下统计界面
+            //关闭原先的弹框
+            if (mPracticePopup.isShowing()){
+                mPracticePopup.dismiss();
+            }
+            if (mPracticeLandPopup.isShowing()){
+                mPracticeLandPopup.dismiss();
+            }
             DWLive.getInstance().getPracticeStatis(practiceId);
+            stopTimer();
+            return;
         }
 
-        if (mPracticeLandPopup != null && mPracticeLandPopup.isShowing()) {
-            mPracticeLandPopup.dismiss();
-            //如果还没有提交问题 需要去手动获取结果
-            DWLive.getInstance().getPracticeStatis(practiceId);
+        if (isPortrait(mContext)) {
+            if (mPracticeStatisPopup != null) {
+                mPracticeStatisPopup.showPracticeStop();
+                if (!mPracticeStatisPopup.isShowing()){
+                    mPracticeStatisPopup.show(root);
+                }
+            }
+        }else{
+            if (mPracticeStatisLandPopup != null) {
+                mPracticeStatisLandPopup.showPracticeStop();
+                if (!mPracticeStatisLandPopup.isShowing()){
+                    mPracticeStatisLandPopup.show(root);
+                }
+            }
         }
-
-        if (mPracticeStatisPopup != null && mPracticeStatisPopup.isShowing()) {
-            mPracticeStatisPopup.showPracticeStop();
-
-        }
-
-        if (mPracticeStatisLandPopup != null && mPracticeStatisLandPopup.isShowing()) {
-            mPracticeStatisLandPopup.showPracticeStop();
-
-        }
-
         stopTimer();
     }
-
     // 关闭随堂测
     public void onPracticeClose(String practiceId) {
         stopTimer();
@@ -145,27 +201,23 @@ public class PracticeHandler implements OnCloseListener {
         }
     }
 
-    // 判断当前屏幕朝向是否为竖屏
-    private boolean isPortrait(Context context) {
-        int mOrientation = context.getResources().getConfiguration().orientation;
-        return mOrientation != Configuration.ORIENTATION_LANDSCAPE;
-    }
-
-    Timer timer;
-    TimerTask timerTask;
-
-    public void startTimer(final PracticeInfo practiceInfo) {
+    public void startTimer(final PracticeInfo practiceInfo,long departTime) {
         if (timer != null && timerTask != null) {
-            return;
+            timer.cancel();
+            timerTask.cancel();
         }
         timer = new Timer();
-        departTime = System.currentTimeMillis() - practiceInfo.getServerTime();
+        if (this.departTime<=0){
+            this.departTime = System.currentTimeMillis() - practiceInfo.getServerTime();
+        }else{
+            this.departTime=departTime;
+        }
+
         timerTask = new TimerTask() {
             @Override
             public void run() {
                 try {
-                    final long now = System.currentTimeMillis() - departTime;
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    final long now = System.currentTimeMillis() - PracticeHandler.this.departTime;
                     final Date date = sdf.parse(practiceInfo.getPublishTime());
                     formatTime = TimeUtil.getFormatTime(now - date.getTime());
                     if (mPracticePopup != null && mPracticePopup.isShowing()) {
@@ -202,4 +254,10 @@ public class PracticeHandler implements OnCloseListener {
             timer = null;
         }
     }
+    // 判断当前屏幕朝向是否为竖屏
+    private boolean isPortrait(Context context) {
+        int mOrientation = context.getResources().getConfiguration().orientation;
+        return mOrientation != Configuration.ORIENTATION_LANDSCAPE;
+    }
+
 }

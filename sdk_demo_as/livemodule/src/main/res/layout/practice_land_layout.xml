@@ -19,19 +19,20 @@
             android:background="#ffffff">
 
             <!--关闭按钮-->
-            <ImageView
-                android:id="@+id/qs_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/qs_close" />
+<!--            <ImageView-->
+<!--                android:id="@+id/qs_close"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentRight="true"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:layout_marginRight="8dp"-->
+<!--                android:src="@drawable/qs_close" />-->
 
             <LinearLayout
                 android:id="@+id/qs_select_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/btn_qs_minimize"
                 android:layout_margin="5dp"
                 android:orientation="horizontal"
                 android:visibility="visible">
@@ -59,7 +60,7 @@
                     android:id="@+id/rg_qs_multi"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:orientation="horizontal"
@@ -162,7 +163,7 @@
                     android:id="@+id/ll_qs_checkboxs"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:orientation="horizontal"
@@ -267,7 +268,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
-                    android:layout_marginBottom="25dp"
+                    android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
@@ -334,10 +335,19 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
                     android:enabled="false"
                     android:text="提交"
                     android:textColor="#FFFFFF" />
+                <Button
+                    android:id="@+id/btn_qs_minimize"
+                    android:textColor="@drawable/vote_text_selector"
+                    android:background="@drawable/vote_rectangle_selector"
+                    android:layout_width="70dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="收起" />
             </LinearLayout>
 
         </RelativeLayout>

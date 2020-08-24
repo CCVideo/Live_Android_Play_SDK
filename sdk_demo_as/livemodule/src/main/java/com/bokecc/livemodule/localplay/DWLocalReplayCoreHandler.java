@@ -22,7 +22,8 @@ import java.util.TreeSet;
  */
 public class DWLocalReplayCoreHandler {
     private final static String TAG = DWLocalReplayCoreHandler.class.getSimpleName();
-
+    public static final String LASTPOSITION = "local_lastposition";
+    public static final String RECORDID = "local_recordid";
     private static DWLocalReplayCoreHandler dwLocalReplayCoreHandler = new DWLocalReplayCoreHandler();
 
     /**

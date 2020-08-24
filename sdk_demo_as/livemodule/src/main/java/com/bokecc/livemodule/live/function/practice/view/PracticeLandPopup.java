@@ -2,6 +2,7 @@ package com.bokecc.livemodule.live.function.practice.view;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
+import com.bokecc.livemodule.live.function.practice.PracticeConfig;
+import com.bokecc.livemodule.live.function.practice.PracticeListener;
 import com.bokecc.livemodule.utils.PopupAnimUtil;
 import com.bokecc.livemodule.view.BasePopupWindow;
 import com.bokecc.sdk.mobile.live.pojo.PracticeInfo;
@@ -34,11 +37,13 @@ public class PracticeLandPopup extends BasePopupWindow {
 
     private ImageView doubleIv0;
     private ImageView doubleIv1;
+    private PracticeListener practiceListener;
+
     public PracticeLandPopup(Context context) {
         super(context);
     }
 
-    private ImageView qsClose;
+//    private ImageView qsClose;
 
     //-----------------答题界面-----------------------------------
     private LinearLayout selectLayout;
@@ -107,17 +112,17 @@ public class PracticeLandPopup extends BasePopupWindow {
     private ArrayList<ImageView> mivs;
     private ArrayList<RelativeLayout> mrls;
 
-    PracticeInfo practiceInfo;
+    public PracticeInfo practiceInfo;
 
     @Override
     protected void onViewCreated() {
-        qsClose = findViewById(R.id.qs_close);
-        qsClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+//        qsClose = findViewById(R.id.qs_close);
+//        qsClose.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dismiss();
+//            }
+//        });
 
         // 答题界面
         selectLayout = findViewById(R.id.qs_select_layout);
@@ -382,6 +387,23 @@ public class PracticeLandPopup extends BasePopupWindow {
                 }
             }
         });
+        //设置收起的点击事件
+        findViewById(R.id.btn_qs_minimize).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (practiceListener!=null){
+                    //还有答案
+                    ArrayList<Integer> indexs = new ArrayList<>();
+                    for (int i = 0; i < practiceInfo.getOptions().size(); i++) {
+                        if (selectOptions.contains(String.valueOf(i))) {
+                            indexs.add(i);
+                        }
+                    }
+                    practiceListener.onMinimize(practiceInfo,voteType,selectOption,indexs);
+                    dismiss();
+                }
+            }
+        });
     }
 
     /**
@@ -415,8 +437,18 @@ public class PracticeLandPopup extends BasePopupWindow {
         initRadioButtonAndImageView();
         // 设定当前选择的选项
         selectOption = index;
-        rbs.get(index).setChecked(true);
-        ivs.get(index).setVisibility(View.VISIBLE);
+        if (voteType == 0){
+            if (index == 0){
+                double0.setChecked(true);
+                doubleIv0.setVisibility(View.VISIBLE);
+            }else{
+                double1.setChecked(true);
+                doubleIv1.setVisibility(View.VISIBLE);
+            }
+        }else{
+            rbs.get(index).setChecked(true);
+            ivs.get(index).setVisibility(View.VISIBLE);
+        }
         submit.setEnabled(true);
     }
 
@@ -469,14 +501,34 @@ public class PracticeLandPopup extends BasePopupWindow {
 
     private int voteCount;
     private int voteType; // 0为判断，1为单选，2为多选
-    public void startPractice(final PracticeInfo practiceInfo) {
+    public void startPractice(final PracticeInfo practiceInfo, PracticeListener practiceListener) {
         this.practiceInfo = practiceInfo;
         this.voteCount = practiceInfo.getOptions().size();
         this.voteType = practiceInfo.getType();
         this.submit.setEnabled(false);
+        this.practiceListener=practiceListener;
         showSelectLayout();
     }
+    public void startPractice(final PracticeConfig practiceConfig, PracticeListener practiceListener) {
+        startPractice(practiceConfig.getPracticeInfo(),practiceListener);
+        //设置对应的答案
+        //选中已经选择过的答案
+        if (voteType == 0||voteType == 1){
+            //判断题或者单选题
+            if (practiceConfig.getSelectIndex()>=0){
+                setSelect(practiceConfig.getSelectIndex());
+            }
+        }else{
+            //多选题
+            if ( practiceConfig.getSelectIndexs()!=null){
+                for (Integer i : practiceConfig.getSelectIndexs()){
+                    selectOptions.add(String.valueOf(i));
+                    setCheck(i, true);
+                }
+            }
+        }
 
+    }
     private void showSelectLayout() {
 
         selectLayout.setVisibility(View.VISIBLE);

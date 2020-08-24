@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.view.ResizeTextureView;
+import com.bokecc.livemodule.view.VideoLoadingView;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -32,7 +33,7 @@ public class LocalReplayVideoView extends RelativeLayout {
 
     TextView mVideoNoplayTip;
 
-    ProgressBar mVideoProgressBar;
+    VideoLoadingView mVideoProgressBar;
 
     DWReplayPlayer player;
 

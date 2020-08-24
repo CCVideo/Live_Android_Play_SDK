@@ -9,6 +9,7 @@ com.bokecc.sdk.mobile.live.logging
 com.bokecc.sdk.mobile.live.message
 com.bokecc.sdk.mobile.live.pojo
 com.bokecc.sdk.mobile.live.replay
+com.bokecc.sdk.mobile.live.replay.config
 com.bokecc.sdk.mobile.live.replay.data
 com.bokecc.sdk.mobile.live.replay.doc
 com.bokecc.sdk.mobile.live.replay.entity
@@ -21,4 +22,16 @@ com.bokecc.sdk.mobile.live.response
 com.bokecc.sdk.mobile.live.rtc
 com.bokecc.sdk.mobile.live.socket
 com.bokecc.sdk.mobile.live.util
+com.bokecc.sdk.mobile.live.util.json
+com.bokecc.sdk.mobile.live.util.json.annotation
+com.bokecc.sdk.mobile.live.util.json.asm
+com.bokecc.sdk.mobile.live.util.json.parser
+com.bokecc.sdk.mobile.live.util.json.parser.deserializer
+com.bokecc.sdk.mobile.live.util.json.serializer
+com.bokecc.sdk.mobile.live.util.json.spi
+com.bokecc.sdk.mobile.live.util.json.support.config
+com.bokecc.sdk.mobile.live.util.json.support.geo
+com.bokecc.sdk.mobile.live.util.json.support.hsf
+com.bokecc.sdk.mobile.live.util.json.util
+com.bokecc.sdk.mobile.live.util.report
 com.bokecc.sdk.mobile.live.widget

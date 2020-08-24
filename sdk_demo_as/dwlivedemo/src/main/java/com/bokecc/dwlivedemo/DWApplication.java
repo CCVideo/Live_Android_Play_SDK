@@ -5,6 +5,8 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.bokecc.livemodule.LiveSDKHelper;
+import com.bokecc.sdk.mobile.live.logging.FwLog;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * 应用的 Application
@@ -29,8 +31,13 @@ public class DWApplication extends Application {
         if (context == null) {
             context = this;
         }
-        //      初始化SDK
+//      初始化SDK
         LiveSDKHelper.initSDK(this);
+        //初始化bugly
+        CrashReport.initCrashReport(getApplicationContext(), "860d2d72ac", false);
+
+        FwLog.setConsoleLogLevel(4);
+
     }
 
 

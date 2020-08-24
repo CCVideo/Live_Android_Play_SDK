@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
@@ -31,6 +32,10 @@ public class MoreFunctionFab extends RelativeLayout implements View.OnClickListe
      * 默认按钮的tag标识
      */
     private Object defaultTag = 0;
+    /**
+     * 答题卡的按钮tag
+     */
+    private static final int VOTE = 4;
     /**
      * 上下文
      */
@@ -109,6 +114,7 @@ public class MoreFunctionFab extends RelativeLayout implements View.OnClickListe
         fab.setOnClickListener(this);
         setAttributes(fab, build.getBuilder());
         addView(fab);
+//        addVote();
     }
 
 
@@ -424,4 +430,19 @@ public class MoreFunctionFab extends RelativeLayout implements View.OnClickListe
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+//    public void addVote(){
+//        FabAttributes build = new FabAttributes.Builder()
+//                .setSrc(context.getResources().getDrawable(R.drawable.more_function_add))
+//                .setFabSize(FloatingActionButton.SIZE_MINI)
+//                .setPressedTranslationZ(10)
+//                .setElevation(15)
+//                .setBackgroundTint(Color.parseColor("#000000"))
+//                .setTag(VOTE)
+//                .build();
+//        FloatingActionButton fab = new FloatingActionButton(context);
+//        fab.setId(R.id.vote_fab_id);
+//        fab.setOnClickListener(this);
+//        setAttributes(fab, build.getBuilder());
+//        addView(fab);
+//    }
 }

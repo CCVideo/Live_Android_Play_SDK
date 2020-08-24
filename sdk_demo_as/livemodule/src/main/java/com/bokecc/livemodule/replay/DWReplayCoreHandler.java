@@ -32,6 +32,8 @@ import static com.bokecc.sdk.mobile.live.Exception.ErrorCode.DOC_LOAD_FAILED;
 public class DWReplayCoreHandler {
 
     private static final String TAG = "DWReplayCoreHandler";
+    public static final String LASTPOSITION = "lastposition";
+    public static final String RECORDID = "recordid";
 
     private static DWReplayCoreHandler dwReplayCoreHandler = new DWReplayCoreHandler();
 
@@ -204,15 +206,6 @@ public class DWReplayCoreHandler {
         dwLiveReplay.setReplayErrorListener(mErrorListener);
         dwLiveReplay.setReplayParams(dwLiveReplayListener, DWLiveEngine.getInstance().getContext());
         dwLiveReplay.start();
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                DWLiveReplay.getInstance().retryReplay(30000, false);
-//            }
-//        }, 2000);
-
-
     }
 
     public void pause() {

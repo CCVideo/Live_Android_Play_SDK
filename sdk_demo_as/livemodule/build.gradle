@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 
+//  0 源码集成  1 lib包集成  2 核心lib包+远端集成 3.纯远端集成
+def buildSource = 1
+
 android {
     compileSdkVersion 29
 
@@ -10,14 +13,27 @@ android {
         versionName rootProject.ext.android.SDK_VERSION
 
         ndk {
-            abiFilters 'armeabi-v7a'//, 'arm64-v8a'//, 'x86'
+            abiFilters 'armeabi-v7a'//, 'x86', 'arm64-v8a'
         }
+
+        
+
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (buildSource == 1) {
+                jniLibs.srcDirs = ["libs/jniLibs2"]
+            } else if (buildSource == 2) {
+                jniLibs.srcDirs = ["libs/jniLibs"]
+            }
         }
     }
 }
@@ -33,8 +49,50 @@ dependencies {
 
     //===================================live sdk=============================
 
-    api 'com.bokecc:dwlivesdk:' + rootProject.ext.android.SDK_VERSION
-
+    if (buildSource == 0) {
+        // 源码集成
+        api project(path: ':livesdk')
+    }
+    if (buildSource == 1) {
+        api files('libs/dwlivesdk-' + rootProject.ext.android.SDK_VERSION + '.jar')
+        // 本地依赖包
+        api files('libs/drmlib.jar')
+        api files('libs/engine-0.8.3.1.jar')
+        api files('libs/hdplayer.jar')
+        api files('libs/httplib.jar')
+        api files('libs/libjingle_peerconnection.jar')
+        api files('libs/rtc.jar')
+        api files('libs/tbs_sdk.jar')
+    }
+    if (buildSource == 2) {
+        api files('libs/dwlivesdk-' + rootProject.ext.android.SDK_VERSION + '.jar')
+        // drm
+        api 'com.bokecc:drm:1.1.0'
+        // 网络库
+        api 'com.bokecc:engine:0.8.3.1'
+        // 播放器
+        api('com.bokecc:hdplayer:1.1.0')
+        // 连麦
+        api('com.bokecc:hdwebrtc:1.1.1')
+        api 'io.agora.rtc:full-sdk:2.4.1'
+        // tbs
+        api 'com.tencent.tbs.tbssdk:sdk:43903'
+    }
+    if (buildSource == 3) {
+        api 'com.bokecc:dwlivesdk:' + rootProject.ext.android.SDK_VERSION
+//        api('com.bokecc:dwlivesdk:' + rootProject.ext.android.SDK_VERSION) {
+//            // drm冲突
+//            exclude group: 'com.bokecc', module: 'drm'
+//            // ijkplayer冲突
+//            exclude group: 'com.bokecc', module: 'hdplayer'
+//            // webrtc冲突
+//            exclude group: 'com.bokecc', module: 'hdwebrtc'
+//            // 声网冲突
+//            exclude group: 'io.agora.rtc', module: 'full-sdk'
+//            // tbs冲突
+//            exclude group: 'com.tencent.tbs.tbssdk', module: 'sdk'
+//        }
+    }
 
 
 }

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -24,6 +25,7 @@ import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.download.FileUtil;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
+import com.bokecc.dwlivedemo.utils.SPUtil;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
@@ -33,6 +35,7 @@ import com.bokecc.livemodule.localplay.intro.LocalReplayIntroComponent;
 import com.bokecc.livemodule.localplay.qa.LocalReplayQAComponent;
 import com.bokecc.livemodule.localplay.room.LocalReplayRoomLayout;
 import com.bokecc.livemodule.localplay.video.LocalReplayVideoView;
+import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
 
 import java.io.File;
@@ -50,6 +53,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
     public static String DOWNLOAD_DIR;
     private View mRoot;
     private String mPlayPath;  // CCR文件名
+    private String fileName;  // CCR文件名
     private LocalReplayVideoView mReplayVideoView;
     private RelativeLayout mReplayVideoContainer;
     private LocalReplayRoomLayout mReplayRoomLayout;
@@ -66,7 +70,7 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         setContentView(R.layout.activity_local_replay_play);
         DOWNLOAD_DIR = FileUtil.getCCDownLoadPath(this);
         Intent intent = getIntent();
-        String fileName = intent.getStringExtra("fileName");
+        fileName = intent.getStringExtra("fileName");
         if (TextUtils.isEmpty(fileName)) {
             Toast.makeText(this, "CCR文件名为空，播放失败！", Toast.LENGTH_LONG).show();
             return;
@@ -79,6 +83,14 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         handler.setLocalTemplateUpdateListener(this);
 
         initViews();
+        //设置记忆播放
+        String recordId = com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().getString(DWLocalReplayCoreHandler.RECORDID);
+        long lastPosition = com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().getLong(DWLocalReplayCoreHandler.LASTPOSITION);
+        if (recordId.equals(fileName)&&lastPosition>0){
+            mReplayRoomLayout.showJump(lastPosition,recordId);
+        }else{
+            mReplayRoomLayout.setRecordId(fileName);
+        }
     }
 
     public static String getUnzipDir(File oriFile) {
@@ -289,10 +301,9 @@ public class LocalReplayPlayActivity extends BaseActivity implements DWLocalRepl
         if (mRoot.getHandler() != null) {
             mRoot.getHandler().removeCallbacksAndMessages(null);
         }
+        mReplayRoomLayout.stopTimerTask();
         mLocalReplayFloatingView.dismiss();
         mReplayVideoView.destroy();
-
-
     }
 
     private void initViews() {

@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +17,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -30,6 +33,7 @@ import com.bokecc.dwlivedemo.R;
 import com.bokecc.dwlivedemo.base.BaseActivity;
 import com.bokecc.dwlivedemo.popup.ExitPopupWindow;
 import com.bokecc.dwlivedemo.popup.FloatingPopupWindow;
+import com.bokecc.dwlivedemo.utils.SPUtil;
 import com.bokecc.livemodule.live.chat.OnChatComponentClickListener;
 import com.bokecc.livemodule.live.chat.util.DensityUtil;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
@@ -45,6 +49,9 @@ import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.replay.ReplayLineSwitchListener;
+import com.bokecc.sdk.mobile.live.replay.config.ReplayLineConfig;
+import com.bokecc.sdk.mobile.live.replay.entity.ReplayLineParams;
 import com.bokecc.sdk.mobile.live.widget.MarqueeView;
 
 import java.util.ArrayList;
@@ -76,6 +83,7 @@ public class ReplayPlayActivity extends BaseActivity {
 
     private boolean isVideo = false;
     private final String CHANNEL_ID = "HD_SDK_CHANNEL_ID";
+    private String recordId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +95,20 @@ public class ReplayPlayActivity extends BaseActivity {
         initViews();
         showFloatingDocLayout();
 
+        //获取回放id
+        recordId = getIntent().getStringExtra("recordId");
+        //读取本地文件并校对
+        String saveRecordId = com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().getString(DWReplayCoreHandler.RECORDID);
+        long lastPosition = com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().getLong(DWReplayCoreHandler.LASTPOSITION);
+        //设置记忆播放
+        if (recordId.equals(saveRecordId)&&lastPosition>0){
+            mReplayRoomLayout.showJump(lastPosition,recordId);
+        }else{
+            mReplayRoomLayout.setRecordId(recordId);
+        }
 
-        //DWLiveReplay.getInstance().setLastPosition(30000);
-        mReplayVideoView.start();
         initViewPager();
-
+        mReplayVideoView.start();
         // 测试音频切换功能
 //        testCase();
     }
@@ -102,9 +119,11 @@ public class ReplayPlayActivity extends BaseActivity {
         super.onDestroy();
         mReplayFloatingView.dismiss();
         mReplayVideoView.destroy();
+        NotificationReceiver.notifiCallBack = null;
         NotificationManager notificationManager = (NotificationManager) ReplayPlayActivity.this
                 .getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(1);
+
     }
 
     @Override
@@ -462,6 +481,7 @@ public class ReplayPlayActivity extends BaseActivity {
                 ((ViewGroup) mReplayVideoView.getParent()).removeView(mReplayVideoView);
             if (mDocLayout.getParent() != null)
                 ((ViewGroup) mDocLayout.getParent()).removeView(mDocLayout);
+            mReplayVideoView.setShowSpeed(!isVideoMain);
             if (isVideoMain) {
                 // 缓存视频的切换前的画面
                 ViewGroup.LayoutParams lp = mDocLayout.getLayoutParams();
@@ -649,5 +669,98 @@ public class ReplayPlayActivity extends BaseActivity {
         super.onPause();
         showAlwaysNotify(DWReplayCoreHandler.getInstance().getPlayer().isPlaying() ? R.drawable.icon_pause : R.drawable.icon_play);
         mReplayVideoView.onPause();
+    }
+
+
+    //  ----------------------------------测试切换音频线路功能-----------------------------------
+    private LinearLayout switch_ll;
+    private View testcase_audio;
+    public List<ReplayLineParams> audioLines;
+    public List<ReplayLineParams> videoLines;
+    public ReplayLineSwitchListener changeLineCallback = new ReplayLineSwitchListener() {
+        @Override
+        public void onChangeLine(int success, int currentIndex) {
+            if (success != 0) {
+                toastOnUiThread("切换失败");
+            } else {
+                toastOnUiThread("切换成功 当前线路 " + (isVideo ? "视频:" : "音频:") + currentIndex);
+                mReplayRoomLayout.mTipsLayout.setVisibility(View.GONE);
+                mReplayRoomLayout.controllerShouldResponseFinger = true;
+            }
+        }
+    };
+
+    private void testCase() {
+        testcase_audio = findViewById(R.id.testcase_audio);
+        switch_ll = findViewById(R.id.switch_ll);
+        testcase_audio.setVisibility(VISIBLE);
+        DWReplayCoreHandler.getInstance().setTestCase(new DWReplayCoreHandler.TestCase() {
+            @Override
+            public void numberOfReceivedLinesWithVideo(final List<ReplayLineParams> videoLines, final List<ReplayLineParams> audioLines) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switch_ll.removeAllViews();
+                        try {
+                            ReplayPlayActivity.this.videoLines = videoLines;
+                            ReplayPlayActivity.this.audioLines = audioLines;
+                            if (videoLines != null && videoLines.size() > 0) {
+                                for (int i = 0; i < videoLines.size(); i++) {
+                                    final ReplayLineParams dwLiveReplayLineParames = videoLines.get(i);
+
+                                    // todo 测试线路切换
+                                    Button textView = new Button(ReplayPlayActivity.this);
+                                    textView.setText("视频:" + dwLiveReplayLineParames.getLineNum());
+                                    textView.setTextColor(Color.RED);
+                                    textView.setTextSize(13);
+                                    textView.setTag(i);
+                                    textView.setClickable(true);
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            isVideo = true;
+                                            ReplayLineConfig dwReplayLineConfig = new ReplayLineConfig();
+                                            dwReplayLineConfig.setDisableVideo(false);
+                                            dwReplayLineConfig.setReplayLineConfig(new ReplayLineParams(((Integer) view.getTag())));
+                                            DWLiveReplay.getInstance().changeLineWithPlayParameter(dwReplayLineConfig, changeLineCallback);
+                                        }
+                                    });
+                                    switch_ll.addView(textView);
+
+                                }
+
+                            }
+                            if (audioLines != null && audioLines.size() > 0) {
+                                for (int i = 0; i < audioLines.size(); i++) {
+                                    ReplayLineParams dwLiveReplayLineParames = videoLines.get(i);
+                                    Button textView = new Button(ReplayPlayActivity.this);
+                                    textView.setText("音频:" + dwLiveReplayLineParames.getLineNum());
+                                    textView.setTextColor(Color.GREEN);
+                                    textView.setTextSize(13);
+                                    textView.setClickable(true);
+                                    textView.setTag(i);
+                                    textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            isVideo = false;
+                                            ReplayLineConfig dwReplayLineConfig = new ReplayLineConfig();
+                                            dwReplayLineConfig.setDisableVideo(true);
+                                            dwReplayLineConfig.setReplayLineConfig(new ReplayLineParams(((Integer) view.getTag())));
+                                            DWLiveReplay.getInstance().changeLineWithPlayParameter(dwReplayLineConfig, changeLineCallback);
+                                        }
+                                    });
+                                    switch_ll.addView(textView);
+
+                                }
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            }
+        });
     }
 }

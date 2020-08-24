@@ -1,42 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_pc_portrait_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <!--seek layout-->
     <RelativeLayout
+        android:id="@+id/seek_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_horizontal_btn_selected"
-        android:visibility="gone"
-        android:id="@+id/seek_root">
+        android:background="#b3000000"
+        android:visibility="gone">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerInParent="true">
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/tv_seek_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:textColor="@color/colorBackHov"/>
+                android:textColor="@color/colorBackHov"
+                android:textSize="17sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:text="/"
-                android:textColor="@color/loginBg"/>
+                android:textColor="@color/loginBg"
+                android:textSize="17sp" />
+
             <TextView
                 android:id="@+id/tv_sum_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:textColor="@color/loginBg"/>
+                android:textColor="@color/loginBg"
+                android:textSize="17sp" />
         </LinearLayout>
 
     </RelativeLayout>
+
+    <!--顶部菜单-->
     <RelativeLayout
         android:id="@+id/rl_portrait_live_top_layout"
         android:layout_width="match_parent"
@@ -49,6 +58,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
+            <!--返回按钮-->
             <ImageView
                 android:id="@+id/iv_portrait_live_close"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
@@ -56,33 +66,82 @@
                 android:paddingRight="5dp"
                 android:src="@drawable/title_back" />
 
+            <!--直播间标题-->
             <TextView
                 android:id="@+id/tv_portrait_live_title"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
-                android:layout_toRightOf="@id/iv_portrait_live_close"
-                android:paddingLeft="0dp"
-                android:text="直播间标题" />
-
-
+                android:layout_toEndOf="@id/iv_portrait_live_close"
+                android:text="直播间标题"
+                tools:ignore="HardcodedText" />
+            <!--文档拉伸类型-->
+            <Spinner
+                android:id="@+id/spr_scale_type"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/video_doc_switch"
+                android:entries="@array/spinner_scale_type"
+                android:gravity="center"
+                android:visibility="gone" />
+            <!--切换文档-->
             <TextView
                 android:id="@+id/video_doc_switch"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="切换文档" />
+                android:layout_alignParentEnd="true"
+                android:paddingEnd="5dp"
+                android:text="切换文档"
+                tools:ignore="HardcodedText,RtlSymmetry" />
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/doc_scale_type"
                 style="@style/phoneLiveLandscapeTitleViewTheme"
                 android:layout_toStartOf="@id/video_doc_switch"
                 android:paddingRight="5dp"
-                android:text="CenterInside" />
+                android:text="CenterInside"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
     </RelativeLayout>
-
+    <!--记忆播放跳转界面-->
+    <LinearLayout
+        android:id="@+id/ll_jump"
+        android:visibility="gone"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:background="@drawable/shape_jump"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="42dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/pc_live_infos_tag"
+            android:textColor="@color/withe"
+            android:text="您上次观看到"/>
+        <TextView
+            android:id="@+id/tv_lastPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/pc_live_infos_tag"
+            android:textColor="@color/withe"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
+        <TextView
+            android:id="@+id/tv_jump"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#ff6633"
+            android:text="跳转"/>
+    </LinearLayout>
+    <!--底部逻辑-->
     <RelativeLayout
         android:id="@+id/rl_portrait_live_bottom_layout"
         android:layout_width="match_parent"
@@ -104,9 +163,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
             android:layout_toLeftOf="@id/iv_portrait_live_full"
-            android:orientation="horizontal" >
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/replay_play_icon"
@@ -159,31 +218,33 @@
 
     </RelativeLayout>
 
-
+    <!--错误界面-->
     <LinearLayout
-        android:visibility="gone"
-        android:orientation="vertical"
         android:id="@+id/id_error_layout"
-        android:gravity="center"
-        android:background="@color/viewfinder_mask"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/viewfinder_mask"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
         <TextView
             android:id="@+id/id_msg_tips"
-            android:textSize="@dimen/pc_live_top_title"
-            android:textColor="#fff"
-            android:text="视频加载失败"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="视频加载失败"
+            android:textColor="#fff"
+            android:textSize="@dimen/pc_live_top_title" />
+
         <TextView
-            android:background="@drawable/write_edge_rectangle_selector"
             android:id="@+id/id_try"
-            android:textSize="@dimen/pc_live_top_title"
-            android:textColor="@color/write_color_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/write_edge_rectangle_selector"
             android:padding="3dp"
             android:text="点击重试"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="@color/write_color_selector"
+            android:textSize="@dimen/pc_live_top_title" />
 
     </LinearLayout>
 

@@ -23,6 +23,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -162,15 +163,19 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
                     if (viewState == State.VIDEO) {
                         viewState = State.DOC;
                         liveRoomStatusListener.switchVideoDoc(viewState);
+                        showScaleType();
                     } else if (viewState == State.DOC) {
                         viewState = State.VIDEO;
                         liveRoomStatusListener.switchVideoDoc(viewState);
+                        hideScaleType();
                     } else if (viewState == State.OPEN_DOC) {
                         liveRoomStatusListener.switchVideoDoc(viewState);
                         viewState = State.VIDEO;
+                        hideScaleType();
                     } else if (viewState == State.OPEN_VIDEO) {
                         liveRoomStatusListener.switchVideoDoc(viewState);
                         viewState = State.DOC;
+                        showScaleType();
                     }
                     setSwitchText(viewState);
                 }
@@ -194,6 +199,11 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         });
 
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
+
+
+        // testCaseAudio();
+        testCase();
+
     }
 
     public void setSwitchText(State state) {
@@ -754,5 +764,69 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         setSwitchText(status);
     }
 
+
+    // ---------------------------------------测试音频线路--------------------------------------
+    private TextView tv_audio;
+
+    public void testCaseAudio() {
+        tv_audio = findViewById(R.id.tv_audio);
+        tv_audio.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DWLive.getInstance().changePlayMode(mLiveVideoView.getmSurface(), DWLive.PlayMode.VIDEO == playMode ? DWLive.PlayMode.SOUND : DWLive.PlayMode.VIDEO);
+                if (DWLive.PlayMode.VIDEO == playMode) {
+                    playMode = DWLive.PlayMode.SOUND;
+                    tv_audio.setText("开启视频");
+                } else {
+                    playMode = DWLive.PlayMode.VIDEO;
+                    tv_audio.setText("只开音频");
+                }
+            }
+        });
+    }
+
+    // --------------------------------------测试拉伸模式-------------------------------------------
+    private boolean isShowScale = true;// 是否显示拉伸类型选项
+    // 文档拉伸类型
+    private Spinner spinner;
+
+    public void testCase() {
+        spinner = findViewById(R.id.spr_scale_type);
+        if (!isShowScale) {
+            spinner.setVisibility(View.GONE);
+        } else {
+            if (DWLive.getInstance().getTemplateInfo().hasDoc()) {
+                spinner.setVisibility(View.VISIBLE);
+            }
+
+        }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                // 如果文档是适应窗口模式
+                if (liveRoomStatusListener != null) {
+                    liveRoomStatusListener.onClickDocScaleType(pos);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    // 显示拉伸类型按钮
+    public void showScaleType() {
+        if (isShowScale) {
+            spinner.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    // 隐藏拉伸类型按钮
+    public void hideScaleType() {
+        spinner.setVisibility(View.GONE);
+    }
 
 }

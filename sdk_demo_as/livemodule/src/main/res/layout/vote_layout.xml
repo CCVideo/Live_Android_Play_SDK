@@ -68,13 +68,12 @@
                     android:text="题干部分请参考文档或直播视频"
                     android:textColor="#666666"
                     android:textSize="11sp" />
-
                 <RadioGroup
                     android:id="@+id/rg_qs_multi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
@@ -161,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
@@ -248,7 +247,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="10dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
                     android:visibility="visible">
@@ -286,14 +285,32 @@
                     </RelativeLayout>
 
                 </RadioGroup>
-
+                <TextView
+                    android:id="@+id/network_error"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#FFF34B5F"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="invisible"
+                    android:text="网络异常，请重试" />
                 <Button
                     android:id="@+id/btn_qs_submit"
                     style="@style/practiceButtonTheme"
                     android:layout_width="132dp"
-                    android:layout_height="45dp"
+                    android:layout_height="30dp"
                     android:enabled="false"
                     android:text="提交" />
+                <Button
+                    android:id="@+id/btn_qs_minimize"
+                    style="@style/practiceButtonTheme"
+                    android:textColor="@drawable/vote_text_selector"
+                    android:background="@drawable/vote_rectangle_selector"
+                    android:layout_width="132dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="6dp"
+                    android:text="收起" />
             </LinearLayout>
 
             <LinearLayout

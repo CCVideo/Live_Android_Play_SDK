@@ -39,6 +39,23 @@
 
     </RelativeLayout>
 
+    <!--中间菜单显示-->
+    <HorizontalScrollView
+        android:id="@+id/testcase_audio"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/switch_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
+    </HorizontalScrollView>
+
     <!--底部显示-->
     <LinearLayout
         android:id="@+id/ll_pc_replay_msg_layout"

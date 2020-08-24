@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -127,7 +128,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
     private void doLiveLogin() {
 
         // 创建登录信息
-        ReplayLoginInfo replayLoginInfo = new ReplayLoginInfo();
+        final ReplayLoginInfo replayLoginInfo = new ReplayLoginInfo();
         replayLoginInfo.setUserId(lllLoginReplayUid.getText().trim());
         replayLoginInfo.setRoomId(lllLoginReplayRoomid.getText().trim());
         replayLoginInfo.setLiveId(lllLoginReplayLiveid.getText().trim());
@@ -152,6 +153,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
                 toastOnUiThread("登录成功");
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("marquee", marquee);
+                bundle.putString("recordId",replayLoginInfo.getRecordId());
                 go(ReplayPlayActivity.class, bundle); // 回放默认Demo页
                 // go(ReplayPlayDocActivity.class);  // 回放'文档大屏/视频小屏'的Demo页
                 dismissPopupWindow();

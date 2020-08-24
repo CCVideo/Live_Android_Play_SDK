@@ -6,6 +6,8 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -14,21 +16,26 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.room.LiveRoomLayout;
 import com.bokecc.livemodule.localplay.DWLocalReplayCoreHandler;
 import com.bokecc.livemodule.localplay.DWLocalReplayRoomListener;
+import com.bokecc.livemodule.replay.DWReplayCoreHandler;
 import com.bokecc.livemodule.utils.TimeUtil;
 import com.bokecc.livemodule.view.RePlaySeekBar;
 import com.bokecc.sdk.mobile.live.replay.DWLiveLocalReplay;
+import com.bokecc.sdk.mobile.live.replay.DWLiveReplay;
 import com.bokecc.sdk.mobile.live.replay.DWReplayPlayer;
+import com.bokecc.sdk.mobile.live.util.SPUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -75,7 +82,19 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     public int docMode = -1;
     private boolean controllerShouldResponseFinger = true;
 
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case DELAY_HIDE_JUMP://3s延迟隐藏跳转view
+                    llJump.setVisibility(GONE);
+                    lastPosition = -1;
+                    break;
+            }
+        }
+    };
+    public static final int DELAY_HIDE_JUMP = 1;
 
     public LocalReplayRoomLayout(Context context) {
         super(context);
@@ -137,15 +156,19 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                     if (viewState == LiveRoomLayout.State.VIDEO) {
                         viewState = LiveRoomLayout.State.DOC;
                         replayRoomStatusListener.switchVideoDoc(viewState);
+                        showScaleType();
                     } else if (viewState == LiveRoomLayout.State.DOC) {
                         viewState = LiveRoomLayout.State.VIDEO;
                         replayRoomStatusListener.switchVideoDoc(viewState);
+                        hideScaleType();
                     } else if (viewState == LiveRoomLayout.State.OPEN_DOC) {
                         replayRoomStatusListener.switchVideoDoc(viewState);
                         viewState = LiveRoomLayout.State.VIDEO;
+                        showScaleType();
                     } else if (viewState == LiveRoomLayout.State.OPEN_VIDEO) {
                         replayRoomStatusListener.switchVideoDoc(viewState);
                         viewState = LiveRoomLayout.State.DOC;
+                        hideScaleType();
                     }
                     setVideoDocSwitchText(viewState);
                 }
@@ -203,7 +226,28 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                 doRetry(false);
             }
         });
-
+        //跳转的部分
+        llJump = findViewById(R.id.ll_jump);
+        tvJumpTime = findViewById(R.id.tv_lastPosition);
+        tvJump = findViewById(R.id.tv_jump);
+        tvJump.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //如果是播放中 直接seek即可
+                if (DWLocalReplayCoreHandler.getInstance().getPlayer().isInPlaybackState()){
+                    DWReplayPlayer player = DWLocalReplayCoreHandler.getInstance().getPlayer();
+                    player.seekTo(lastPosition);
+                }else{
+                    //如果不是播放中  为了安全起见 重新播放
+                    DWReplayCoreHandler.getInstance().retryReplay(lastPosition,true);
+                }
+                DWLiveReplay.getInstance().setLastPosition(lastPosition);
+                llJump.setVisibility(GONE);
+                mPlaySeekBar.setProgress((int) lastPosition);
+                lastPosition = -1;
+            }
+        });
+        testCase();
     }
 
     public void doRetry(boolean isSeek) {
@@ -332,6 +376,12 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     @Override
     public void videoPrepared() {
         startTimerTask();
+        if (lastPosition>0){
+            llJump.setVisibility(VISIBLE);
+            long playSecond = Math.round((double) lastPosition / 1000) * 1000;
+            tvJumpTime.setText(TimeUtil.getFormatTime(playSecond));
+            handler.sendEmptyMessageDelayed(DELAY_HIDE_JUMP,3000);
+        }
     }
 
     /**
@@ -410,6 +460,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
         });
     }
 
+
     /****************************** 回放直播间状态监听 用于Activity更新UI ******************************/
 
     /**
@@ -468,10 +519,11 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     Timer timer = new Timer();
 
     TimerTask timerTask;
-
+    long timerTime = 0;
     // 开始时间任务
     private void startTimerTask() {
         stopTimerTask();
+
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -494,6 +546,11 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
                         mPlayIcon.setSelected(player.isPlaying());
                     }
                 });
+                if (timerTime%5==0&&localReplayCoreHandler.getPlayer()!=null){
+                    com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().put(DWLocalReplayCoreHandler.LASTPOSITION, DWLocalReplayCoreHandler.getInstance().getPlayer().getCurrentPosition());
+                    com.bokecc.sdk.mobile.live.util.SPUtil.getInstance().put(DWLocalReplayCoreHandler.RECORDID, recordId);
+                }
+
             }
         };
         timer.schedule(timerTask, 0, 1000);
@@ -501,6 +558,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
 
     // 停止计时器（进度条、播放时间）
     public void stopTimerTask() {
+        timerTime = 0;
         if (timerTask != null) {
             timerTask.cancel();
             timerTask = null;
@@ -650,5 +708,63 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     @Override
     public boolean performClick() {
         return super.performClick();
+    }
+
+
+    // --------------------------------------测试拉伸模式-------------------------------------------
+    private boolean isShowScale = false;// 是否显示拉伸类型选项
+    // 文档拉伸类型
+    private Spinner spinner;
+
+    public void testCase() {
+        spinner = findViewById(R.id.spr_scale_type);
+        if (!isShowScale) {
+            spinner.setVisibility(View.GONE);
+        } else {
+            spinner.setVisibility(View.VISIBLE);
+        }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                // 如果文档是适应窗口模式
+                if (replayRoomStatusListener != null) {
+                    replayRoomStatusListener.onClickDocScaleType(pos);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    // 显示拉伸类型按钮
+    public void showScaleType() {
+        if (isShowScale) {
+            spinner.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    // 隐藏拉伸类型按钮
+    public void hideScaleType() {
+        spinner.setVisibility(View.GONE);
+    }
+
+    private LinearLayout llJump;
+    private TextView tvJumpTime;
+    private TextView tvJump;
+    private long lastPosition;
+    private String recordId;
+    public void showJump(long lastPosition, String recordId) {
+        if (lastPosition>0)
+            this.recordId=recordId;{
+            this.lastPosition = lastPosition;
+        }
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 }
