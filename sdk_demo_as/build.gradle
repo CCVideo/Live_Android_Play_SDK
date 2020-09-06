@@ -6,9 +6,6 @@ buildscript {
         mavenCentral()
         google()
         maven { url 'https://jitpack.io' }
-        maven {
-             url 'http://nexus-app.bokecc.com/repository/sdk-group/'
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -24,7 +21,11 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url 'http://nexus-app.bokecc.com/repository/sdk-group/'
+            url 'http://nexus.bokecc.com/repository/sdk-group/'
+            credentials {
+                username "upload_bokecc"
+                password "bokecc"
+            }
         }
         jcenter()
         mavenCentral()

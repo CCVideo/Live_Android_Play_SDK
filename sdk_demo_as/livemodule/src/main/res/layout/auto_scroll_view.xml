@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/trumpet" />
+
+    <com.bokecc.livemodule.view.AutoScrollTextView
+        android:id="@+id/text_switcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:animDuration="300"
+        app:padding="1dp"
+        app:scrollDuration="200"
+        app:textColor="#FF6633"
+        app:textSize="5sp"
+         />
+</LinearLayout>

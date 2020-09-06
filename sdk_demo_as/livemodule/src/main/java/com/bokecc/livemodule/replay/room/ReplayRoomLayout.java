@@ -124,6 +124,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
     private TextView tvJump;
     private long lastPosition;
     private String recordId;
+    private boolean isTouch;
     public void setVideoView(ReplayVideoView videoView) {
         mVideoView = videoView;
     }
@@ -269,12 +270,14 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                isTouch = true;
                 start = seekBar.getProgress();
                 handler.removeMessages(DELAY_HIDE_WHAT);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                isTouch = false;
                 DWReplayCoreHandler replayCoreHandler = DWReplayCoreHandler.getInstance();
                 // 判断是否为空
                 if (replayCoreHandler == null || replayCoreHandler.getPlayer() == null) {
@@ -380,7 +383,10 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
             @Override
             public void run() {
                 long playSecond = Math.round((double) time / 1000) * 1000;
-                mPlaySeekBar.setProgress((int) playSecond);
+                if (!isTouch&&!isSeek){
+                    mCurrentTime.setText(TimeUtil.getFormatTime(mPlaySeekBar.getProgress()));
+                    mPlaySeekBar.setProgress((int) playSecond);
+                }
             }
         });
     }
@@ -854,6 +860,7 @@ public class ReplayRoomLayout extends RelativeLayout implements DWReplayRoomList
                 case MotionEvent.ACTION_CANCEL:
                     if (mSeekRoot.getVisibility() != GONE)
                         mSeekRoot.setVisibility(GONE);
+                    isSeek = false;
                     break;
             }
         } else {

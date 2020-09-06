@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 //  0 源码集成  1 lib包集成  2 核心lib包+远端集成 3.纯远端集成
-def buildSource = 1
+def buildSource = 3
 
 android {
     compileSdkVersion 29
@@ -57,9 +57,9 @@ dependencies {
         api files('libs/dwlivesdk-' + rootProject.ext.android.SDK_VERSION + '.jar')
         // 本地依赖包
         api files('libs/drmlib.jar')
-        api files('libs/engine-0.8.3.1.jar')
-        api files('libs/hdplayer.jar')
         api files('libs/httplib.jar')
+        api files('libs/CommonLib-0.1.12.jar')
+        api files('libs/hdplayer.jar')
         api files('libs/libjingle_peerconnection.jar')
         api files('libs/rtc.jar')
         api files('libs/tbs_sdk.jar')
@@ -67,9 +67,11 @@ dependencies {
     if (buildSource == 2) {
         api files('libs/dwlivesdk-' + rootProject.ext.android.SDK_VERSION + '.jar')
         // drm
-        api 'com.bokecc:drm:1.1.0'
-        // 网络库
-        api 'com.bokecc:engine:0.8.3.1'
+        api 'com.bokecc:drm:1.2.1'
+        //网络
+        api ('com.bokecc:commonLib:0.1.12'){
+            exclude group: "com.tencent.mars"
+        }
         // 播放器
         api('com.bokecc:hdplayer:1.1.0')
         // 连麦

@@ -1,5 +1,6 @@
 package com.bokecc.livemodule.live;
 
+import com.bokecc.sdk.mobile.live.pojo.BanChatBroadcast;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 
@@ -81,4 +82,15 @@ public interface DWLiveChatListener {
      * 根据id删除广播消息
      */
     void onBroadcastMsgDel(String id);
+
+    /**
+     *    禁言通知,通知给直播间所有人某用户被禁言
+     * @param banChatBroadcast
+     *    userId 用户id
+     *    userName 用户名
+     *    userRole 用户角色
+     *    userAvatar 用户头像
+     *    groupId 分组id
+     */
+    void HDBanChatBroadcastWithData(BanChatBroadcast banChatBroadcast);
 }

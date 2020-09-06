@@ -81,7 +81,7 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
     private TextView mSeekTime, mSumTime;
     public int docMode = -1;
     private boolean controllerShouldResponseFinger = true;
-
+    private boolean isTouch;
     private Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -198,15 +198,17 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 progress = i;
+                mCurrentTime.setText(TimeUtil.getFormatTime(seekBar.getProgress()));
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                isTouch = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                isTouch = false;
                 DWLocalReplayCoreHandler localReplayCoreHandler = DWLocalReplayCoreHandler.getInstance();
                 // 判断是否为空
                 if (localReplayCoreHandler == null || localReplayCoreHandler.getPlayer() == null) {
@@ -307,8 +309,10 @@ public class LocalReplayRoomLayout extends RelativeLayout implements DWLocalRepl
             @Override
             public void run() {
                 long playSecond = Math.round((double) time / 1000) * 1000;
-                mCurrentTime.setText(TimeUtil.getFormatTime(playSecond));
-                mPlaySeekBar.setProgress((int) playSecond);
+                if (!isTouch&&!isSeek){
+                    mPlaySeekBar.setProgress((int) playSecond);
+                }
+
             }
         });
     }

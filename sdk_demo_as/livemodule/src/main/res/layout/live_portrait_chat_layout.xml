@@ -4,27 +4,35 @@
     android:layout_height="match_parent"
     android:background="#fafafa">
     <!-- 公聊列表 -->
-
-
-
-    <!-- 下方输入聊天信息框 -->
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chat_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/v_marge"
             android:background="#fafafa" />
         <View
+            android:id="@+id/v_marge"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="52dp" />
 
-    </LinearLayout>
-
+    </RelativeLayout>
+<!--    进入 退出提醒-->
+    <com.bokecc.livemodule.view.AutoScrollView
+        android:id="@+id/auto_scroll_view"
+        android:background="@drawable/userjoin_tips_bg"
+        android:layout_width="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="15dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:visibility="gone"
+        android:layout_marginBottom="52dp"
+        android:layout_height="30dp"/>
+    <!-- 下方输入聊天信息框 -->
     <RelativeLayout
         android:id="@+id/id_push_chat_layout"
         android:layout_width="match_parent"

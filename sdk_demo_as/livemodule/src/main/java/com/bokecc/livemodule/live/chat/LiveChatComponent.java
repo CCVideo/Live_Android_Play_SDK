@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.bokecc.livemodule.R;
 import com.bokecc.livemodule.live.DWLiveChatListener;
 import com.bokecc.livemodule.live.DWLiveCoreHandler;
+import com.bokecc.livemodule.live.UserListener;
 import com.bokecc.livemodule.live.chat.adapter.EmojiAdapter;
 import com.bokecc.livemodule.live.chat.adapter.LivePublicChatAdapter;
 import com.bokecc.livemodule.live.chat.barrage.BarrageLayout;
@@ -36,10 +37,13 @@ import com.bokecc.livemodule.live.chat.module.ChatEntity;
 import com.bokecc.livemodule.live.chat.util.EmojiUtil;
 import com.bokecc.livemodule.live.chat.window.BanChatPopup;
 import com.bokecc.livemodule.utils.ChatImageUtils;
+import com.bokecc.livemodule.view.AutoScrollView;
 import com.bokecc.livemodule.view.BaseRelativeLayout;
 import com.bokecc.sdk.mobile.live.DWLive;
+import com.bokecc.sdk.mobile.live.pojo.BanChatBroadcast;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
+import com.bokecc.sdk.mobile.live.pojo.UserRedminAction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +56,7 @@ import java.util.Comparator;
 /**
  * 直播间聊天展示控件（公共聊天）
  */
-public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatListener, KeyboardHeightObserver {
+public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatListener, KeyboardHeightObserver, UserListener {
 
     private final static String TAG = "LiveChatComponent";
 
@@ -83,6 +87,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     private int softKeyHeight;
     private boolean showEmojiAction = false;
     private BanChatPopup banChatPopup;
+    private AutoScrollView autoScrollView;
 
     public void setOnChatComponentClickListener(OnChatComponentClickListener listener) {
         mChatComponentClickListener = listener;
@@ -107,7 +112,8 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         mEmoji = findViewById(R.id.id_push_chat_emoji);
         mEmojiGrid = findViewById(R.id.id_push_emoji_grid);
         Button mChatSend = findViewById(R.id.id_push_chat_send);
-
+        //用户进入动画
+        autoScrollView = findViewById(R.id.auto_scroll_view);
         mEmoji.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,6 +186,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 mChatLayout.setTranslationY(0);
+                autoScrollView.setTranslationY(0);
                 hideKeyboard();
                 return false;
             }
@@ -190,6 +197,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         DWLiveCoreHandler dwLiveCoreHandler = DWLiveCoreHandler.getInstance();
         if (dwLiveCoreHandler != null) {
             dwLiveCoreHandler.setDwLiveChatListener(this);
+            dwLiveCoreHandler.setUserListener(this);
         }
     }
 
@@ -279,6 +287,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             transY = -softKeyHeight;
         }
         mChatLayout.setTranslationY(transY);
+        autoScrollView.setTranslationY(transY);
     }
 
     /**
@@ -303,6 +312,7 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
     public boolean onBackPressed() {
         if (isEmojiShow) {
             mChatLayout.setTranslationY(0);
+            autoScrollView.setTranslationY(0);
             hideEmoji();
             hideChatLayout();
             return true;
@@ -650,11 +660,13 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
             isSoftInput = true;
             softKeyHeight = height;
             mChatLayout.setTranslationY(-softKeyHeight);
+            autoScrollView.setTranslationY(-softKeyHeight);
             mEmoji.setImageResource(R.drawable.push_chat_emoji_normal);
             isEmojiShow = false;
         } else {
             if (!showEmojiAction) {
                 mChatLayout.setTranslationY(0);
+                autoScrollView.setTranslationY(0);
                 hideEmoji();
             }
             isSoftInput = false;
@@ -662,5 +674,18 @@ public class LiveChatComponent extends BaseRelativeLayout implements DWLiveChatL
         }
         //结束动作指令
         showEmojiAction = false;
+    }
+
+    @Override
+    public void HDUserRemindWithAction( UserRedminAction userJoinExitAction) {
+        //判断观众段是否需要接受
+        if (userJoinExitAction.getClientType().contains(4)){
+            autoScrollView.addDate(userJoinExitAction);
+        }
+    }
+
+    @Override
+    public void HDBanChatBroadcastWithData(BanChatBroadcast banChatBroadcast) {
+        toastOnUiThread("用户"+banChatBroadcast.getUserName()+"被禁言了");
     }
 }

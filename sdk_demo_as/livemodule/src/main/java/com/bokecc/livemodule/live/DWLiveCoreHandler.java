@@ -13,6 +13,7 @@ import com.bokecc.sdk.mobile.live.DWLivePlayer;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.Exception.ErrorCode;
 import com.bokecc.sdk.mobile.live.pojo.Answer;
+import com.bokecc.sdk.mobile.live.pojo.BanChatBroadcast;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastAction;
 import com.bokecc.sdk.mobile.live.pojo.BroadCastMsg;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
@@ -28,6 +29,7 @@ import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireStatisInfo;
 import com.bokecc.sdk.mobile.live.pojo.SettingInfo;
 import com.bokecc.sdk.mobile.live.pojo.TeacherInfo;
+import com.bokecc.sdk.mobile.live.pojo.UserRedminAction;
 import com.bokecc.sdk.mobile.live.rtc.CCRTCRender;
 import com.bokecc.sdk.mobile.live.rtc.RtcClient;
 import com.bokecc.sdk.mobile.live.widget.DocView;
@@ -145,6 +147,16 @@ public class DWLiveCoreHandler {
      */
     public void setDwLiveRTCStatusListener(DWLiveRTCStatusListener dwLiveRTCStatusListener) {
         this.dwLiveRTCStatusListener = dwLiveRTCStatusListener;
+    }
+
+    private UserListener userListener;
+
+    /**
+     * 防止房间内学员退出和进入监听
+     * @param userListener
+     */
+    public void setUserListener(UserListener userListener) {
+        this.userListener = userListener;
     }
 
     /******************************* 设置"播放"组件/控件相关 ***************************************/
@@ -1065,6 +1077,42 @@ public class DWLiveCoreHandler {
         public void onPracticeClose(String practiceId) {
             if (dwLiveFunctionListener != null) {
                 dwLiveFunctionListener.onPracticeClose(practiceId);
+            }
+        }
+        /**
+         *    禁言通知,通知给直播间所有人某用户被禁言
+         * @param banChatBroadcast
+         *    userId 用户id
+         *    userName 用户名
+         *    userRole 用户角色
+         *    userAvatar 用户头像
+         *    groupId 分组id
+         */
+        @Override
+        public void HDBanChatBroadcastWithData(BanChatBroadcast banChatBroadcast) {
+            if (dwLiveChatListener!=null){
+                dwLiveChatListener.HDBanChatBroadcastWithData(banChatBroadcast);
+            }
+        }
+        /**
+         *  用户进出通知
+         * @param actionType
+         * {@link UserRedminAction.ActionType#HDUSER_IN_REMIND} 进入直播间
+         * {@link UserRedminAction.ActionType#HDUSER_OUT_REMIND}   退出直播间
+         *
+         * @param userJoinExitAction
+         *    userId 用户id
+         *    userName 用户名
+         *    userRole 用户角色
+         *    userAvatar 用户头像
+         *    groupId 分组id
+         *    role 接收端列表  1-讲师；2-助教；3-主持人；4-观看端
+         *    content 自定义内容
+         */
+        @Override
+        public void HDUserRemindWithAction(UserRedminAction userJoinExitAction) {
+            if (userListener!=null){
+                userListener.HDUserRemindWithAction(userJoinExitAction);
             }
         }
     };

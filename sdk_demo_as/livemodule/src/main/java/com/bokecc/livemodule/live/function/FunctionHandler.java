@@ -618,7 +618,6 @@ public class FunctionHandler implements DWLiveFunctionListener {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())&&practiceHandler!=null){
                 boolean isConnected = NetworkUtils.isConnected();
                 if (isConnected){
-                    Log.e("###","isNeed = "+isNeed);
                     if (isNeed){
 //                        onPracticeClose("");
                         DWLive.getInstance().getPracticeInformation();

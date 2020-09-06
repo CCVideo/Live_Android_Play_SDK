@@ -201,7 +201,7 @@ public class LiveRoomLayout extends RelativeLayout implements DWLiveRoomListener
         handler.sendEmptyMessageDelayed(DELAY_HIDE_WHAT, 3000);
 
 
-        // testCaseAudio();
+         testCaseAudio();
         testCase();
 
     }

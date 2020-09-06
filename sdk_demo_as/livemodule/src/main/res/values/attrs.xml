@@ -90,4 +90,11 @@
             <enum name="progress" value="1" />
         </attr>
     </declare-styleable>
+    <declare-styleable name="AutoScrollHeight">
+        <attr name="textSize" format="dimension"/>
+        <attr name="padding" format="dimension"/>
+        <attr name="animDuration" format="integer"/>
+        <attr name="scrollDuration" format="integer"/>
+        <attr name="textColor" format="color"/>
+    </declare-styleable>
 </resources>

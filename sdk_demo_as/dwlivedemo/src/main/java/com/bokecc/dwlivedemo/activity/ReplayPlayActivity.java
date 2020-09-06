@@ -643,15 +643,16 @@ public class ReplayPlayActivity extends BaseActivity {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //TODO：
-            CharSequence name = DWLiveReplay.getInstance().getRoomInfo().getName();
-            String description = "";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setDescription(description);
-            //锁屏显示通知
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            if (DWLiveReplay.getInstance().getRoomInfo()!=null){
+                CharSequence name = DWLiveReplay.getInstance().getRoomInfo().getName();
+                String description = "";
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setDescription(description);
+                //锁屏显示通知
+                channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 

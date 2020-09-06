@@ -14,7 +14,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -412,13 +411,13 @@ public class LiveVideoView extends RelativeLayout implements DWLiveVideoListener
             } else {
                 Toast.makeText(mContext, "播放失败!", Toast.LENGTH_SHORT).show();
             }
-            try {
-                DWLive.getInstance().restartVideo();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (DWLiveException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                DWLive.getInstance().restartVideo();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (DWLiveException e) {
+//                e.printStackTrace();
+//            }
             return false;
         }
     };
