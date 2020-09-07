@@ -21,11 +21,7 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url 'http://nexus.bokecc.com/repository/sdk-group/'
-            credentials {
-                username "upload_bokecc"
-                password "bokecc"
-            }
+            url 'http://nexus-app.bokecc.com/repository/sdk-group/'           
         }
         jcenter()
         mavenCentral()
